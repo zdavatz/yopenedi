@@ -6,8 +6,8 @@ OpenTrans 2.1/EDIFACT D.96A File converter
 4. Send files as attachment in EDIFACT D.96A format to xmlxonv@ywesee.com and convert them to the OpenTrans 2.1 format.
 5. Upload converted files to an FTP-Server.
 6. Import OpenTrans 2.1 files from FTP and convert them to EDIFACT D.96A and send the converted file as Email-Attachment from xmlxonv@ywesee.com to a dedicated Email address.
-7. Send and receive OpenTrans 2.1 files via WebConnect. Send Opentrans 2.1 XML files to this [https://connect.boni.ch/OpaccOne/B2B/Channel/XmlOverHttp/ywesee](URL)
-8. Receive Opentrans 2.1 XML files at this [yopenedi.ch/input](URL)
+7. Send and receive OpenTrans 2.1 files via WebConnect. Send Opentrans 2.1 XML files to this [URL](https://connect.boni.ch/OpaccOne/B2B/Channel/XmlOverHttp/ywesee)
+8. Receive Opentrans 2.1 XML files at this [URL](yopenedi.ch/input)
 
 ## FAQ
 * [https://stackoverflow.com/questions/11295551/is-there-a-really-simple-way-to-process-edifact-for-example-d96a](Stackoverflow)
