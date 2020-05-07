@@ -11,8 +11,9 @@ OpenTrans 2.1/EDIFACT D.96A File converter
 
 ## FAQ
 * [Stackoverflow](https://stackoverflow.com/questions/11295551/is-there-a-really-simple-way-to-process-edifact-for-example-d96a)
-* https://www.npmjs.com/package/edifact-parser
-* https://www.truugo.com/edifact/d96a/orders/
+* [edifact-parser](https://www.npmjs.com/package/edifact-parser)
+* [Truugo](https://www.truugo.com/edifact/d96a/orders/)
+* [Edicat](https://github.com/notpeter/edicat)
 
 ## Certbot for Ubuntu 20.04
 * https://certbot.eff.org/lets-encrypt/ubuntufocal-other
