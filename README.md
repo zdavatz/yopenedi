@@ -14,6 +14,7 @@ OpenTrans 2.1/EDIFACT D.96A File converter
 
 ## Certbot for Ubuntu 20.04
 * https://certbot.eff.org/lets-encrypt/ubuntufocal-other
+* `certbot certonly --server https://acme-v02.api.letsencrypt.org/directory --manual --preferred-challenges dns -d 'test.yopenedi.ch'`
 
 ## Digital Ocean deployment
 ### Apache setup
