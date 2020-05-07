@@ -10,7 +10,7 @@ OpenTrans 2.1/EDIFACT D.96A File converter
 8. Receive Opentrans 2.1 XML files at this [URL](https://yopenedi.ch/input)
 
 ## FAQ
-* [https://stackoverflow.com/questions/11295551/is-there-a-really-simple-way-to-process-edifact-for-example-d96a](Stackoverflow)
+* [Stackoverflow](https://stackoverflow.com/questions/11295551/is-there-a-really-simple-way-to-process-edifact-for-example-d96a)
 * https://www.npmjs.com/package/edifact-parser
 * https://www.truugo.com/edifact/d96a/orders/
 
