@@ -14,3 +14,24 @@ OpenTrans 2.1/EDIFACT D.96A File converter
 
 ## Certbot for Ubuntu 20.04
 * https://certbot.eff.org/lets-encrypt/ubuntufocal-other
+
+## Digital Ocean deployment
+### Apache setup
+```
+<VirtualHost *:80>
+  ServerName test.yopenedi.ch
+  Redirect permanent / https://test.yopenedi.ch
+</VirtualHost>
+
+<VirtualHost 104.248.255.2:443>
+  ServerName test.yopenedi.ch
+  ProxyPreserveHost On
+  ProxyPass  /excluded !
+  ProxyPass / http://127.0.0.1:3000/
+  ProxyPassReverse / http://127.0.0.1:3000/
+  SSLEngine on
+  SSLCertificateFile /etc/letsencrypt/live/test.yopenedi.ch/cert.pem
+  SSLCertificateKeyFile /etc/letsencrypt/live/test.yopenedi.ch/privkey.pem
+  SSLCertificateChainFile /etc/letsencrypt/live/test.yopenedi.ch/chain.pem
+</VirtualHost>
+```
