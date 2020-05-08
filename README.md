@@ -17,6 +17,7 @@ OpenTrans 2.1/EDIFACT D.96A File converter
 ### AS2 Gateway
 * https://medium.com/@manjulapiyumal/getting-start-with-as2-protocol-using-as2gateway-and-openas2-796249cfd3ac
 * https://github.com/OpenAS2/OpenAs2App
+* https://github.com/abhishek-ram/django-pyas2
 
 ## Certbot for Ubuntu 20.04
 * https://certbot.eff.org/lets-encrypt/ubuntufocal-other
