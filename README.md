@@ -14,6 +14,9 @@ OpenTrans 2.1/EDIFACT D.96A File converter
 * [edifact-parser](https://www.npmjs.com/package/edifact-parser)
 * [Truugo](https://www.truugo.com/edifact/d96a/orders/)
 * [Edicat](https://github.com/notpeter/edicat)
+### AS2 Gateway
+* https://medium.com/@manjulapiyumal/getting-start-with-as2-protocol-using-as2gateway-and-openas2-796249cfd3ac
+* https://github.com/OpenAS2/OpenAs2App
 
 ## Certbot for Ubuntu 20.04
 * https://certbot.eff.org/lets-encrypt/ubuntufocal-other
