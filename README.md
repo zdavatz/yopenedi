@@ -23,6 +23,7 @@ OpenTrans 2.1/EDIFACT D.96A File converter
 * https://github.com/abhishek-ram/django-pyas2
 ### Send AS2 message with Curl
 * https://stackoverflow.com/questions/42390232/edi-as2-http-trace
+* https://docs.axway.com/bundle/B2Bi_230_AdministratorsGuide_allOS_en_HTML5/page/Content/Transports/Secure_file/curl_tool.htm
 
 ## Certbot for Ubuntu 20.04
 * https://certbot.eff.org/lets-encrypt/ubuntufocal-other
