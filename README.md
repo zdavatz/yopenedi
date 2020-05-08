@@ -21,6 +21,8 @@ OpenTrans 2.1/EDIFACT D.96A File converter
 * https://medium.com/@manjulapiyumal/getting-start-with-as2-protocol-using-as2gateway-and-openas2-796249cfd3ac
 * https://github.com/OpenAS2/OpenAs2App
 * https://github.com/abhishek-ram/django-pyas2
+### Send AS2 message with Curl
+* https://stackoverflow.com/questions/42390232/edi-as2-http-trace
 
 ## Certbot for Ubuntu 20.04
 * https://certbot.eff.org/lets-encrypt/ubuntufocal-other
