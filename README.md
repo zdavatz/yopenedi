@@ -11,7 +11,7 @@ OpenTrans 2.1/EDIFACT D.96A File converter
 
 ## FAQ
 ### EDIFACT D.96A
-* [Stackoverflow](https://stackoverflow.com/questions/11295551/is-there-a-really-simple-way-to-process-edifact-for-example-d96a)
+* [Stackoverflow](https://stackoverflow.com/questions/11295551/is-there-a-really-simple-way-to-process-edifact-for-example-d96a)\
 ** Just split at the sytax chars: first at `'` to get the segments, than at `+` to get data elements of that segments and at `:` to get the individual components.
 * [edifact-parser](https://www.npmjs.com/package/edifact-parser)
 * [Truugo](https://www.truugo.com/edifact/d96a/orders/)
