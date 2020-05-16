@@ -16,6 +16,7 @@ OpenTrans 2.1/EDIFACT D.96A File converter
 * [edifact-parser](https://www.npmjs.com/package/edifact-parser)
 * [Truugo](https://www.truugo.com/edifact/d96a/orders/)
 * [Edicat](https://github.com/notpeter/edicat)
+* [Edivisualizer](https://stackoverflow.com/questions/32889967/what-algorithm-to-use-to-format-an-edifact-file)
 ### Opentrans 2.1
 * [Opentrans 2.1 XSD](https://www.opentrans.de/XMLSchema/2.1/opentrans_2_1.xsd)
 ### AS2 Gateway
