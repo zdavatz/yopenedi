@@ -4,3 +4,5 @@ node_modules/
 settings.json
 keys.json
 .env
+tasks.todo
+res.md

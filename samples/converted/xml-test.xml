@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<edi>
+    <UNA>+.? </UNA>
+    <UNB attr=UNOC:3+4028684000006:14+4047943000007:14+200505:1306+2158>
+        <UNH attr=0001+ORDERS:D:96A:UN>
+            <BGM>220+0351485311</BGM>
+            <DATE_TIME>137:20200427:102</DATE_TIME>
+            <DATE_TIME>2:20200505:102</DATE_TIME>
+            <FTX>PUR++001+bitte die Handlingspauschale entsprechend mit in REchnung stellen:MFG:A.Migenda</FTX>
+            <REFERENCE>AJK:SONDERBESTELLUNG</REFERENCE>
+            <REFERENCE>PD</REFERENCE>
+            <REFERENCE>ZZZ</REFERENCE>
+            <REFERENCE>IT:3603347</REFERENCE>
+            <PERSON>BY+4028684035121::9</PERSON>
+            <CTA>UC+:MIGENDA</CTA>
+            <COM>49 (0)8142/6521805:TE</COM>
+            <CTA>UC+Andreas Migenda</CTA>
+            <COM>Andreas.Migenda�rexel.de:EM</COM>
+            <PERSON>SU+4047943000007::9</PERSON>
+            <PERSON>DP+4028684035121::9</PERSON>
+            <CUX>2:EUR:9</CUX>
+            <PRODUCT attr=1>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1206520:SA::92</PIA>
+                <IMD>F++:::1206520</IMD>
+                <IMD>F++:::Wellschlauch PA 6 V0 NW4,5 schwarz:ungeschlitzt</IMD>
+                <IMD>F++:::Angebot 01053963 31.03.2020:gultig bis 30.04.2020</IMD>
+                <Quantity>21:100:MTR</Quantity>
+                <FTX>PUR++001+Angebot 01053963 31.03.2020:gultig bis 30.04.2020</FTX>
+                <PRI>AAA:25.29:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1206540:SA::92</PIA>
+                <IMD>F++:::1206540</IMD>
+                <IMD>F++:::Wellschlauch PA 6 V0 NW4,5 schwarz:geschlitzt</IMD>
+                <Quantity>21:100:MTR</Quantity>
+                <PRI>AAA:24.63:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1206521:SA::92</PIA>
+                <IMD>F++:::1206521</IMD>
+                <IMD>F++:::Wellschlauch PA 6 V0 NW7,5 schwarz:ungeschlitzt</IMD>
+                <Quantity>21:50:MTR</Quantity>
+                <PRI>AAA:32.88:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1206541:SA::92</PIA>
+                <IMD>F++:::1206541</IMD>
+                <IMD>F++:::Wellschlauch PA 6 V0 NW7,5 schwarz:geschlitzt</IMD>
+                <Quantity>21:50:MTR</Quantity>
+                <PRI>AAA:32.88:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1206522:SA::92</PIA>
+                <IMD>F++:::1206522</IMD>
+                <IMD>F++:::Wellschlauch PA 6 V0 NW8,5 schwarz:ungeschlitzt</IMD>
+                <Quantity>21:50:MTR</Quantity>
+                <PRI>AAA:36.82:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1206542:SA::92</PIA>
+                <IMD>F++:::1206542</IMD>
+                <IMD>F++:::Wellschlauch PA 6 V0 NW8,5 schwarz:geschlitzt</IMD>
+                <Quantity>21:50:MTR</Quantity>
+                <PRI>AAA:45.16:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1206523:SA::92</PIA>
+                <IMD>F++:::1206523</IMD>
+                <IMD>F++:::Wellschlauch PA 6 V0 NW10 schwarz u:ngeschlitzt</IMD>
+                <Quantity>21:50:MTR</Quantity>
+                <PRI>AAA:40.6:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1206543:SA::92</PIA>
+                <IMD>F++:::1206543</IMD>
+                <IMD>F++:::Wellschlauch PA 6 V0 NW10 schwarz g:eschlitzt</IMD>
+                <Quantity>21:50:MTR</Quantity>
+                <PRI>AAA:40.6:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1926654:SA::92</PIA>
+                <IMD>F++:::1926654</IMD>
+                <IMD>F++:::Wellschlauch PP NW4,5 schwarz gesch:litzt</IMD>
+                <Quantity>21:100:MTR</Quantity>
+                <PRI>AAA:13.86:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1926604:SA::92</PIA>
+                <IMD>F++:::1926604</IMD>
+                <IMD>F++:::Wellschlauch PP NW4,5 schwarz unges:chlitzt</IMD>
+                <Quantity>21:100:MTR</Quantity>
+                <PRI>AAA:13.86:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1926657:SA::92</PIA>
+                <IMD>F++:::1926657</IMD>
+                <IMD>F++:::Wellschlauch PP NW7,5 schwarz gesch:litzt</IMD>
+                <Quantity>21:50:MTR</Quantity>
+                <PRI>AAA:13.08:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1926607:SA::92</PIA>
+                <IMD>F++:::1926607</IMD>
+                <IMD>F++:::Wellschlauch PP NW7,5 schwarz unges:chlitzt</IMD>
+                <Quantity>21:50:MTR</Quantity>
+                <PRI>AAA:13.08:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1926660:SA::92</PIA>
+                <IMD>F++:::1926660</IMD>
+                <IMD>F++:::Wellschlauch PP NW10 schwarz geschl:itzt</IMD>
+                <Quantity>21:50:MTR</Quantity>
+                <PRI>AAA:16.82:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1926610:SA::92</PIA>
+                <IMD>F++:::1926610</IMD>
+                <IMD>F++:::Wellschlauch PP NW10 schwarz unge-:schlitzt</IMD>
+                <Quantity>21:50:MTR</Quantity>
+                <PRI>AAA:16.82:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1927904:SA::92</PIA>
+                <IMD>F++:::1927904</IMD>
+                <IMD>F++:::PP NW 4,5 AHW SW geschl.</IMD>
+                <Quantity>21:100:MTR</Quantity>
+                <PRI>AAA:15.99:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+0000029:BP::92</PIA>
+                <PIA>5+1927964:SA::92</PIA>
+                <IMD>F++:::1927964</IMD>
+                <IMD>F++:::PP NW 4,5 AHW SW</IMD>
+                <IMD>F++:::Angebot 01053963 31.03.2020:Preisgultigkeit 30.04.2020</IMD>
+                <Quantity>21:100:MTR</Quantity>
+                <FTX>PUR++001+Angebot 01053963 31.03.2020:Preisgultigkeit 30.04.2020</FTX>
+                <PRI>AAA:15.99:::100</PRI>
+                <REFERENCE>AAG:Sonderpreis</REFERENCE>
+                <UNS>S</UNS>
+                <UNT>151+0001</UNT>
+            </PRODUCT>
+        </UNH>
+        <UNH>
+            <BGM>220+0941087811</BGM>
+            <DATE_TIME>137:20200421:102</DATE_TIME>
+            <DATE_TIME>2:20200427:102</DATE_TIME>
+            <FTX>PUR++001+bitte um eine AB mit Liefertermin</FTX>
+            <REFERENCE>AJK:DIREKTLIEFERUNG</REFERENCE>
+            <REFERENCE>CR:1145018685</REFERENCE>
+            <REFERENCE>PD</REFERENCE>
+            <REFERENCE>IT:9404117</REFERENCE>
+            <PERSON>BY+4028684094012::9</PERSON>
+            <CTA>UC+:LOIDL</CTA>
+            <COM>49 (0)871/974826-33:TE</COM>
+            <CTA>UC+Tobias Loidl</CTA>
+            <COM>Tobias.Loidl�rexel.de:EM</COM>
+            <PERSON>SU+4047943000007::9</PERSON>
+            <PERSON>DP+++REXEL LANDSHUT ABHOLTHEKE:SELBSTABHOLUNG DURCH:LEISTUNGSEMPFANGER+OTTOSTR. 16 A+LANDSHUT++
+            </PERSON>
+            <CUX>2:EUR:9</CUX>
+            <PRODUCT attr=1++4047943214497:EN>
+                <PIA>5+2933373:BP::92</PIA>
+                <PIA>5+7217702:SA::91</PIA>
+                <IMD>F++:::FLACHKOPFDICHTUNG 12</IMD>
+                <IMD>F++:::Flachkopfabdichtung passend fur PG1:3,5, PG16, M20 12.0x15.0 Gummi</IMD>
+                <Quantity>21:900:PCE</Quantity>
+                <PRI>AAA:18.69:::100</PRI>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+2933373:BP::92</PIA>
+                <PIA>5+7217702:SA::91</PIA>
+                <IMD>F++:::FLACHKOPFDICHTUNG 12</IMD>
+                <IMD>F++:::Flachkopfabdichtung passend fur PG1:3,5, PG16, M20 12.0x15.0 Gummi</IMD>
+                <Quantity>21:100:PCE</Quantity>
+                <PRI>AAA:18.69:::100</PRI>
+                <UNS>S</UNS>
+                <UNT>33+0002</UNT>
+            </PRODUCT>
+        </UNH>
+        <UNH>
+            <BGM>220+0943080175</BGM>
+            <DATE_TIME>137:20200416:102</DATE_TIME>
+            <DATE_TIME>2:20200424:102</DATE_TIME>
+            <REFERENCE>AJK:LAGERBESTELLUNG</REFERENCE>
+            <PERSON>BY+4028684094012::9</PERSON>
+            <CTA>UC+:MIGENDA</CTA>
+            <COM>49 (0)8142/6521805:TE</COM>
+            <CTA>UC+Andreas Migenda</CTA>
+            <COM>Andreas.Migenda�rexel.de:EM</COM>
+            <PERSON>SU+4047943000007::9</PERSON>
+            <PERSON>DP+4028684094012::9</PERSON>
+            <CUX>2:EUR:9</CUX>
+            <PRODUCT attr=1++4047943262498:EN>
+                <PIA>5+2371967:BP::92</PIA>
+                <PIA>5+5308949:SA::91</PIA>
+                <IMD>F++:::935344121</IMD>
+                <IMD>F++:::Kabelverschraubung M 20 Polyamid sc:hwarz</IMD>
+                <Quantity>21:1500:PCE</Quantity>
+                <PRI>AAA:21.63:::100</PRI>
+            </PRODUCT>
+            <PRODUCT>
+                <PIA>5+2902452:BP::92</PIA>
+                <PIA>5+4224103:SA::91</PIA>
+                <IMD>F++:::935370796</IMD>
+                <IMD>F++:::Kabelverschraubung lange Dichtung M:20 Messing vernickelt</

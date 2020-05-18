@@ -9,8 +9,20 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.8.3",
+    "base64-stream": "^1.0.0",
+    "edi": "^1.1.0",
+    "edifact-parser": "0.0.4",
+    "imap": "^0.8.19",
     "jquery": "^3.4.1",
-    "meteor-node-stubs": "^1.0.0"
+    "jstoxml": "^1.6.6",
+    "lodash": "^4.17.15",
+    "mailparser": "^2.7.7",
+    "meteor-node-stubs": "^1.0.0",
+    "nodemailer": "^6.4.6",
+    "pretty-data": "^0.40.0",
+    "xml": "^1.0.1",
+    "xmlbuilder": "^15.1.1",
+    "xmlovely": "^1.0.1"
   },
   "meteor": {
     "mainModule": {
