@@ -16,6 +16,9 @@ OpenTrans 2.1/EDIFACT D.96A File converter
 * [Truugo](https://www.truugo.com/edifact/d96a/orders/)
 * [Edicat](https://github.com/notpeter/edicat)
 * [Edivisualizer](https://stackoverflow.com/questions/32889967/what-algorithm-to-use-to-format-an-edifact-file)
+#### Useful Windows Tools
+* [EDI Notepad](https://download.cnet.com/EDI-Notepad/3000-20411_4-76182031.html)
+* [R2ediviewer](http://r2ediviewer.de/index.html)
 ### Opentrans 2.1
 * [Opentrans 2.1 XSD](https://www.opentrans.de/XMLSchema/2.1/opentrans_2_1.xsd)
 ### AS2 Gateway
