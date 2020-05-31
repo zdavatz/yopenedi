@@ -1,6 +1,7 @@
 # yopenedi
 OpenTrans 2.1/EDIFACT D.96A File converter
 1. Convert order Files to and from OpenTrans 2.1/[EDIFACT D.96A](http://www.unece.org/trade/untdid/d96a/content.htm)
+Focus on the opening UNH/UNT Tags. They contain the order information like Buyer, Seller, Contact Address and itmes list. UNB is just the message header. 
 2. [Noname order sample from REXEL](https://1drv.ms/u/s!AgbWsnOPcbiN7iyEebz5pdfK6Arz?e=p9vhYD)
 3. [Sample XML Files from OpenTrans 2.1](https://1drv.ms/u/s!AgbWsnOPcbiN7hNOj5J96OsS2svQ?e=OnPvPZ)
 4. Send order files as attachment in EDIFACT D.96A format to xmlxonv@ywesee.com and convert them to the OpenTrans 2.1 format.
