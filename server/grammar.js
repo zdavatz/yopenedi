@@ -86,7 +86,8 @@ Grammar = [{
 }, {
     "name": "FTX",
     "tag": "FreeText",
-    "render": "<FreeText><CODE>$code</CODE><CONTENT>$FREETXT1 - $FREETXT2</CONTENT></FreeText>",
+    render:'',
+    "renderX": "<FreeText><CODE>$code</CODE><CONTENT>$FREETXT1 - $FREETXT2</CONTENT></FreeText>",
     "match": [
         ["", "$code", "$REF"],
         ["$FREETXT1", "$FREETXT2"]
@@ -97,7 +98,8 @@ Grammar = [{
 }, {
     "name": "RFF",
     "tag": "REFERENCE",
-    "render": "<REFERENCE>$code - $value</REFERENCE>",
+    render:'',
+    "renderOld": "<REFERENCE>$code - $value</REFERENCE>",
     "match": [
         ["", "$code", "$REF"],
         ["$value", "$extra"]
@@ -105,7 +107,7 @@ Grammar = [{
     "parent": "",
     "children": "",
     "isHeader": "",
-    skip: true,
+    isSkipped: true,
 }, {
     "name": "NAD",
     "tag": "PARTY",
@@ -140,13 +142,14 @@ Grammar = [{
 }, {
     "name": "CTA",
     tag: "COMMUNICATION_INFORMATION",
-    "render": `
+    "renderOLD": `
     <COMMUNICATION_INFORMATION>
     <FUNCTION_CODE>$FUNCTIONCODE</FUNCTION_CODE>
     <DEPCODE>$DEP</DEPCODE>
     <DEPCODE_NAME>$CODENAME</DEPCODE_NAME>
     <PERSON>$PERSONDEP</PERSON>
     </COMMUNICATION_INFORMATION>`,
+    render: ``,
     match: [ 
         ["", "$FUNCTIONCODE", "$DEP"],
         ["$CODENAME", "$PERSONDEP", "$type"]

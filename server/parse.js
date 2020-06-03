@@ -192,6 +192,7 @@ function generateStructuredArr() {
     var start = ["UNB", "UNG", "UNH", "LIN"]
     var skip = ["UNT", "UNE", "UNZ"]
     var looped = ["LIN", "NAD"] //
+    var skipRendering = ["RFF", ""]
     _.each(tags, (tag, index) => {
         var prev = tag;
         var line = linesArr[index].substring(4, 100)
@@ -421,9 +422,6 @@ function jsonToXML(jsonArr) {
     // ORDER_INFO
     xml.push('<ORDER_INFO>')
     _.each(jsonArr, (jsonElem) => {
-        if(jsonElem.skip){
-            console.log('__________________________ SKIPPED TAG')
-        }
         var tag = jsonElem.tag;
         console.log('Processing:', tag)
         if (struc.length == 0 && tag) {
