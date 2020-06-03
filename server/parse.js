@@ -31,6 +31,20 @@ var order = []
 var parent, prev;
 var structuredData;
 /* -------------------------------------------------------------------------- */
+
+var dataToReplace = [{
+    replace: "<PARTY_ROLE>SU</PARTY_ROLE>",
+    value: "<PARTY_ROLE>supplier</PARTY_ROLE>"
+},
+{
+    replace: "<PARTY_ROLE>DP</PARTY_ROLE>",
+    value: "<PARTY_ROLE>delivery</PARTY_ROLE>"
+},
+{
+    replace: "<PARTY_ROLE>BY</PARTY_ROLE>",
+    value: "<PARTY_ROLE>buyer</PARTY_ROLE>"
+}
+]
 /* -------------------------------------------------------------------------- */
 out.push('<?xml version="1.0" encoding="utf-8" standalone="yes"?>')
 out.push(`
@@ -290,6 +304,7 @@ function generateStructuredArr() {
 var jsonReady = generateStructuredArr()
 // // console.log(JSON.stringify(jsonReady))
 var newXML = jsonToXML(jsonReady)
+var newXML = replaceTags(newXML)
 writeFile('json.export.json', JSON.stringify(jsonReady))
 writeFile(fileName + 'xml.export.xml', newXML)
 /* -------------------------------------------------------------------------- */
@@ -605,6 +620,17 @@ function renderXML() {
     return xml;
 }
 /* -------------------------------------------------------------------------- */
+
+
+function replaceTags(xml){
+    for (i = 0; i < dataToReplace.length; i++) {
+        var tag = dataToReplace[i].replace
+        let re = new RegExp(tag, 'g');
+        var xml = xml.replace(re, dataToReplace[i].value);
+    }
+    return xml
+}
+
 // REPLACE XML TAGS
 // LIN => PRODUCT
 parseEDI.setTags = function (xml) {

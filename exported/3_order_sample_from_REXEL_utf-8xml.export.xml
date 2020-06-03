@@ -4,7 +4,7 @@
     <ORDER_HEADER>
         <CONTROL_INFO>
             <GENERATOR>Yopenedi</GENERATOR>
-            <GENERATION_DATE>Wed Jun 03 2020 17:37:33 GMT+0300 (GMT+03:00)</GENERATION_DATE>
+            <GENERATION_DATE>Wed Jun 03 2020 17:59:17 GMT+0300 (GMT+03:00)</GENERATION_DATE>
         </CONTROL_INFO>
         <ORDER_INFO>
             <ORDER_ID>220-0941534519</ORDER_ID>
@@ -16,19 +16,19 @@
             <PARTIES>
                 <PARTY>
                     <bmecat:PARTY_ID>4028684094012</bmecat:PARTY_ID>
-                    <PARTY_ROLE>BY</PARTY_ROLE>
+                    <PARTY_ROLE>buyer</PARTY_ROLE>
                     <bmecat:PARTY_ID type="supplier_specific">9</bmecat:PARTY_ID>
                     <bmecat:PHONE>49 (0)8142/6521805</bmecat:PHONE>
                     <bmecat:EMAILS>Andreas.Migenda§rexel.de</bmecat:EMAILS>
                 </PARTY>
                 <PARTY>
                     <bmecat:PARTY_ID>4251800100001</bmecat:PARTY_ID>
-                    <PARTY_ROLE>SU</PARTY_ROLE>
+                    <PARTY_ROLE>supplier</PARTY_ROLE>
                     <bmecat:PARTY_ID type="supplier_specific">9</bmecat:PARTY_ID>
                 </PARTY>
                 <PARTY>
                     <bmecat:PARTY_ID>4028684094012</bmecat:PARTY_ID>
-                    <PARTY_ROLE>DP</PARTY_ROLE>
+                    <PARTY_ROLE>delivery</PARTY_ROLE>
                     <bmecat:PARTY_ID type="supplier_specific">9</bmecat:PARTY_ID>
                 </PARTY>
             </PARTIES>
