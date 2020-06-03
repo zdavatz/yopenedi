@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ORDER type="standard" xmlns="http://www.opentrans.org/XMLSchema/2.1" xmlns:bmecat="http://www.bmecat.org/bmecat/2005"
+    version="2.1">
+    <ORDER_HEADER>
+        <CONTROL_INFO>
+            <GENERATION_DATE>Mon Jun 01 2020 17:57:23 GMT+0300 (GMT+03:00)</GENERATION_DATE>
+        </CONTROL_INFO>
+        <ORDER_INFO>
+            <ORDER_ID>
+                <CODE>220</CODE>
+                <ID>0353045903</ID>
+            </ORDER_ID>
+            <ORDER_DATE>20200427</ORDER_DATE>
+            <DELIVERY_DATE type="optional">
+                <DELIVERY_START_DATE>20200505</DELIVERY_START_DATE>
+                <DATE_FORMAT>102</DATE_FORMAT>
+            </DELIVERY_DATE>
+            <REFERENCE> - AJK</REFERENCE>
+            <PARTIES>
+                <PARTY>
+                    <COMMUNICATION_INFORMATION>
+                        <FUNCTION_CODE>UC</FUNCTION_CODE>
+                        <DEPCODE></DEPCODE>
+                        <DEPCODE_NAME></DEPCODE_NAME>
+                        <PERSON>MIGENDA</PERSON>
+                    </COMMUNICATION_INFORMATION>
+                    <COMMUNICATION>
+                        <TYPE>TE</TYPE>
+                        <CONTACT>49 (0)8142/6521805</CONTACT>
+                    </COMMUNICATION>
+                    <COMMUNICATION_INFORMATION>
+                        <FUNCTION_CODE>UC</FUNCTION_CODE>
+                        <DEPCODE>Andreas Migenda</DEPCODE>
+                        <DEPCODE_NAME></DEPCODE_NAME>
+                        <PERSON></PERSON>
+                    </COMMUNICATION_INFORMATION>
+                    <COMMUNICATION>
+                        <TYPE>EM</TYPE>
+                        <CONTACT>Andreas.Migenda�rexel.de</CONTACT>
+                    </COMMUNICATION>
+                </PARTY>
+                <PARTY>
+                    <PARTY>
+                        <PARTY_ID type="iln">4251800100001</PARTY_ID>
+                        <PARTY_ROLE>SU</PARTY_ROLE>
+                    </PARTY>
+                </PARTY>
+                <PARTY>
+                    <PARTY>
+                        <PARTY_ID type="iln">4028684035121</PARTY_ID>
+                        <PARTY_ROLE>DP</PARTY_ROLE>
+                    </PARTY>
+                </PARTY>
+            </PARTIES>
+            <CURRENCY>EUR</CURRENCY>
+        </ORDER_INFO>
+    </ORDER_HEADER>
+    <ORDER_ITEM_LIST>
+        <ORDER_ITEM>
+            <PRODUCT_ID>
+                <CODE>5</CODE>
+                <ID>2081281_CODE</ID>
+                <ITEM_NUMBER_ID>92</ITEM_NUMBER_ID>
+            </PRODUCT_ID>
+            <PRODUCT_ID>
+                <CODE>5</CODE>
+                <ID>935370369_CODE</ID>
+                <ITEM_NUMBER_ID>91</ITEM_NUMBER_ID>
+            </PRODUCT_ID>
+            <ITEM_DESCRIPTION>HMSM50</ITEM_DESCRIPTION>
+            <ITEM_DESCRIPTION>Messingverschraubung kurz, IP68, ve</ITEM_DESCRIPTION>
+            <QUANTITY>150</QUANTITY>
+            <ORDER_UNIT>PCE</ORDER_UNIT>
+            <PRODUCT_PRICE_FIX>
+                <PRICE_AMOUNT>540.06</PRICE_AMOUNT>
+                <PRICE_QUANTITY>AAA</PRICE_QUANTITY>
+                <PRICE_UNIT>100</PRICE_UNIT>
+            </PRODUCT_PRICE_FIX>
+        </ORDER_ITEM>
+        </ORDER_INFO>
+        </ORDER_HEADER>
+    </ORDER_ITEM_LIST>
+    <ORDER_SUMMARY>
+        <TOTAL_ITEM_NUM>11</TOTAL_ITEM_NUM>
+        <TOTAL_AMOUNT>1080.25</TOTAL_AMOUNT>
+    </ORDER_SUMMARY>
+</ORDER>

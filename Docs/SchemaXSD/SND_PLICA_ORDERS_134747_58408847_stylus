@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<EANCOM>
+ <UNB>
+  <UNB01>
+   <UNB0101><!--0001: Syntax identifier-->UNOC<!--UN/ECE level C--></UNB0101>
+   <UNB0102><!--0002: Syntax version number-->3<!--Syntax version number 3--></UNB0102>
+  </UNB01>
+  <UNB02>
+   <UNB0201><!--0004: Sender identification-->4015828000008</UNB0201>
+   <UNB0202><!--0007: Partner identification code qualifier-->14<!--EAN International--></UNB0202>
+  </UNB02>
+  <UNB03>
+   <UNB0301><!--0010: Recipient identification-->4251800100001</UNB0301>
+   <UNB0302><!--0007: Partner identification code qualifier-->14<!--EAN International--></UNB0302>
+  </UNB03>
+  <UNB04>
+   <UNB0401><!--0017: Date of preparation-->200217</UNB0401>
+   <UNB0402><!--0019: Time of preparation-->1347</UNB0402>
+  </UNB04>
+  <UNB05><!--0020: INTERCHANGE CONTROL REFERENCE-->0</UNB05>
+  <UNB07><!--0026: APPLICATION REFERENCE-->ORDERS</UNB07>
+  <UNB11><!--0035: TEST INDICATOR-->1<!--Interchange is a test--></UNB11>
+ </UNB>
+ <ORDERS>
+  <UNH>
+   <UNH01><!--0062: MESSAGE REFERENCE NUMBER-->70-0639880</UNH01>
+   <UNH02>
+    <UNH0201><!--0065: Message type-->ORDERS<!--Purchase order message--></UNH0201>
+    <UNH0202><!--0052: Message version number-->D<!--Draft directory--></UNH0202>
+    <UNH0203><!--0054: Message release number-->96A<!--Version 96A--></UNH0203>
+    <UNH0204><!--0051: CONTROLLING AGENCY-->UN<!--UN/ECE/TRADE/WP.4, United Nations Standard Messages (UNSM)--></UNH0204>
+    <UNH0205><!--0057: Association assigned code-->EAN008</UNH0205>
+   </UNH02>
+  </UNH>
+  <BGM>
+   <BGM01>
+    <BGM0101><!--1001: DOCUMENT/MESSAGE NAME, CODED-->220<!--Order--></BGM0101>
+   </BGM01>
+   <BGM02><!--1004: Document/message number-->70-0639880</BGM02>
+  </BGM>
+  <DTM>
+   <DTM01>
+    <DTM0101><!--2005: Date/time/period qualifier-->137<!--Document/message date/time--></DTM0101>
+    <DTM0102><!--2380: Date/time/period-->20200214</DTM0102>
+    <DTM0103><!--2379: Date/time/period format qualifier-->102<!--CCYYMMDD--></DTM0103>
+   </DTM01>
+  </DTM>
+  <DTM>
+   <DTM01>
+    <DTM0101><!--2005: Date/time/period qualifier-->2<!--Delivery date/time, requested--></DTM0101>
+    <DTM0102><!--2380: Date/time/period-->20200214</DTM0102>
+    <DTM0103><!--2379: Date/time/period format qualifier-->102<!--CCYYMMDD--></DTM0103>
+   </DTM01>
+  </DTM>
+  <GROUP_2>
+   <NAD>
+    <NAD01><!--3035: PARTY QUALIFIER-->BY<!--Buyer--></NAD01>
+    <NAD02>
+     <NAD0201><!--3039: Party id. identification-->4015828000008</NAD0201>
+     <NAD0203><!--3055: Code list responsible agency, coded-->9<!--EAN (International Article Numbering association)--></NAD0203>
+    </NAD02>
+   </NAD>
+   <GROUP_5>
+    <CTA>
+     <CTA01><!--3139: CONTACT FUNCTION, CODED-->SD<!--Shipping contact--></CTA01>
+     <CTA02>
+      <CTA0201><!--3413: Department or employee identification-->Frederik Lühn</CTA0201>
+     </CTA02>
+    </CTA>
+    <COM>
+     <COM01>
+      <COM0101><!--3148: Communication number-->+49 5971 999-256</COM0101>
+      <COM0102><!--3155: Communication channel qualifier-->TE<!--Telephone--></COM0102>
+     </COM01>
+    </COM>
+    <COM>
+     <COM01>
+      <COM0101><!--3148: Communication number-->+49 5971 999-310</COM0101>
+      <COM0102><!--3155: Communication channel qualifier-->FX<!--Fax--></COM0102>
+     </COM01>
+    </COM>
+    <COM>
+     <COM01>
+      <COM0101><!--3148: Communication number-->frederik.luehn@hardy-schmitz.de</COM0101>
+      <COM0102><!--3155: Communication channel qualifier-->EM<!--Electronic mail--></COM0102>
+     </COM01>
+    </COM>
+   </GROUP_5>
+  </GROUP_2>
+  <GROUP_2>
+   <NAD>
+    <NAD01><!--3035: PARTY QUALIFIER-->SU<!--Supplier--></NAD01>
+    <NAD02>
+     <NAD0201><!--3039: Party id. identification-->4251800100001</NAD0201>
+     <NAD0203><!--3055: Code list responsible agency, coded-->9<!--EAN (International Article Numbering association)--></NAD0203>
+    </NAD02>
+   </NAD>
+  </GROUP_2>
+  <GROUP_2>
+   <NAD>
+    <NAD01><!--3035: PARTY QUALIFIER-->DP<!--Delivery party--></NAD01>
+    <NAD02>
+     <NAD0201><!--3039: Party id. identification-->4015828001005</NAD0201>
+     <NAD0203><!--3055: Code list responsible agency, coded-->9<!--EAN (International Article Numbering association)--></NAD0203>
+    </NAD02>
+   </NAD>
+  </GROUP_2>
+  <GROUP_2>
+   <NAD>
+    <NAD01><!--3035: PARTY QUALIFIER-->IV<!--Invoicee--></NAD01>
+    <NAD02>
+     <NAD0201><!--3039: Party id. identification-->4015828000008</NAD0201>
+     <NAD0203><!--3055: Code list responsible agency, coded-->9<!--EAN (International Article Numbering association)--></NAD0203>
+    </NAD02>
+   </NAD>
+  </GROUP_2>
+  <GROUP_25>
+   <LIN>
+    <LIN01><!--1082: LINE ITEM NUMBER-->1</LIN01>
+    <LIN03>
+     <LIN0301><!--7140: ITEM NUMBER-->4047943235126</LIN0301>
+     <LIN0302><!--7143: Item number type, coded-->EN<!--International Article Numbering Association (EAN)--></LIN0302>
+    </LIN03>
+   </LIN>
+   <PIA>
+    <PIA01><!--4347: PRODUCT ID. FUNCTION QUALIFIER-->5<!--Product identification--></PIA01>
+    <PIA02>
+     <PIA0201><!--7140: ITEM NUMBER-->2459013</PIA0201>
+     <PIA0202><!--7143: Item number type, coded-->BP<!--Buyer's part number--></PIA0202>
+    </PIA02>
+   </PIA>
+   <IMD>
+    <IMD01><!--7077: ITEM DESCRIPTION TYPE, CODED-->F<!--Free-form--></IMD01>
+    <IMD03>
+     <IMD0301><!--7009: Item description identification-->IN<!--Invoicing unit (EAN Code)--></IMD0301>
+     <IMD0304><!--7008: Item description-->Gegenmutter M25             7211982</IMD0304>
+    </IMD03>
+   </IMD>
+   <QTY>
+    <QTY01>
+     <QTY0101><!--6063: Quantity qualifier-->21<!--Ordered quantity--></QTY0101>
+     <QTY0102><!--6060: Quantity-->3000</QTY0102>
+     <QTY0103><!--6411: Measure unit qualifier-->PCE<!--Piece--></QTY0103>
+    </QTY01>
+   </QTY>
+   <DTM>
+    <DTM01>
+     <DTM0101><!--2005: Date/time/period qualifier-->2<!--Delivery date/time, requested--></DTM0101>
+     <DTM0102><!--2380: Date/time/period-->20200302</DTM0102>
+     <DTM0103><!--2379: Date/time/period format qualifier-->102<!--CCYYMMDD--></DTM0103>
+    </DTM01>
+   </DTM>
+   <MOA>
+    <MOA01>
+     <MOA0101><!--5025: Monetary amount type qualifier-->203<!--Line item amount--></MOA0101>
+     <MOA0102><!--5004: Monetary amount-->723.12</MOA0102>
+    </MOA01>
+   </MOA>
+   <FTX>
+    <FTX01><!--4451: TEXT SUBJECT QUALIFIER-->AAI<!--General information--></FTX01>
+    <FTX04>
+     <FTX0401><!--4440: Free text-->SIB: G4325010</FTX0401>
+    </FTX04>
+   </FTX>
+   <GROUP_28>
+    <PRI>
+     <PRI01>
+      <PRI0101><!--5125: Price qualifier-->AAA<!--Calculation net--></PRI0101>
+      <PRI0102><!--5118: Price-->24.1</PRI0102>
+      <PRI0105><!--5284: Unit price basis-->100</PRI0105>
+     </PRI01>
+    </PRI>
+   </GROUP_28>
+  </GROUP_25>
+  <GROUP_25>
+   <LIN>
+    <LIN01><!--1082: LINE ITEM NUMBER-->2</LIN01>
+    <LIN03>
+     <LIN0301><!--7140: ITEM NUMBER-->4047943035214</LIN0301>
+     <LIN0302><!--7143: Item number type, coded-->EN<!--International Article Numbering Association (EAN)--></LIN0302>
+    </LIN03>
+   </LIN>
+   <PIA>
+    <PIA01><!--4347: PRODUCT ID. FUNCTION QUALIFIER-->5<!--Product identification--></PIA01>
+    <PIA02>
+     <PIA0201><!--7140: ITEM NUMBER-->2459040</PIA0201>
+     <PIA0202><!--7143: Item number type, coded-->BP<!--Buyer's part number--></PIA0202>
+    </PIA02>
+   </PIA>
+   <IMD>
+    <IMD01><!--7077: ITEM DESCRIPTION TYPE, CODED-->F<!--Free-form--></IMD01>
+    <IMD03>
+     <IMD0301><!--7009: Item description identification-->IN<!--Invoicing unit (EAN Code)--></IMD0301>
+     <IMD0304><!--7008: Item description-->Kabelverschraubung M25x1,5/PG21  53</IMD0304>
+     <IMD0305><!--7008: Item description-->08953</IMD0305>
+    </IMD03>
+   </IMD>
+   <QTY>
+    <QTY01>
+     <QTY0101><!--6063: Quantity qualifier-->21<!--Ordered quantity--></QTY0101>
+     <QTY0102><!--6060: Quantity-->1500</QTY0102>
+     <QTY0103><!--6411: Measure unit qualifier-->PCE<!--Piece--></QTY0103>
+    </QTY01>
+   </QTY>
+   <DTM>
+    <DTM01>
+     <DTM0101><!--2005: Date/time/period qualifier-->2<!--Delivery date/time, requested--></DTM0101>
+     <DTM0102><!--2380: Date/time/period-->20200302</DTM0102>
+     <DTM0103><!--2379: Date/time/period format qualifier-->102<!--CCYYMMDD--></DTM0103>
+    </DTM01>
+   </DTM>
+   <MOA>
+    <MOA01>
+     <MOA0101><!--5025: Monetary amount type qualifier-->203<!--Line item amount--></MOA0101>
+     <MOA0102><!--5004: Monetary amount-->379.2</MOA0102>
+    </MOA01>
+   </MOA>
+   <FTX>
+    <FTX01><!--4451: TEXT SUBJECT QUALIFIER-->AAI<!--General information--></FTX01>
+    <FTX04>
+     <FTX0401><!--4440: Free text-->SIB: F7022500</FTX0401>
+    </FTX04>
+   </FTX>
+   <GROUP_28>
+    <PRI>
+     <PRI01>
+      <PRI0101><!--5125: Price qualifier-->AAA<!--Calculation net--></PRI0101>
+      <PRI0102><!--5118: Price-->25.28</PRI0102>
+      <PRI0105><!--5284: Unit price basis-->100</PRI0105>
+     </PRI01>
+    </PRI>
+   </GROUP_28>
+  </GROUP_25>
+  <GROUP_25>
+   <LIN>
+    <LIN01><!--1082: LINE ITEM NUMBER-->3</LIN01>
+    <LIN03>
+     <LIN0301><!--7140: ITEM NUMBER-->4047943035528</LIN0301>
+     <LIN0302><!--7143: Item number type, coded-->EN<!--International Article Numbering Association (EAN)--></LIN0302>
+    </LIN03>
+   </LIN>
+   <PIA>
+    <PIA01><!--4347: PRODUCT ID. FUNCTION QUALIFIER-->5<!--Product identification--></PIA01>
+    <PIA02>
+     <PIA0201><!--7140: ITEM NUMBER-->2459067</PIA0201>
+     <PIA0202><!--7143: Item number type, coded-->BP<!--Buyer's part number--></PIA0202>
+    </PIA02>
+   </PIA>
+   <IMD>
+    <IMD01><!--7077: ITEM DESCRIPTION TYPE, CODED-->F<!--Free-form--></IMD01>
+    <IMD03>
+     <IMD0301><!--7009: Item description identification-->IN<!--Invoicing unit (EAN Code)--></IMD0301>
+     <IMD0304><!--7008: Item description-->Gegenmutter Pg 13,5         7211884</IMD0304>
+    </IMD03>
+   </IMD>
+   <QTY>
+    <QTY01>
+     <QTY0101><!--6063: Quantity qualifier-->21<!--Ordered quantity--></QTY0101>
+     <QTY0102><!--6060: Quantity-->50</QTY0102>
+     <QTY0103><!--6411: Measure unit qualifier-->PCE<!--Piece--></QTY0103>
+    </QTY01>
+   </QTY>
+   <DTM>
+    <DTM01>
+     <DTM0101><!--2005: Date/time/period qualifier-->2<!--Delivery date/time, requested--></DTM0101>
+     <DTM0102><!--2380: Date/time/period-->20200302</DTM0102>
+     <DTM0103><!--2379: Date/time/period format qualifier-->102<!--CCYYMMDD--></DTM0103>
+    </DTM01>
+   </DTM>
+   <MOA>
+    <MOA01>
+     <MOA0101><!--5025: Monetary amount type qualifier-->203<!--Line item amount--></MOA0101>
+     <MOA0102><!--5004: Monetary amount-->2.51</MOA0102>
+    </MOA01>
+   </MOA>
+   <FTX>
+    <FTX01><!--4451: TEXT SUBJECT QUALIFIER-->AAI<!--General information--></FTX01>
+    <FTX04>
+     <FTX0401><!--4440: Free text-->SIB: G4113110</FTX0401>
+    </FTX04>
+   </FTX>
+   <GROUP_28>
+    <PRI>
+     <PRI01>
+      <PRI0101><!--5125: Price qualifier-->AAA<!--Calculation net--></PRI0101>
+      <PRI0102><!--5118: Price-->5.02</PRI0102>
+      <PRI0105><!--5284: Unit price basis-->100</PRI0105>
+     </PRI01>
+    </PRI>
+   </GROUP_28>
+  </GROUP_25>
+  <GROUP_25>
+   <LIN>
+    <LIN01><!--1082: LINE ITEM NUMBER-->4</LIN01>
+    <LIN03>
+     <LIN0301><!--7140: ITEM NUMBER-->4047943080108</LIN0301>
+     <LIN0302><!--7143: Item number type, coded-->EN<!--International Article Numbering Association (EAN)--></LIN0302>
+    </LIN03>
+   </LIN>
+   <PIA>
+    <PIA01><!--4347: PRODUCT ID. FUNCTION QUALIFIER-->5<!--Product identification--></PIA01>
+    <PIA02>
+     <PIA0201><!--7140: ITEM NUMBER-->2459079</PIA0201>
+     <PIA0202><!--7143: Item number type, coded-->BP<!--Buyer's part number--></PIA0202>
+    </PIA02>
+   </PIA>
+   <IMD>
+    <IMD01><!--7077: ITEM DESCRIPTION TYPE, CODED-->F<!--Free-form--></IMD01>
+    <IMD03>
+     <IMD0301><!--7009: Item description identification-->IN<!--Invoicing unit (EAN Code)--></IMD0301>
+     <IMD0304><!--7008: Item description-->Kabelverschraubung M40x1,5  5308935</IMD0304>
+    </IMD03>
+   </IMD>
+   <QTY>
+    <QTY01>
+     <QTY0101><!--6063: Quantity qualifier-->21<!--Ordered quantity--></QTY0101>
+     <QTY0102><!--6060: Quantity-->40</QTY0102>
+     <QTY0103><!--6411: Measure unit qualifier-->PCE<!--Piece--></QTY0103>
+    </QTY01>
+   </QTY>
+   <DTM>
+    <DTM01>
+     <DTM0101><!--2005: Date/time/period qualifier-->2<!--Delivery date/time, requested--></DTM0101>
+     <DTM0102><!--2380: Date/time/period-->20200302</DTM0102>
+     <DTM0103><!--2379: Date/time/period format qualifier-->102<!--CCYYMMDD--></DTM0103>
+    </DTM01>
+   </DTM>
+   <MOA>
+    <MOA01>
+     <MOA0101><!--5025: Monetary amount type qualifier-->203<!--Line item amount--></MOA0101>
+     <MOA0102><!--5004: Monetary amount-->29.4</MOA0102>
+    </MOA01>
+   </MOA>
+   <FTX>
+    <FTX01><!--4451: TEXT SUBJECT QUALIFIER-->AAI<!--General information--></FTX01>
+    <FTX04>
+     <FTX0401><!--4440: Free text-->SIB: F7024009</FTX0401>
+    </FTX04>
+   </FTX>
+   <GROUP_28>
+    <PRI>
+     <PRI01>
+      <PRI0101><!--5125: Price qualifier-->AAA<!--Calculation net--></PRI0101>
+      <PRI0102><!--5118: Price-->73.5</PRI0102>
+      <PRI0105><!--5284: Unit price basis-->100</PRI0105>
+     </PRI01>
+    </PRI>
+   </GROUP_28>
+  </GROUP_25>
+  <GROUP_25>
+   <LIN>
+    <LIN01><!--1082: LINE ITEM NUMBER-->5</LIN01>
+    <LIN03>
+     <LIN0301><!--7140: ITEM NUMBER-->4047943153611</LIN0301>
+     <LIN0302><!--7143: Item number type, coded-->EN<!--International Article Numbering Association (EAN)--></LIN0302>
+    </LIN03>
+   </LIN>
+   <PIA>
+    <PIA01><!--4347: PRODUCT ID. FUNCTION QUALIFIER-->5<!--Product identification--></PIA01>
+    <PIA02>
+     <PIA0201><!--7140: ITEM NUMBER-->2469050</PIA0201>
+     <PIA0202><!--7143: Item number type, coded-->BP<!--Buyer's part number--></PIA0202>
+    </PIA02>
+   </PIA>
+   <IMD>
+    <IMD01><!--7077: ITEM DESCRIPTION TYPE, CODED-->F<!--Free-form--></IMD01>
+    <IMD03>
+     <IMD0301><!--7009: Item description identification-->IN<!--Invoicing unit (EAN Code)--></IMD0301>
+     <IMD0304><!--7008: Item description-->Kabelverschraubung M12      4220612</IMD0304>
+    </IMD03>
+   </IMD>
+   <QTY>
+    <QTY01>
+     <QTY0101><!--6063: Quantity qualifier-->21<!--Ordered quantity--></QTY0101>
+     <QTY0102><!--6060: Quantity-->50</QTY0102>
+     <QTY0103><!--6411: Measure unit qualifier-->PCE<!--Piece--></QTY0103>
+    </QTY01>
+   </QTY>
+   <DTM>
+    <DTM01>
+     <DTM0101><!--2005: Date/time/period qualifier-->2<!--Delivery date/time, requested--></DTM0101>
+     <DTM0102><!--2380: Date/time/period-->20200302</DTM0102>
+     <DTM0103><!--2379: Date/time/period format qualifier-->102<!--CCYYMMDD--></DTM0103>
+    </DTM01>
+   </DTM>
+   <MOA>
+    <MOA01>
+     <MOA0101><!--5025: Monetary amount type qualifier-->203<!--Line item amount--></MOA0101>
+     <MOA0102><!--5004: Monetary amount-->27.55</MOA0102>
+    </MOA01>
+   </MOA>
+   <FTX>
+    <FTX01><!--4451: TEXT SUBJECT QUALIFIER-->AAI<!--General information--></FTX01>
+    <FTX04>
+     <FTX0401><!--4440: Free text-->SIB: C5212000</FTX0401>
+    </FTX04>
+   </FTX>
+   <GROUP_28>
+    <PRI>
+     <PRI01>
+      <PRI0101><!--5125: Price qualifier-->AAA<!--Calculation net--></PRI0101>
+      <PRI0102><!--5118: Price-->55.1</PRI0102>
+      <PRI0105><!--5284: Unit price basis-->100</PRI0105>
+     </PRI01>
+    </PRI>
+   </GROUP_28>
+   <GROUP_39>
+    <ALC>
+     <ALC01><!--5463: ALLOWANCE OR CHARGE QUALIFIER-->C<!--Charge--></ALC01>
+     <ALC05>
+      <ALC0501><!--7161: Special services, coded-->MS</ALC0501>
+     </ALC05>
+    </ALC>
+    <GROUP_41>
+     <PCD>
+      <PCD01>
+       <PCD0101><!--5245: Percentage qualifier-->3<!--Allowance or charge--></PCD0101>
+       <PCD0102><!--5482: Percentage-->5</PCD0102>
+      </PCD01>
+     </PCD>
+    </GROUP_41>
+    <GROUP_42>
+     <MOA>
+      <MOA01>
+       <MOA0101><!--5025: Monetary amount type qualifier-->8<!--Allowance or charge amount--></MOA0101>
+       <MOA0102><!--5004: Monetary amount-->155</MOA0102>
+      </MOA01>
+     </MOA>
+    </GROUP_42>
+    <GROUP_42>
+     <MOA>
+      <MOA01>
+       <MOA0101><!--5025: Monetary amount type qualifier-->236<!--Amount subject to price adjustment--></MOA0101>
+       <MOA0102><!--5004: Monetary amount-->415</MOA0102>
+      </MOA01>
+     </MOA>
+    </GROUP_42>
+   </GROUP_39>
+  </GROUP_25>
+  <GROUP_25>
+   <LIN>
+    <LIN01><!--1082: LINE ITEM NUMBER-->6</LIN01>
+    <LIN03>
+     <LIN0301><!--7140: ITEM NUMBER-->7611577115344</LIN0301>
+     <LIN0302><!--7143: Item number type, coded-->EN<!--International Article Numbering Association (EAN)--></LIN0302>
+    </LIN03>
+   </LIN>
+   <PIA>
+    <PIA01><!--4347: PRODUCT ID. FUNCTION QUALIFIER-->5<!--Product identification--></PIA01>
+    <PIA02>
+     <PIA0201><!--7140: ITEM NUMBER-->2465970</PIA0201>
+     <PIA0202><!--7143: Item number type, coded-->BP<!--Buyer's part number--></PIA0202>
+    </PIA02>
+   </PIA>
+   <PIA>
+    <PIA01><!--4347: PRODUCT ID. FUNCTION QUALIFIER-->5<!--Product identification--></PIA01>
+    <PIA02>
+     <PIA0201><!--7140: ITEM NUMBER-->934283716</PIA0201>
+     <PIA0202><!--7143: Item number type, coded-->SA<!--Supplier's article number--></PIA0202>
+    </PIA02>
+   </PIA>
+   <IMD>
+    <IMD01><!--7077: ITEM DESCRIPTION TYPE, CODED-->F<!--Free-form--></IMD01>
+    <IMD03>
+     <IMD0301><!--7009: Item description identification-->IN<!--Invoicing unit (EAN Code)--></IMD0301>
+     <IMD0304><!--7008: Item description-->Plica KV M16 MS Kabelverschraubung</IMD0304>
+     <IMD0305><!--7008: Item description-->M 16</IMD0305>
+    </IMD03>
+   </IMD>
+   <QTY>
+    <QTY01>
+     <QTY0101><!--6063: Quantity qualifier-->21<!--Ordered quantity--></QTY0101>
+     <QTY0102><!--6060: Quantity-->50</QTY0102>
+     <QTY0103><!--6411: Measure unit qualifier-->PCE<!--Piece--></QTY0103>
+    </QTY01>
+   </QTY>
+   <DTM>
+    <DTM01>
+     <DTM0101><!--2005: Date/time/period qualifier-->2<!--Delivery date/time, requested--></DTM0101>
+     <DTM0102><!--2380: Date/time/period-->20200302</DTM0102>
+     <DTM0103><!--2379: Date/time/period format qualifier-->102<!--CCYYMMDD--></DTM0103>
+    </DTM01>
+   </DTM>
+   <MOA>
+    <MOA01>
+     <MOA0101><!--5025: Monetary amount type qualifier-->203<!--Line item amount--></MOA0101>
+     <MOA0102><!--5004: Monetary amount-->43.94</MOA0102>
+    </MOA01>
+   </MOA>
+   <FTX>
+    <FTX01><!--4451: TEXT SUBJECT QUALIFIER-->AAI<!--General information--></FTX01>
+    <FTX04>
+     <FTX0401><!--4440: Free text-->Messing 934283716</FTX0401>
+    </FTX04>
+   </FTX>
+   <GROUP_28>
+    <PRI>
+     <PRI01>
+      <PRI0101><!--5125: Price qualifier-->AAA<!--Calculation net--></PRI0101>
+      <PRI0102><!--5118: Price-->87.88</PRI0102>
+      <PRI0105><!--5284: Unit price basis-->100</PRI0105>
+     </PRI01>
+    </PRI>
+   </GROUP_28>
+   <GROUP_39>
+    <ALC>
+     <ALC01><!--5463: ALLOWANCE OR CHARGE QUALIFIER-->C<!--Charge--></ALC01>
+     <ALC05>
+      <ALC0501><!--7161: Special services, coded-->MS</ALC0501>
+     </ALC05>
+    </ALC>
+    <GROUP_41>
+     <PCD>
+      <PCD01>
+       <PCD0101><!--5245: Percentage qualifier-->3<!--Allowance or charge--></PCD0101>
+       <PCD0102><!--5482: Percentage-->31</PCD0102>
+      </PCD01>
+     </PCD>
+    </GROUP_41>
+    <GROUP_42>
+     <MOA>
+      <MOA01>
+       <MOA0101><!--5025: Monetary amount type qualifier-->236<!--Amount subject to price adjustment--></MOA0101>
+       <MOA0102><!--5004: Monetary amount-->415</MOA0102>
+      </MOA01>
+     </MOA>
+    </GROUP_42>
+   </GROUP_39>
+  </GROUP_25>
+  <GROUP_25>
+   <LIN>
+    <LIN01><!--1082: LINE ITEM NUMBER-->7</LIN01>
+    <LIN03>
+     <LIN0301><!--7140: ITEM NUMBER-->7611577105543</LIN0301>
+     <LIN0302><!--7143: Item number type, coded-->EN<!--International Article Numbering Association (EAN)--></LIN0302>
+    </LIN03>
+   </LIN>
+   <PIA>
+    <PIA01><!--4347: PRODUCT ID. FUNCTION QUALIFIER-->5<!--Product identification--></PIA01>
+    <PIA02>
+     <PIA0201><!--7140: ITEM NUMBER-->2466668</PIA0201>
+     <PIA0202><!--7143: Item number type, coded-->BP<!--Buyer's part number--></PIA0202>
+    </PIA02>
+   </PIA>
+   <PIA>
+    <PIA01><!--4347: PRODUCT ID. FUNCTION QUALIFIER-->5<!--Product identification--></PIA01>
+    <PIA02>
+     <PIA0201><!--7140: ITEM NUMBER-->907005434</PIA0201>
+     <PIA0202><!--7143: Item number type, coded-->SA<!--Supplier's article number--></PIA0202>
+    </PIA02>
+   </PIA>
+   <IMD>
+    <IMD01><!--7077: ITEM DESCRIPTION TYPE, CODED-->F<!--Free-form--></IMD01>
+    <IMD03>
+     <IMD0301><!--7009: Item description identification-->IN<!--Invoicing unit (EAN Code)--></IMD0301>
+     <IMD0304><!--7008: Item description-->Plica ADAP M32/M20 PA 6 Reduktion 6</IMD0304>
+     <IMD0305><!--7008: Item description-->-kant</IMD0305>
+    </IMD03>
+   </IMD>
+   <QTY>
+    <QTY01>
+     <QTY0101><!--6063: Quantity qualifier-->21<!--Ordered quantity--></QTY0101>
+     <QTY0102><!--6060: Quantity-->200</QTY0102>
+     <QTY0103><!--6411: Measure unit qualifier-->PCE<!--Piece--></QTY0103>
+    </QTY01>
+   </QTY>
+   <DTM>
+    <DTM01>
+     <DTM0101><!--2005: Date/time/period qualifier-->2<!--Delivery date/time, requested--></DTM0101>
+     <DTM0102><!--2380: Date/time/period-->20200302</DTM0102>
+     <DTM0103><!--2379: Date/time/period format qualifier-->102<!--CCYYMMDD--></DTM0103>
+    </DTM01>
+   </DTM>
+   <MOA>
+    <MOA01>
+     <MOA0101><!--5025: Monetary amount type qualifier-->203<!--Line item amount--></MOA0101>
+     <MOA0102><!--5004: Monetary amount-->62.9</MOA0102>
+    </MOA01>
+   </MOA>
+   <FTX>
+    <FTX01><!--4451: TEXT SUBJECT QUALIFIER-->AAI<!--General information--></FTX01>
+    <FTX04>
+     <FTX0401><!--4440: Free text-->M 32 M 20 Kunststoff 907005434</FTX0401>
+    </FTX04>
+   </FTX>
+   <GROUP_28>
+    <PRI>
+     <PRI01>
+      <PRI0101><!--5125: Price qualifier-->AAA<!--Calculation net--></PRI0101>
+      <PRI0102><!--5118: Price-->31.45</PRI0102>
+      <PRI0105><!--5284: Unit price basis-->100</PRI0105>
+     </PRI01>
+    </PRI>
+   </GROUP_28>
+  </GROUP_25>
+  <GROUP_25>
+   <LIN>
+    <LIN01><!--1082: LINE ITEM NUMBER-->8</LIN01>
+    <LIN03>
+     <LIN0301><!--7140: ITEM NUMBER-->7611577114521</LIN0301>
+     <LIN0302><!--7143: Item number type, coded-->EN<!--International Article Numbering Association (EAN)--></LIN0302>
+    </LIN03>
+   </LIN>
+   <PIA>
+    <PIA01><!--4347: PRODUCT ID. FUNCTION QUALIFIER-->5<!--Product identification--></PIA01>
+    <PIA02>
+     <PIA0201><!--7140: ITEM NUMBER-->2466075</PIA0201>
+     <PIA0202><!--7143: Item number type, coded-->BP<!--Buyer's part number--></PIA0202>
+    </PIA02>
+   </PIA>
+   <PIA>
+    <PIA01><!--4347: PRODUCT ID. FUNCTION QUALIFIER-->5<!--Product identification--></PIA01>
+    <PIA02>
+     <PIA0201><!--7140: ITEM NUMBER-->935345220</PIA0201>
+     <PIA0202><!--7143: Item number type, coded-->SA<!--Supplier's article number--></PIA0202>
+    </PIA02>
+   </PIA>
+   <IMD>
+    <IMD01><!--7077: ITEM DESCRIPTION TYPE, CODED-->F<!--Free-form--></IMD01>
+    <IMD03>
+     <IMD0301><!--7009: Item description identification-->IN<!--Invoicing unit (EAN Code)--></IMD0301>
+     <IMD0304><!--7008: Item description-->Plica KV M20/16 PA 6 Kabelverschrau</IMD0304>
+     <IMD0305><!--7008: Item description-->bung</IMD0305>
+    </IMD03>
+   </IMD>
+   <QTY>
+    <QTY01>
+     <QTY0101><!--6063: Quantity qualifier-->21<!--Ordered quantity--></QTY0101>
+     <QTY0102><!--6060: Quantity-->50</QTY0102>
+     <QTY0103><!--6411: Measure unit qualifier-->PCE<!--Piece--></QTY0103>
+    </QTY01>
+   </QTY>
+   <DTM>
+    <DTM01>
+     <DTM0101><!--2005: Date/time/period qualifier-->2<!--Delivery date/time, requested--></DTM0101>
+     <DTM0102><!--2380: Date/time/period-->20200302</DTM0102>
+     <DTM0103><!--2379: Date/time/period format qualifier-->102<!--CCYYMMDD--></DTM0103>
+    </DTM01>
+   </DTM>
+   <MOA>
+    <MOA01>
+     <MOA0101><!--5025: Monetary amount type qualifier-->203<!--Line item amount--></MOA0101>
+     <MOA0102><!--5004: Monetary amount-->12.8</MOA0102>
+    </MOA01>
+   </MOA>
+   <FTX>
+    <FTX01><!--4451: TEXT SUBJECT QUALIFIER-->AAI<!--General information--></FTX01>
+    <FTX04>
+     <FTX0401><!--4440: Free text-->M 20 Polyamid 935345220</FTX0401>
+    </FTX04>
+   </FTX>
+   <GROUP_28>
+    <PRI>
+     <PRI01>
+      <PRI0101><!--5125: Price qualifier-->AAA<!--Calculation net--></PRI0101>
+      <PRI0102><!--5118: Price-->25.61</PRI0102>
+      <PRI0105><!--5284: Unit price basis-->100</PRI0105>
+     </PRI01>
+    </PRI>
+   </GROUP_28>
+  </GROUP_25>
+  <GROUP_25>
+   <LIN>
+    <LIN01><!--1082: LINE ITEM NUMBER-->9</LIN01>
+    <LIN03>
+     <LIN0301><!--7140: ITEM NUMBER-->4047943035177</LIN0301>
+     <LIN0302><!--7143: Item number type, coded-->EN<!--International Article Numbering Association (EAN)--></LIN0302>
+    </LIN03>
+   </LIN>
+   <PIA>
+    <PIA01><!--4347: PRODUCT ID. FUNCTION QUALIFIER-->5<!--Product identification--></PIA01>
+    <PIA02>
+     <PIA0201><!--7140: ITEM NUMBER-->2459055</PIA0201>
+     <PIA0202><!--7143: Item number type, coded-->BP<!--Buyer's part number--></PIA0202>
+    </PIA02>
+   </PIA>
+   <IMD>
+    <IMD01><!--7077: ITEM DESCRIPTION TYPE, CODED-->F<!--Free-form--></IMD01>
+    <IMD03>
+     <IMD0301><!--7009: Item description identification-->IN<!--Invoicing unit (EAN Code)--></IMD0301>
+     <IMD0304><!--7008: Item description-->Kabelverschraubung M25      5307025</IMD0304>
+    </IMD03>
+   </IMD>
+   <QTY>
+    <QTY01>
+     <QTY0101><!--6063: Quantity qualifier-->21<!--Ordered quantity--></QTY0101>
+     <QTY0102><!--6060: Quantity-->50</QTY0102>
+     <QTY0103><!--6411: Measure unit qualifier-->PCE<!--Piece--></QTY0103>
+    </QTY01>
+   </QTY>
+   <DTM>
+    <DTM01>
+     <DTM0101><!--2005: Date/time/period qualifier-->2<!--Delivery date/time, requested--></DTM0101>
+     <DTM0102><!--2380: Date/time/period-->20200302</DTM0102>
+     <DTM0103><!--2379: Date/time/period format qualifier-->102<!--CCYYMMDD--></DTM0103>
+    </DTM01>
+   </DTM>
+   <MOA>
+    <MOA01>
+     <MOA0101><!--5025: Monetary amount type qualifier-->203<!--Line item amount--></MOA0101>
+     <MOA0102><!--5004: Monetary amount-->26.62</MOA0102>
+    </MOA01>
+   </MOA>
+   <FTX>
+    <FTX01><!--4451: TEXT SUBJECT QUALIFIER-->AAI<!--General information--></FTX01>
+    <FTX04>
+     <FTX0401><!--4440: Free text-->SIB: F7032509</FTX0401>
+    </FTX04>
+   </FTX>
+   <GROUP_28>
+    <PRI>
+     <PRI01>
+      <PRI0101><!--5125: Price qualifier-->AAA<!--Calculation net--></PRI0101>
+      <PRI0102><!--5118: Price-->53.24</PRI0102>
+      <PRI0105><!--5284: Unit price basis-->100</PRI0105>
+     </PRI01>
+    </PRI>
+   </GROUP_28>
+  </GROUP_25>
+  <UNS>
+   <UNS01><!--0081: SECTION IDENTIFICATION-->S<!--Detail/summary section separation--></UNS01>
+  </UNS>
+  <UNT>
+   <UNT01><!--0074: NUMBER OF SEGMENTS IN THE MESSAGE-->96</UNT01>
+   <UNT02><!--0062: MESSAGE REFERENCE NUMBER-->70-0639880</UNT02>
+  </UNT>
+ </ORDERS>
+ <UNZ>
+  <UNZ01><!--0036: INTERCHANGE CONTROL COUNT-->1</UNZ01>
+  <UNZ02><!--0020: INTERCHANGE CONTROL REFERENCE-->0</UNZ02>
+ </UNZ>
+</EANCOM>

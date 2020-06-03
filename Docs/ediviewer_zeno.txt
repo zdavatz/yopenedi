@@ -1,0 +1,1175 @@
+C:\Users\zdavatz\Downloads\plica\OneDrive-2020-05-15\SND_PLICA_ORDERS_134747_58408847
+
+
+      UNA   DEFINITION
+----------------------------------------------------------------------------
+            Delimiter                                      M  a...6........: ':+.? ''
+
+      UNB    INTERCHANGE HEADER
+----------------------------------------------------------------------------
+010   0001   Syntax identifier                             M  a...4........: 'UNOC'    {UN/ECE level C}
+      0002   Syntax version number                         M  n...1........: '3'
+020   0004   Sender identification                         M  an..35.......: '4015828000008'
+      0007   Partner identification code qualifier         C  an..4........: '14'      {EAN (European Article Numbering Association)}
+      0008   Address for reverse routing                   C  an..14.......: ''
+030   0010   Recipient identification                      M  an..35.......: '4251800100001'
+      0007   Partner identification code qualifier         C  an..4........: '14'      {EAN (European Article Numbering Association)}
+      0014   Routing address                               C  an..14.......: ''
+040   0017   Date of preparation                           M  n...6........: '200217'
+      0019   Time of preparation                           M  n...4........: '1347'
+050   0020  INTERCHANGE CONTROL REFERENCE                  M  an..14.......: '0'
+060   0022   Recipient's reference/password                M  an..14.......: ''
+      0025   Recipient's reference/password qualifier      C  an..2........: ''
+070   0026  APPLICATION REFERENCE                          C  an..14.......: 'ORDERS'
+080   0029  PROCESSING PRIORITY CODE                       C  a...1........: ''
+090   0031  ACKNOWLEDGEMENT REQUEST                        C  n...1........: ''
+100   0032  COMMUNICATIONS AGREEMENT ID                    C  an..35.......: ''
+110   0035  TEST INDICATOR                                 C  n...1........: '1'       {Interchange is a test}
+
+      UNH    MESSAGE HEADER
+----------------------------------------------------------------------------
+010   0062  MESSAGE REFERENCE NUMBER                       M  an..14.......: '70-0639880'
+020   0065   Message type                                  M  an..6........: 'ORDERS'  {Purchase order message}
+      0052   Message version number                        M  an..3........: 'D'
+      0054   Message release number                        M  an..3........: '96A'
+      0051   Controlling agency                            M  an..2........: 'UN'      {UN/ECE/TRADE/WP.4, United Nations Standard Messages (UNSM)}
+      0057   Association assigned code                     C  an..6........: 'EAN008'  {unknown value!}
+030   0068  COMMON ACCESS REFERENCE                        C  an..35.......: ''
+040   0070   Sequence of transfers                         M  n...2........: ''
+      0073   First and last transfer                       C  a...1........: ''
+
+      BGM    BEGINNING OF MESSAGE
+----------------------------------------------------------------------------
+010   1001   Document/message name, coded                  C  an..3........: '220'     {Order}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+      1000   Document/message name                         C  an..35.......: ''
+020   1004  DOCUMENT/MESSAGE NUMBER                        C  an..35.......: '70-0639880'
+030   1225  MESSAGE FUNCTION, CODED                        C  an..3........: ''
+040   4343  RESPONSE TYPE, CODED                           C  an..3........: ''
+
+      DTM    DATE/TIME/PERIOD
+----------------------------------------------------------------------------
+010   2005   Date/time/period qualifier                    M  an..3........: '137'     {Document/message date/time}
+      2380   Date/time/period                              C  an..35.......: '20200214'
+      2379   Date/time/period format qualifier             C  an..3........: '102'     {CCYYMMDD}
+
+      DTM    DATE/TIME/PERIOD
+----------------------------------------------------------------------------
+010   2005   Date/time/period qualifier                    M  an..3........: '2'       {Delivery date/time, requested}
+      2380   Date/time/period                              C  an..35.......: '20200214'
+      2379   Date/time/period format qualifier             C  an..3........: '102'     {CCYYMMDD}
+
+      NAD    NAME AND ADDRESS
+----------------------------------------------------------------------------
+010   3035  PARTY QUALIFIER                                M  an..3........: 'BY'      {Buyer}
+020   3039   Party id. identification                      M  an..35.......: '4015828000008'
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: '9'       {EAN (International Article Numbering association)}
+030   3124   Name and address line                         M  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+040   3036   Party name                                    M  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3045   Party name format, coded                      C  an..3........: ''
+050   3042   Street and number/p.o. box                    M  an..35.......: ''
+      3042   Street and number/p.o. box                    C  an..35.......: ''
+      3042   Street and number/p.o. box                    C  an..35.......: ''
+      3042   Street and number/p.o. box                    C  an..35.......: ''
+060   3164  CITY NAME                                      C  an..35.......: ''
+070   3229  COUNTRY SUB-ENTITY IDENTIFICATION              C  an..9........: ''
+080   3251  POSTCODE IDENTIFICATION                        C  an..9........: ''
+090   3207  COUNTRY, CODED                                 C  an..3........: ''
+
+      CTA    CONTACT INFORMATION
+----------------------------------------------------------------------------
+010   3139  CONTACT FUNCTION, CODED                        C  an..3........: 'SD'      {Shipping contact}
+020   3413   Department or employee identification         C  an..17.......: 'Frederik Lühn'
+      3412   Department or employee                        C  an..35.......: ''
+
+      COM    COMMUNICATION CONTACT
+----------------------------------------------------------------------------
+010   3148   Communication number                          M  an..512......: '+49 5971 999-256'
+      3155   Communication channel qualifier               M  an..3........: 'TE'      {Telephone}
+
+      COM    COMMUNICATION CONTACT
+----------------------------------------------------------------------------
+010   3148   Communication number                          M  an..512......: '+49 5971 999-310'
+      3155   Communication channel qualifier               M  an..3........: 'FX'      {Telefax}
+
+      COM    COMMUNICATION CONTACT
+----------------------------------------------------------------------------
+010   3148   Communication number                          M  an..512......: 'frederik.luehn@hardy-schmitz.de'
+      3155   Communication channel qualifier               M  an..3........: 'EM'      {Electronic mail}
+
+      NAD    NAME AND ADDRESS
+----------------------------------------------------------------------------
+010   3035  PARTY QUALIFIER                                M  an..3........: 'SU'      {Supplier}
+020   3039   Party id. identification                      M  an..35.......: '4251800100001'
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: '9'       {EAN (International Article Numbering association)}
+030   3124   Name and address line                         M  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+040   3036   Party name                                    M  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3045   Party name format, coded                      C  an..3........: ''
+050   3042   Street and number/p.o. box                    M  an..35.......: ''
+      3042   Street and number/p.o. box                    C  an..35.......: ''
+      3042   Street and number/p.o. box                    C  an..35.......: ''
+      3042   Street and number/p.o. box                    C  an..35.......: ''
+060   3164  CITY NAME                                      C  an..35.......: ''
+070   3229  COUNTRY SUB-ENTITY IDENTIFICATION              C  an..9........: ''
+080   3251  POSTCODE IDENTIFICATION                        C  an..9........: ''
+090   3207  COUNTRY, CODED                                 C  an..3........: ''
+
+      NAD    NAME AND ADDRESS
+----------------------------------------------------------------------------
+010   3035  PARTY QUALIFIER                                M  an..3........: 'DP'      {Delivery party}
+020   3039   Party id. identification                      M  an..35.......: '4015828001005'
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: '9'       {EAN (International Article Numbering association)}
+030   3124   Name and address line                         M  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+040   3036   Party name                                    M  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3045   Party name format, coded                      C  an..3........: ''
+050   3042   Street and number/p.o. box                    M  an..35.......: ''
+      3042   Street and number/p.o. box                    C  an..35.......: ''
+      3042   Street and number/p.o. box                    C  an..35.......: ''
+      3042   Street and number/p.o. box                    C  an..35.......: ''
+060   3164  CITY NAME                                      C  an..35.......: ''
+070   3229  COUNTRY SUB-ENTITY IDENTIFICATION              C  an..9........: ''
+080   3251  POSTCODE IDENTIFICATION                        C  an..9........: ''
+090   3207  COUNTRY, CODED                                 C  an..3........: ''
+
+      NAD    NAME AND ADDRESS
+----------------------------------------------------------------------------
+010   3035  PARTY QUALIFIER                                M  an..3........: 'IV'      {Invoicee}
+020   3039   Party id. identification                      M  an..35.......: '4015828000008'
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: '9'       {EAN (International Article Numbering association)}
+030   3124   Name and address line                         M  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+      3124   Name and address line                         C  an..35.......: ''
+040   3036   Party name                                    M  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3036   Party name                                    C  an..35.......: ''
+      3045   Party name format, coded                      C  an..3........: ''
+050   3042   Street and number/p.o. box                    M  an..35.......: ''
+      3042   Street and number/p.o. box                    C  an..35.......: ''
+      3042   Street and number/p.o. box                    C  an..35.......: ''
+      3042   Street and number/p.o. box                    C  an..35.......: ''
+060   3164  CITY NAME                                      C  an..35.......: ''
+070   3229  COUNTRY SUB-ENTITY IDENTIFICATION              C  an..9........: ''
+080   3251  POSTCODE IDENTIFICATION                        C  an..9........: ''
+090   3207  COUNTRY, CODED                                 C  an..3........: ''
+
+      LIN    LINE ITEM
+----------------------------------------------------------------------------
+010   1082  LINE ITEM NUMBER                               C  n..6.........: '1'
+020   1229  ACTION REQUEST/NOTIFICATION, CODED             C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: '4047943235126'
+      7143   Item number type, coded                       C  an..3........: 'EN'      {International Article Numbering Association (EAN)}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   5495   Sub-line indicator, coded                     C  an..3........: ''
+      1082   Line item number                              C  n..6.........: ''
+050   1222  CONFIGURATION LEVEL                            C  n..2.........: ''
+060   7083  CONFIGURATION, CODED                           C  an..3........: ''
+
+      PIA    ADDITIONAL PRODUCT ID
+----------------------------------------------------------------------------
+010   4347  PRODUCT ID. FUNCTION QUALIFIER                 M  an..3........: '5'       {Product identification}
+020   7140   Item number                                   C  an..35.......: '2459013'
+      7143   Item number type, coded                       C  an..3........: 'BP'      {Buyer's part number}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+050   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+060   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+
+      IMD    ITEM DESCRIPTION
+----------------------------------------------------------------------------
+010   7077  ITEM DESCRIPTION TYPE, CODED                   C  an..3........: 'F'       {Free-form}
+020   7081  ITEM CHARACTERISTIC, CODED                     C  an..3........: ''
+030   7009   Item description identification               C  an..17.......: 'IN'
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+      7008   Item description                              C  an..35.......: 'Gegenmutter M25             7211982'
+      7008   Item description                              C  an..35.......: ''
+      3453   Language, coded                               C  an..3........: ''
+040   7383  SURFACE/LAYER INDICATOR, CODED                 C  an..3........: ''
+
+      QTY    QUANTITY
+----------------------------------------------------------------------------
+010   6063   Quantity qualifier                            M  an..3........: '21'      {Ordered quantity}
+      6060   Quantity                                      M  n..15........: '3000'
+      6411   Measure unit qualifier                        C  an..3........: 'PCE'
+
+      DTM    DATE/TIME/PERIOD
+----------------------------------------------------------------------------
+010   2005   Date/time/period qualifier                    M  an..3........: '2'       {Delivery date/time, requested}
+      2380   Date/time/period                              C  an..35.......: '20200302'
+      2379   Date/time/period format qualifier             C  an..3........: '102'     {CCYYMMDD}
+
+      MOA    MONETARY AMOUNT
+----------------------------------------------------------------------------
+010   5025   Monetary amount type qualifier                M  an..3........: '203'     {Line item amount}
+      5004   Monetary amount                               C  n..18........: '723.12'
+      6345   Currency, coded                               C  an..3........: ''
+      6343   Currency qualifier                            C  an..3........: ''
+      4405   Status, coded                                 C  an..3........: ''
+
+      FTX    FREE TEXT
+----------------------------------------------------------------------------
+010   4451  TEXT SUBJECT QUALIFIER                         M  an..3........: 'AAI'     {General information}
+020   4453  TEXT FUNCTION, CODED                           C  an..3........: ''
+030   4441   Free text, coded                              M  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   4440   Free text                                     M  an..70.......: 'SIB: G4325010'
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+050   3453  LANGUAGE, CODED                                C  an..3........: ''
+
+      PRI    PRICE DETAILS
+----------------------------------------------------------------------------
+010   5125   Price qualifier                               M  an..3........: 'AAA'     {Calculation net}
+      5118   Price                                         C  n..15........: '24.1'
+      5375   Price type, coded                             C  an..3........: ''
+      5387   Price type qualifier                          C  an..3........: ''
+      5284   Unit price basis                              C  n..9.........: '100'
+      6411   Measure unit qualifier                        C  an..3........: ''
+020   5213  SUB-LINE PRICE CHANGE, CODED                   C  an..3........: ''
+
+      LIN    LINE ITEM
+----------------------------------------------------------------------------
+010   1082  LINE ITEM NUMBER                               C  n..6.........: '2'
+020   1229  ACTION REQUEST/NOTIFICATION, CODED             C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: '4047943035214'
+      7143   Item number type, coded                       C  an..3........: 'EN'      {International Article Numbering Association (EAN)}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   5495   Sub-line indicator, coded                     C  an..3........: ''
+      1082   Line item number                              C  n..6.........: ''
+050   1222  CONFIGURATION LEVEL                            C  n..2.........: ''
+060   7083  CONFIGURATION, CODED                           C  an..3........: ''
+
+      PIA    ADDITIONAL PRODUCT ID
+----------------------------------------------------------------------------
+010   4347  PRODUCT ID. FUNCTION QUALIFIER                 M  an..3........: '5'       {Product identification}
+020   7140   Item number                                   C  an..35.......: '2459040'
+      7143   Item number type, coded                       C  an..3........: 'BP'      {Buyer's part number}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+050   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+060   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+
+      IMD    ITEM DESCRIPTION
+----------------------------------------------------------------------------
+010   7077  ITEM DESCRIPTION TYPE, CODED                   C  an..3........: 'F'       {Free-form}
+020   7081  ITEM CHARACTERISTIC, CODED                     C  an..3........: ''
+030   7009   Item description identification               C  an..17.......: 'IN'
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+      7008   Item description                              C  an..35.......: 'Kabelverschraubung M25x1,5/PG21  53'
+      7008   Item description                              C  an..35.......: '08953'
+      3453   Language, coded                               C  an..3........: ''
+040   7383  SURFACE/LAYER INDICATOR, CODED                 C  an..3........: ''
+
+      QTY    QUANTITY
+----------------------------------------------------------------------------
+010   6063   Quantity qualifier                            M  an..3........: '21'      {Ordered quantity}
+      6060   Quantity                                      M  n..15........: '1500'
+      6411   Measure unit qualifier                        C  an..3........: 'PCE'
+
+      DTM    DATE/TIME/PERIOD
+----------------------------------------------------------------------------
+010   2005   Date/time/period qualifier                    M  an..3........: '2'       {Delivery date/time, requested}
+      2380   Date/time/period                              C  an..35.......: '20200302'
+      2379   Date/time/period format qualifier             C  an..3........: '102'     {CCYYMMDD}
+
+      MOA    MONETARY AMOUNT
+----------------------------------------------------------------------------
+010   5025   Monetary amount type qualifier                M  an..3........: '203'     {Line item amount}
+      5004   Monetary amount                               C  n..18........: '379.2'
+      6345   Currency, coded                               C  an..3........: ''
+      6343   Currency qualifier                            C  an..3........: ''
+      4405   Status, coded                                 C  an..3........: ''
+
+      FTX    FREE TEXT
+----------------------------------------------------------------------------
+010   4451  TEXT SUBJECT QUALIFIER                         M  an..3........: 'AAI'     {General information}
+020   4453  TEXT FUNCTION, CODED                           C  an..3........: ''
+030   4441   Free text, coded                              M  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   4440   Free text                                     M  an..70.......: 'SIB: F7022500'
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+050   3453  LANGUAGE, CODED                                C  an..3........: ''
+
+      PRI    PRICE DETAILS
+----------------------------------------------------------------------------
+010   5125   Price qualifier                               M  an..3........: 'AAA'     {Calculation net}
+      5118   Price                                         C  n..15........: '25.28'
+      5375   Price type, coded                             C  an..3........: ''
+      5387   Price type qualifier                          C  an..3........: ''
+      5284   Unit price basis                              C  n..9.........: '100'
+      6411   Measure unit qualifier                        C  an..3........: ''
+020   5213  SUB-LINE PRICE CHANGE, CODED                   C  an..3........: ''
+
+      LIN    LINE ITEM
+----------------------------------------------------------------------------
+010   1082  LINE ITEM NUMBER                               C  n..6.........: '3'
+020   1229  ACTION REQUEST/NOTIFICATION, CODED             C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: '4047943035528'
+      7143   Item number type, coded                       C  an..3........: 'EN'      {International Article Numbering Association (EAN)}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   5495   Sub-line indicator, coded                     C  an..3........: ''
+      1082   Line item number                              C  n..6.........: ''
+050   1222  CONFIGURATION LEVEL                            C  n..2.........: ''
+060   7083  CONFIGURATION, CODED                           C  an..3........: ''
+
+      PIA    ADDITIONAL PRODUCT ID
+----------------------------------------------------------------------------
+010   4347  PRODUCT ID. FUNCTION QUALIFIER                 M  an..3........: '5'       {Product identification}
+020   7140   Item number                                   C  an..35.......: '2459067'
+      7143   Item number type, coded                       C  an..3........: 'BP'      {Buyer's part number}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+050   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+060   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+
+      IMD    ITEM DESCRIPTION
+----------------------------------------------------------------------------
+010   7077  ITEM DESCRIPTION TYPE, CODED                   C  an..3........: 'F'       {Free-form}
+020   7081  ITEM CHARACTERISTIC, CODED                     C  an..3........: ''
+030   7009   Item description identification               C  an..17.......: 'IN'
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+      7008   Item description                              C  an..35.......: 'Gegenmutter Pg 13,5         7211884'
+      7008   Item description                              C  an..35.......: ''
+      3453   Language, coded                               C  an..3........: ''
+040   7383  SURFACE/LAYER INDICATOR, CODED                 C  an..3........: ''
+
+      QTY    QUANTITY
+----------------------------------------------------------------------------
+010   6063   Quantity qualifier                            M  an..3........: '21'      {Ordered quantity}
+      6060   Quantity                                      M  n..15........: '50'
+      6411   Measure unit qualifier                        C  an..3........: 'PCE'
+
+      DTM    DATE/TIME/PERIOD
+----------------------------------------------------------------------------
+010   2005   Date/time/period qualifier                    M  an..3........: '2'       {Delivery date/time, requested}
+      2380   Date/time/period                              C  an..35.......: '20200302'
+      2379   Date/time/period format qualifier             C  an..3........: '102'     {CCYYMMDD}
+
+      MOA    MONETARY AMOUNT
+----------------------------------------------------------------------------
+010   5025   Monetary amount type qualifier                M  an..3........: '203'     {Line item amount}
+      5004   Monetary amount                               C  n..18........: '2.51'
+      6345   Currency, coded                               C  an..3........: ''
+      6343   Currency qualifier                            C  an..3........: ''
+      4405   Status, coded                                 C  an..3........: ''
+
+      FTX    FREE TEXT
+----------------------------------------------------------------------------
+010   4451  TEXT SUBJECT QUALIFIER                         M  an..3........: 'AAI'     {General information}
+020   4453  TEXT FUNCTION, CODED                           C  an..3........: ''
+030   4441   Free text, coded                              M  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   4440   Free text                                     M  an..70.......: 'SIB: G4113110'
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+050   3453  LANGUAGE, CODED                                C  an..3........: ''
+
+      PRI    PRICE DETAILS
+----------------------------------------------------------------------------
+010   5125   Price qualifier                               M  an..3........: 'AAA'     {Calculation net}
+      5118   Price                                         C  n..15........: '5.02'
+      5375   Price type, coded                             C  an..3........: ''
+      5387   Price type qualifier                          C  an..3........: ''
+      5284   Unit price basis                              C  n..9.........: '100'
+      6411   Measure unit qualifier                        C  an..3........: ''
+020   5213  SUB-LINE PRICE CHANGE, CODED                   C  an..3........: ''
+
+      LIN    LINE ITEM
+----------------------------------------------------------------------------
+010   1082  LINE ITEM NUMBER                               C  n..6.........: '4'
+020   1229  ACTION REQUEST/NOTIFICATION, CODED             C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: '4047943080108'
+      7143   Item number type, coded                       C  an..3........: 'EN'      {International Article Numbering Association (EAN)}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   5495   Sub-line indicator, coded                     C  an..3........: ''
+      1082   Line item number                              C  n..6.........: ''
+050   1222  CONFIGURATION LEVEL                            C  n..2.........: ''
+060   7083  CONFIGURATION, CODED                           C  an..3........: ''
+
+      PIA    ADDITIONAL PRODUCT ID
+----------------------------------------------------------------------------
+010   4347  PRODUCT ID. FUNCTION QUALIFIER                 M  an..3........: '5'       {Product identification}
+020   7140   Item number                                   C  an..35.......: '2459079'
+      7143   Item number type, coded                       C  an..3........: 'BP'      {Buyer's part number}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+050   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+060   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+
+      IMD    ITEM DESCRIPTION
+----------------------------------------------------------------------------
+010   7077  ITEM DESCRIPTION TYPE, CODED                   C  an..3........: 'F'       {Free-form}
+020   7081  ITEM CHARACTERISTIC, CODED                     C  an..3........: ''
+030   7009   Item description identification               C  an..17.......: 'IN'
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+      7008   Item description                              C  an..35.......: 'Kabelverschraubung M40x1,5  5308935'
+      7008   Item description                              C  an..35.......: ''
+      3453   Language, coded                               C  an..3........: ''
+040   7383  SURFACE/LAYER INDICATOR, CODED                 C  an..3........: ''
+
+      QTY    QUANTITY
+----------------------------------------------------------------------------
+010   6063   Quantity qualifier                            M  an..3........: '21'      {Ordered quantity}
+      6060   Quantity                                      M  n..15........: '40'
+      6411   Measure unit qualifier                        C  an..3........: 'PCE'
+
+      DTM    DATE/TIME/PERIOD
+----------------------------------------------------------------------------
+010   2005   Date/time/period qualifier                    M  an..3........: '2'       {Delivery date/time, requested}
+      2380   Date/time/period                              C  an..35.......: '20200302'
+      2379   Date/time/period format qualifier             C  an..3........: '102'     {CCYYMMDD}
+
+      MOA    MONETARY AMOUNT
+----------------------------------------------------------------------------
+010   5025   Monetary amount type qualifier                M  an..3........: '203'     {Line item amount}
+      5004   Monetary amount                               C  n..18........: '29.4'
+      6345   Currency, coded                               C  an..3........: ''
+      6343   Currency qualifier                            C  an..3........: ''
+      4405   Status, coded                                 C  an..3........: ''
+
+      FTX    FREE TEXT
+----------------------------------------------------------------------------
+010   4451  TEXT SUBJECT QUALIFIER                         M  an..3........: 'AAI'     {General information}
+020   4453  TEXT FUNCTION, CODED                           C  an..3........: ''
+030   4441   Free text, coded                              M  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   4440   Free text                                     M  an..70.......: 'SIB: F7024009'
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+050   3453  LANGUAGE, CODED                                C  an..3........: ''
+
+      PRI    PRICE DETAILS
+----------------------------------------------------------------------------
+010   5125   Price qualifier                               M  an..3........: 'AAA'     {Calculation net}
+      5118   Price                                         C  n..15........: '73.5'
+      5375   Price type, coded                             C  an..3........: ''
+      5387   Price type qualifier                          C  an..3........: ''
+      5284   Unit price basis                              C  n..9.........: '100'
+      6411   Measure unit qualifier                        C  an..3........: ''
+020   5213  SUB-LINE PRICE CHANGE, CODED                   C  an..3........: ''
+
+      LIN    LINE ITEM
+----------------------------------------------------------------------------
+010   1082  LINE ITEM NUMBER                               C  n..6.........: '5'
+020   1229  ACTION REQUEST/NOTIFICATION, CODED             C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: '4047943153611'
+      7143   Item number type, coded                       C  an..3........: 'EN'      {International Article Numbering Association (EAN)}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   5495   Sub-line indicator, coded                     C  an..3........: ''
+      1082   Line item number                              C  n..6.........: ''
+050   1222  CONFIGURATION LEVEL                            C  n..2.........: ''
+060   7083  CONFIGURATION, CODED                           C  an..3........: ''
+
+      PIA    ADDITIONAL PRODUCT ID
+----------------------------------------------------------------------------
+010   4347  PRODUCT ID. FUNCTION QUALIFIER                 M  an..3........: '5'       {Product identification}
+020   7140   Item number                                   C  an..35.......: '2469050'
+      7143   Item number type, coded                       C  an..3........: 'BP'      {Buyer's part number}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+050   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+060   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+
+      IMD    ITEM DESCRIPTION
+----------------------------------------------------------------------------
+010   7077  ITEM DESCRIPTION TYPE, CODED                   C  an..3........: 'F'       {Free-form}
+020   7081  ITEM CHARACTERISTIC, CODED                     C  an..3........: ''
+030   7009   Item description identification               C  an..17.......: 'IN'
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+      7008   Item description                              C  an..35.......: 'Kabelverschraubung M12      4220612'
+      7008   Item description                              C  an..35.......: ''
+      3453   Language, coded                               C  an..3........: ''
+040   7383  SURFACE/LAYER INDICATOR, CODED                 C  an..3........: ''
+
+      QTY    QUANTITY
+----------------------------------------------------------------------------
+010   6063   Quantity qualifier                            M  an..3........: '21'      {Ordered quantity}
+      6060   Quantity                                      M  n..15........: '50'
+      6411   Measure unit qualifier                        C  an..3........: 'PCE'
+
+      DTM    DATE/TIME/PERIOD
+----------------------------------------------------------------------------
+010   2005   Date/time/period qualifier                    M  an..3........: '2'       {Delivery date/time, requested}
+      2380   Date/time/period                              C  an..35.......: '20200302'
+      2379   Date/time/period format qualifier             C  an..3........: '102'     {CCYYMMDD}
+
+      MOA    MONETARY AMOUNT
+----------------------------------------------------------------------------
+010   5025   Monetary amount type qualifier                M  an..3........: '203'     {Line item amount}
+      5004   Monetary amount                               C  n..18........: '27.55'
+      6345   Currency, coded                               C  an..3........: ''
+      6343   Currency qualifier                            C  an..3........: ''
+      4405   Status, coded                                 C  an..3........: ''
+
+      FTX    FREE TEXT
+----------------------------------------------------------------------------
+010   4451  TEXT SUBJECT QUALIFIER                         M  an..3........: 'AAI'     {General information}
+020   4453  TEXT FUNCTION, CODED                           C  an..3........: ''
+030   4441   Free text, coded                              M  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   4440   Free text                                     M  an..70.......: 'SIB: C5212000'
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+050   3453  LANGUAGE, CODED                                C  an..3........: ''
+
+      PRI    PRICE DETAILS
+----------------------------------------------------------------------------
+010   5125   Price qualifier                               M  an..3........: 'AAA'     {Calculation net}
+      5118   Price                                         C  n..15........: '55.1'
+      5375   Price type, coded                             C  an..3........: ''
+      5387   Price type qualifier                          C  an..3........: ''
+      5284   Unit price basis                              C  n..9.........: '100'
+      6411   Measure unit qualifier                        C  an..3........: ''
+020   5213  SUB-LINE PRICE CHANGE, CODED                   C  an..3........: ''
+
+      ALC    ALLOWANCE OR CHARGE
+----------------------------------------------------------------------------
+010   5463  ALLOWANCE OR CHARGE QUALIFIER                  M  an..3........: 'C'       {Charge}
+020   1230   Allowance or charge number                    C  an..35.......: ''
+      5189   Charge/allowance description, coded           C  an..3........: ''
+030   4471  SETTLEMENT, CODED                              C  an..3........: ''
+040   1227  CALCULATION SEQUENCE INDICATOR, CODED          C  an..3........: ''
+050   7161   Special services, coded                       C  an..3........: 'MS'      {unknown value!}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+      7160   Special service                               C  an..35.......: ''
+      7160   Special service                               C  an..35.......: ''
+
+      PCD    PERCENTAGE DETAILS
+----------------------------------------------------------------------------
+010   5245   Percentage qualifier                          M  an..3........: '3'       {Allowance or charge}
+      5482   Percentage                                    C  n..10........: '5'
+      5249   Percentage basis, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+
+      MOA    MONETARY AMOUNT
+----------------------------------------------------------------------------
+010   5025   Monetary amount type qualifier                M  an..3........: '8'       {Allowance or charge amount}
+      5004   Monetary amount                               C  n..18........: '155'
+      6345   Currency, coded                               C  an..3........: ''
+      6343   Currency qualifier                            C  an..3........: ''
+      4405   Status, coded                                 C  an..3........: ''
+
+      MOA    MONETARY AMOUNT
+----------------------------------------------------------------------------
+010   5025   Monetary amount type qualifier                M  an..3........: '236'     {Amount subject to price adjustment}
+      5004   Monetary amount                               C  n..18........: '415'
+      6345   Currency, coded                               C  an..3........: ''
+      6343   Currency qualifier                            C  an..3........: ''
+      4405   Status, coded                                 C  an..3........: ''
+
+      LIN    LINE ITEM
+----------------------------------------------------------------------------
+010   1082  LINE ITEM NUMBER                               C  n..6.........: '6'
+020   1229  ACTION REQUEST/NOTIFICATION, CODED             C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: '7611577115344'
+      7143   Item number type, coded                       C  an..3........: 'EN'      {International Article Numbering Association (EAN)}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   5495   Sub-line indicator, coded                     C  an..3........: ''
+      1082   Line item number                              C  n..6.........: ''
+050   1222  CONFIGURATION LEVEL                            C  n..2.........: ''
+060   7083  CONFIGURATION, CODED                           C  an..3........: ''
+
+      PIA    ADDITIONAL PRODUCT ID
+----------------------------------------------------------------------------
+010   4347  PRODUCT ID. FUNCTION QUALIFIER                 M  an..3........: '5'       {Product identification}
+020   7140   Item number                                   C  an..35.......: '2465970'
+      7143   Item number type, coded                       C  an..3........: 'BP'      {Buyer's part number}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+050   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+060   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+
+      PIA    ADDITIONAL PRODUCT ID
+----------------------------------------------------------------------------
+010   4347  PRODUCT ID. FUNCTION QUALIFIER                 M  an..3........: '5'       {Product identification}
+020   7140   Item number                                   C  an..35.......: '934283716'
+      7143   Item number type, coded                       C  an..3........: 'SA'      {Supplier's article number}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+050   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+060   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+
+      IMD    ITEM DESCRIPTION
+----------------------------------------------------------------------------
+010   7077  ITEM DESCRIPTION TYPE, CODED                   C  an..3........: 'F'       {Free-form}
+020   7081  ITEM CHARACTERISTIC, CODED                     C  an..3........: ''
+030   7009   Item description identification               C  an..17.......: 'IN'
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+      7008   Item description                              C  an..35.......: 'Plica KV M16 MS Kabelverschraubung'
+      7008   Item description                              C  an..35.......: 'M 16'
+      3453   Language, coded                               C  an..3........: ''
+040   7383  SURFACE/LAYER INDICATOR, CODED                 C  an..3........: ''
+
+      QTY    QUANTITY
+----------------------------------------------------------------------------
+010   6063   Quantity qualifier                            M  an..3........: '21'      {Ordered quantity}
+      6060   Quantity                                      M  n..15........: '50'
+      6411   Measure unit qualifier                        C  an..3........: 'PCE'
+
+      DTM    DATE/TIME/PERIOD
+----------------------------------------------------------------------------
+010   2005   Date/time/period qualifier                    M  an..3........: '2'       {Delivery date/time, requested}
+      2380   Date/time/period                              C  an..35.......: '20200302'
+      2379   Date/time/period format qualifier             C  an..3........: '102'     {CCYYMMDD}
+
+      MOA    MONETARY AMOUNT
+----------------------------------------------------------------------------
+010   5025   Monetary amount type qualifier                M  an..3........: '203'     {Line item amount}
+      5004   Monetary amount                               C  n..18........: '43.94'
+      6345   Currency, coded                               C  an..3........: ''
+      6343   Currency qualifier                            C  an..3........: ''
+      4405   Status, coded                                 C  an..3........: ''
+
+      FTX    FREE TEXT
+----------------------------------------------------------------------------
+010   4451  TEXT SUBJECT QUALIFIER                         M  an..3........: 'AAI'     {General information}
+020   4453  TEXT FUNCTION, CODED                           C  an..3........: ''
+030   4441   Free text, coded                              M  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   4440   Free text                                     M  an..70.......: 'Messing 934283716'
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+050   3453  LANGUAGE, CODED                                C  an..3........: ''
+
+      PRI    PRICE DETAILS
+----------------------------------------------------------------------------
+010   5125   Price qualifier                               M  an..3........: 'AAA'     {Calculation net}
+      5118   Price                                         C  n..15........: '87.88'
+      5375   Price type, coded                             C  an..3........: ''
+      5387   Price type qualifier                          C  an..3........: ''
+      5284   Unit price basis                              C  n..9.........: '100'
+      6411   Measure unit qualifier                        C  an..3........: ''
+020   5213  SUB-LINE PRICE CHANGE, CODED                   C  an..3........: ''
+
+      ALC    ALLOWANCE OR CHARGE
+----------------------------------------------------------------------------
+010   5463  ALLOWANCE OR CHARGE QUALIFIER                  M  an..3........: 'C'       {Charge}
+020   1230   Allowance or charge number                    C  an..35.......: ''
+      5189   Charge/allowance description, coded           C  an..3........: ''
+030   4471  SETTLEMENT, CODED                              C  an..3........: ''
+040   1227  CALCULATION SEQUENCE INDICATOR, CODED          C  an..3........: ''
+050   7161   Special services, coded                       C  an..3........: 'MS'      {unknown value!}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+      7160   Special service                               C  an..35.......: ''
+      7160   Special service                               C  an..35.......: ''
+
+      PCD    PERCENTAGE DETAILS
+----------------------------------------------------------------------------
+010   5245   Percentage qualifier                          M  an..3........: '3'       {Allowance or charge}
+      5482   Percentage                                    C  n..10........: '31'
+      5249   Percentage basis, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+
+      MOA    MONETARY AMOUNT
+----------------------------------------------------------------------------
+010   5025   Monetary amount type qualifier                M  an..3........: '236'     {Amount subject to price adjustment}
+      5004   Monetary amount                               C  n..18........: '415'
+      6345   Currency, coded                               C  an..3........: ''
+      6343   Currency qualifier                            C  an..3........: ''
+      4405   Status, coded                                 C  an..3........: ''
+
+      LIN    LINE ITEM
+----------------------------------------------------------------------------
+010   1082  LINE ITEM NUMBER                               C  n..6.........: '7'
+020   1229  ACTION REQUEST/NOTIFICATION, CODED             C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: '7611577105543'
+      7143   Item number type, coded                       C  an..3........: 'EN'      {International Article Numbering Association (EAN)}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   5495   Sub-line indicator, coded                     C  an..3........: ''
+      1082   Line item number                              C  n..6.........: ''
+050   1222  CONFIGURATION LEVEL                            C  n..2.........: ''
+060   7083  CONFIGURATION, CODED                           C  an..3........: ''
+
+      PIA    ADDITIONAL PRODUCT ID
+----------------------------------------------------------------------------
+010   4347  PRODUCT ID. FUNCTION QUALIFIER                 M  an..3........: '5'       {Product identification}
+020   7140   Item number                                   C  an..35.......: '2466668'
+      7143   Item number type, coded                       C  an..3........: 'BP'      {Buyer's part number}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+050   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+060   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+
+      PIA    ADDITIONAL PRODUCT ID
+----------------------------------------------------------------------------
+010   4347  PRODUCT ID. FUNCTION QUALIFIER                 M  an..3........: '5'       {Product identification}
+020   7140   Item number                                   C  an..35.......: '907005434'
+      7143   Item number type, coded                       C  an..3........: 'SA'      {Supplier's article number}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+050   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+060   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+
+      IMD    ITEM DESCRIPTION
+----------------------------------------------------------------------------
+010   7077  ITEM DESCRIPTION TYPE, CODED                   C  an..3........: 'F'       {Free-form}
+020   7081  ITEM CHARACTERISTIC, CODED                     C  an..3........: ''
+030   7009   Item description identification               C  an..17.......: 'IN'
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+      7008   Item description                              C  an..35.......: 'Plica ADAP M32/M20 PA 6 Reduktion 6'
+      7008   Item description                              C  an..35.......: '-kant'
+      3453   Language, coded                               C  an..3........: ''
+040   7383  SURFACE/LAYER INDICATOR, CODED                 C  an..3........: ''
+
+      QTY    QUANTITY
+----------------------------------------------------------------------------
+010   6063   Quantity qualifier                            M  an..3........: '21'      {Ordered quantity}
+      6060   Quantity                                      M  n..15........: '200'
+      6411   Measure unit qualifier                        C  an..3........: 'PCE'
+
+      DTM    DATE/TIME/PERIOD
+----------------------------------------------------------------------------
+010   2005   Date/time/period qualifier                    M  an..3........: '2'       {Delivery date/time, requested}
+      2380   Date/time/period                              C  an..35.......: '20200302'
+      2379   Date/time/period format qualifier             C  an..3........: '102'     {CCYYMMDD}
+
+      MOA    MONETARY AMOUNT
+----------------------------------------------------------------------------
+010   5025   Monetary amount type qualifier                M  an..3........: '203'     {Line item amount}
+      5004   Monetary amount                               C  n..18........: '62.9'
+      6345   Currency, coded                               C  an..3........: ''
+      6343   Currency qualifier                            C  an..3........: ''
+      4405   Status, coded                                 C  an..3........: ''
+
+      FTX    FREE TEXT
+----------------------------------------------------------------------------
+010   4451  TEXT SUBJECT QUALIFIER                         M  an..3........: 'AAI'     {General information}
+020   4453  TEXT FUNCTION, CODED                           C  an..3........: ''
+030   4441   Free text, coded                              M  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   4440   Free text                                     M  an..70.......: 'M 32 M 20 Kunststoff 907005434'
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+050   3453  LANGUAGE, CODED                                C  an..3........: ''
+
+      PRI    PRICE DETAILS
+----------------------------------------------------------------------------
+010   5125   Price qualifier                               M  an..3........: 'AAA'     {Calculation net}
+      5118   Price                                         C  n..15........: '31.45'
+      5375   Price type, coded                             C  an..3........: ''
+      5387   Price type qualifier                          C  an..3........: ''
+      5284   Unit price basis                              C  n..9.........: '100'
+      6411   Measure unit qualifier                        C  an..3........: ''
+020   5213  SUB-LINE PRICE CHANGE, CODED                   C  an..3........: ''
+
+      LIN    LINE ITEM
+----------------------------------------------------------------------------
+010   1082  LINE ITEM NUMBER                               C  n..6.........: '8'
+020   1229  ACTION REQUEST/NOTIFICATION, CODED             C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: '7611577114521'
+      7143   Item number type, coded                       C  an..3........: 'EN'      {International Article Numbering Association (EAN)}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   5495   Sub-line indicator, coded                     C  an..3........: ''
+      1082   Line item number                              C  n..6.........: ''
+050   1222  CONFIGURATION LEVEL                            C  n..2.........: ''
+060   7083  CONFIGURATION, CODED                           C  an..3........: ''
+
+      PIA    ADDITIONAL PRODUCT ID
+----------------------------------------------------------------------------
+010   4347  PRODUCT ID. FUNCTION QUALIFIER                 M  an..3........: '5'       {Product identification}
+020   7140   Item number                                   C  an..35.......: '2466075'
+      7143   Item number type, coded                       C  an..3........: 'BP'      {Buyer's part number}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+050   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+060   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+
+      PIA    ADDITIONAL PRODUCT ID
+----------------------------------------------------------------------------
+010   4347  PRODUCT ID. FUNCTION QUALIFIER                 M  an..3........: '5'       {Product identification}
+020   7140   Item number                                   C  an..35.......: '935345220'
+      7143   Item number type, coded                       C  an..3........: 'SA'      {Supplier's article number}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+050   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+060   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+
+      IMD    ITEM DESCRIPTION
+----------------------------------------------------------------------------
+010   7077  ITEM DESCRIPTION TYPE, CODED                   C  an..3........: 'F'       {Free-form}
+020   7081  ITEM CHARACTERISTIC, CODED                     C  an..3........: ''
+030   7009   Item description identification               C  an..17.......: 'IN'
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+      7008   Item description                              C  an..35.......: 'Plica KV M20/16 PA 6 Kabelverschrau'
+      7008   Item description                              C  an..35.......: 'bung'
+      3453   Language, coded                               C  an..3........: ''
+040   7383  SURFACE/LAYER INDICATOR, CODED                 C  an..3........: ''
+
+      QTY    QUANTITY
+----------------------------------------------------------------------------
+010   6063   Quantity qualifier                            M  an..3........: '21'      {Ordered quantity}
+      6060   Quantity                                      M  n..15........: '50'
+      6411   Measure unit qualifier                        C  an..3........: 'PCE'
+
+      DTM    DATE/TIME/PERIOD
+----------------------------------------------------------------------------
+010   2005   Date/time/period qualifier                    M  an..3........: '2'       {Delivery date/time, requested}
+      2380   Date/time/period                              C  an..35.......: '20200302'
+      2379   Date/time/period format qualifier             C  an..3........: '102'     {CCYYMMDD}
+
+      MOA    MONETARY AMOUNT
+----------------------------------------------------------------------------
+010   5025   Monetary amount type qualifier                M  an..3........: '203'     {Line item amount}
+      5004   Monetary amount                               C  n..18........: '12.8'
+      6345   Currency, coded                               C  an..3........: ''
+      6343   Currency qualifier                            C  an..3........: ''
+      4405   Status, coded                                 C  an..3........: ''
+
+      FTX    FREE TEXT
+----------------------------------------------------------------------------
+010   4451  TEXT SUBJECT QUALIFIER                         M  an..3........: 'AAI'     {General information}
+020   4453  TEXT FUNCTION, CODED                           C  an..3........: ''
+030   4441   Free text, coded                              M  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   4440   Free text                                     M  an..70.......: 'M 20 Polyamid 935345220'
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+050   3453  LANGUAGE, CODED                                C  an..3........: ''
+
+      PRI    PRICE DETAILS
+----------------------------------------------------------------------------
+010   5125   Price qualifier                               M  an..3........: 'AAA'     {Calculation net}
+      5118   Price                                         C  n..15........: '25.61'
+      5375   Price type, coded                             C  an..3........: ''
+      5387   Price type qualifier                          C  an..3........: ''
+      5284   Unit price basis                              C  n..9.........: '100'
+      6411   Measure unit qualifier                        C  an..3........: ''
+020   5213  SUB-LINE PRICE CHANGE, CODED                   C  an..3........: ''
+
+      LIN    LINE ITEM
+----------------------------------------------------------------------------
+010   1082  LINE ITEM NUMBER                               C  n..6.........: '9'
+020   1229  ACTION REQUEST/NOTIFICATION, CODED             C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: '4047943035177'
+      7143   Item number type, coded                       C  an..3........: 'EN'      {International Article Numbering Association (EAN)}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   5495   Sub-line indicator, coded                     C  an..3........: ''
+      1082   Line item number                              C  n..6.........: ''
+050   1222  CONFIGURATION LEVEL                            C  n..2.........: ''
+060   7083  CONFIGURATION, CODED                           C  an..3........: ''
+
+      PIA    ADDITIONAL PRODUCT ID
+----------------------------------------------------------------------------
+010   4347  PRODUCT ID. FUNCTION QUALIFIER                 M  an..3........: '5'       {Product identification}
+020   7140   Item number                                   C  an..35.......: '2459055'
+      7143   Item number type, coded                       C  an..3........: 'BP'      {Buyer's part number}
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+030   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+050   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+060   7140   Item number                                   C  an..35.......: ''
+      7143   Item number type, coded                       C  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+
+      IMD    ITEM DESCRIPTION
+----------------------------------------------------------------------------
+010   7077  ITEM DESCRIPTION TYPE, CODED                   C  an..3........: 'F'       {Free-form}
+020   7081  ITEM CHARACTERISTIC, CODED                     C  an..3........: ''
+030   7009   Item description identification               C  an..17.......: 'IN'
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+      7008   Item description                              C  an..35.......: 'Kabelverschraubung M25      5307025'
+      7008   Item description                              C  an..35.......: ''
+      3453   Language, coded                               C  an..3........: ''
+040   7383  SURFACE/LAYER INDICATOR, CODED                 C  an..3........: ''
+
+      QTY    QUANTITY
+----------------------------------------------------------------------------
+010   6063   Quantity qualifier                            M  an..3........: '21'      {Ordered quantity}
+      6060   Quantity                                      M  n..15........: '50'
+      6411   Measure unit qualifier                        C  an..3........: 'PCE'
+
+      DTM    DATE/TIME/PERIOD
+----------------------------------------------------------------------------
+010   2005   Date/time/period qualifier                    M  an..3........: '2'       {Delivery date/time, requested}
+      2380   Date/time/period                              C  an..35.......: '20200302'
+      2379   Date/time/period format qualifier             C  an..3........: '102'     {CCYYMMDD}
+
+      MOA    MONETARY AMOUNT
+----------------------------------------------------------------------------
+010   5025   Monetary amount type qualifier                M  an..3........: '203'     {Line item amount}
+      5004   Monetary amount                               C  n..18........: '26.62'
+      6345   Currency, coded                               C  an..3........: ''
+      6343   Currency qualifier                            C  an..3........: ''
+      4405   Status, coded                                 C  an..3........: ''
+
+      FTX    FREE TEXT
+----------------------------------------------------------------------------
+010   4451  TEXT SUBJECT QUALIFIER                         M  an..3........: 'AAI'     {General information}
+020   4453  TEXT FUNCTION, CODED                           C  an..3........: ''
+030   4441   Free text, coded                              M  an..3........: ''
+      1131   Code list qualifier                           C  an..3........: ''
+      3055   Code list responsible agency, coded           C  an..3........: ''
+040   4440   Free text                                     M  an..70.......: 'SIB: F7032509'
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+      4440   Free text                                     C  an..70.......: ''
+050   3453  LANGUAGE, CODED                                C  an..3........: ''
+
+      PRI    PRICE DETAILS
+----------------------------------------------------------------------------
+010   5125   Price qualifier                               M  an..3........: 'AAA'     {Calculation net}
+      5118   Price                                         C  n..15........: '53.24'
+      5375   Price type, coded                             C  an..3........: ''
+      5387   Price type qualifier                          C  an..3........: ''
+      5284   Unit price basis                              C  n..9.........: '100'
+      6411   Measure unit qualifier                        C  an..3........: ''
+020   5213  SUB-LINE PRICE CHANGE, CODED                   C  an..3........: ''
+
+      UNS    SECTION CONTROL
+----------------------------------------------------------------------------
+010   0081  SECTION IDENTIFICATION                         M  a...1........: 'S'       {Detail/summary section separation}
+
+      UNT    MESSAGE TRAILER
+----------------------------------------------------------------------------
+010   0074  NUMBER OF SEGMENTS IN THE MESSAGE              M  n...6........: '96'
+020   0062  MESSAGE REFERENCE NUMBER                       M  an..14.......: '70-0639880'
+
+      UNZ    INTERCHANGE TRAILER
+----------------------------------------------------------------------------
+010   0036  INTERCHANGE CONTROL COUNT                      M  n...6........: '1'
+020   0020  INTERCHANGE CONTROL REFERENCE                  M  an..14.......: '0'

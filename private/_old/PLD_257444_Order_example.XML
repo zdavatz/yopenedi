@@ -21,7 +21,7 @@
 						<bmecat:NAME>Plica AG</bmecat:NAME>
 						<bmecat:NAME2>Systeme für Elektrotechnik</bmecat:NAME2>
 						<bmecat:NAME3/>
-						<bmecat:STREET>Zürc1herstrasse 350</bmecat:STREET>
+						<bmecat:STREET>Zürcherstrasse 350</bmecat:STREET>
 						<bmecat:ZIP>8500</bmecat:ZIP>
 						<bmecat:BOXNO/>
 						<bmecat:ZIPBOX/>
@@ -33,15 +33,15 @@
 						<bmecat:FAX>+41 52 723 67 18</bmecat:FAX>
 						<bmecat:EMAIL>verkauf@plica.ch;einkauf@plica.ch</bmecat:EMAIL>
 						<bmecat:URL>www.plica.ch</bmecat:URL>
+						<CONTACT_DETAILS>
+							<bmecat:CONTACT_NAME>Marbach</bmecat:CONTACT_NAME>
+							<bmecat:FIRST_NAME>Laura</bmecat:FIRST_NAME>
+							<bmecat:PHONE>+41 52 723 67 34</bmecat:PHONE>
+							<bmecat:FAX>+41 52 723 67 18</bmecat:FAX>
+							<bmecat:EMAILS>laura.marbach@plica.ch</bmecat:EMAILS>
+							<bmecat:CONTACT_ROLE type="document_issuer">Sachbearbeitung Ek</bmecat:CONTACT_ROLE>
+						</CONTACT_DETAILS>
 					</ADDRESS>
-					<CONTACT_DETAILS>
-						<bmecat:CONTACT_NAME>Marbach</bmecat:CONTACT_NAME>
-						<bmecat:FIRST_NAME>Laura</bmecat:FIRST_NAME>
-						<bmecat:PHONE>+41 52 723 67 34</bmecat:PHONE>
-						<bmecat:FAX>+41 52 723 67 18</bmecat:FAX>
-						<bmecat:EMAILS>laura.marbach@plica.ch</bmecat:EMAILS>
-						<bmecat:CONTACT_ROLE type="document_issuer">Sachbearbeitung Ek</bmecat:CONTACT_ROLE>
-					</CONTACT_DETAILS>
 				</PARTY>
 				<PARTY>
 					<bmecat:PARTY_ID type="iln">7611577000008</bmecat:PARTY_ID>
@@ -63,15 +63,15 @@
 						<bmecat:FAX>+41 52 723 67 18</bmecat:FAX>
 						<bmecat:EMAIL>verkauf@plica.ch;einkauf@plica.ch</bmecat:EMAIL>
 						<bmecat:URL>www.plica.ch</bmecat:URL>
+						<CONTACT_DETAILS>
+							<bmecat:CONTACT_NAME>Administration</bmecat:CONTACT_NAME>
+							<bmecat:FIRST_NAME>Abteilung</bmecat:FIRST_NAME>
+							<bmecat:PHONE>+41 52 723 61 11</bmecat:PHONE>
+							<bmecat:FAX/>
+							<bmecat:EMAILS>administration@janico.ch</bmecat:EMAILS>
+							<bmecat:CONTACT_ROLE type="administrativ"/>
+						</CONTACT_DETAILS>
 					</ADDRESS>
-					<CONTACT_DETAILS>
-						<bmecat:CONTACT_NAME>Administration</bmecat:CONTACT_NAME>
-						<bmecat:FIRST_NAME>Abteilung</bmecat:FIRST_NAME>
-						<bmecat:PHONE>+41 52 723 61 11</bmecat:PHONE>
-						<bmecat:FAX/>
-						<bmecat:EMAILS>administration@janico.ch</bmecat:EMAILS>
-						<bmecat:CONTACT_ROLE type="administrativ"/>
-					</CONTACT_DETAILS>
 				</PARTY>
 				<PARTY>
 					<bmecat:PARTY_ID type="iln">7611577000008</bmecat:PARTY_ID>
@@ -93,15 +93,15 @@
 						<bmecat:FAX>+41 52 723 67 18</bmecat:FAX>
 						<bmecat:EMAIL>verkauf@plica.ch;einkauf@plica.ch</bmecat:EMAIL>
 						<bmecat:URL>www.plica.ch</bmecat:URL>
+						<CONTACT_DETAILS>
+							<bmecat:CONTACT_NAME>Logistik</bmecat:CONTACT_NAME>
+							<bmecat:FIRST_NAME>Abteilung</bmecat:FIRST_NAME>
+							<bmecat:PHONE>+41 52 723 61 11</bmecat:PHONE>
+							<bmecat:FAX/>
+							<bmecat:EMAILS>jlogistik@janico.ch</bmecat:EMAILS>
+							<bmecat:CONTACT_ROLE type="others"/>
+						</CONTACT_DETAILS>
 					</ADDRESS>
-					<CONTACT_DETAILS>
-						<bmecat:CONTACT_NAME>Logistik</bmecat:CONTACT_NAME>
-						<bmecat:FIRST_NAME>Abteilung</bmecat:FIRST_NAME>
-						<bmecat:PHONE>+41 52 723 61 11</bmecat:PHONE>
-						<bmecat:FAX/>
-						<bmecat:EMAILS>jlogistik@janico.ch</bmecat:EMAILS>
-						<bmecat:CONTACT_ROLE type="others"/>
-					</CONTACT_DETAILS>
 				</PARTY>
 				<PARTY>
 					<bmecat:PARTY_ID type="iln">3661458000003</bmecat:PARTY_ID>
@@ -122,15 +122,15 @@
 						<bmecat:FAX>2472734636727</bmecat:FAX>
 						<bmecat:EMAIL>hans.weber@ultra.fyi</bmecat:EMAIL>
 						<bmecat:URL>https://www.ultra.fyi/</bmecat:URL>
+						<CONTACT_DETAILS>
+							<bmecat:CONTACT_NAME>Weber</bmecat:CONTACT_NAME>
+							<bmecat:FIRST_NAME>Hans</bmecat:FIRST_NAME>
+							<bmecat:PHONE>24257572524</bmecat:PHONE>
+							<bmecat:FAX>2472734636727</bmecat:FAX>
+							<bmecat:EMAILS>hans.weber@ultra.fyi</bmecat:EMAILS>
+							<bmecat:CONTACT_ROLE type="document_issuer">LT, Bestellungen</bmecat:CONTACT_ROLE>
+						</CONTACT_DETAILS>
 					</ADDRESS>
-					<CONTACT_DETAILS>
-						<bmecat:CONTACT_NAME>Weber</bmecat:CONTACT_NAME>
-						<bmecat:FIRST_NAME>Hans</bmecat:FIRST_NAME>
-						<bmecat:PHONE>24257572524</bmecat:PHONE>
-						<bmecat:FAX>2472734636727</bmecat:FAX>
-						<bmecat:EMAILS>hans.weber@ultra.fyi</bmecat:EMAILS>
-						<bmecat:CONTACT_ROLE type="document_issuer">LT, Bestellungen</bmecat:CONTACT_ROLE>
-					</CONTACT_DETAILS>
 				</PARTY>
 			</PARTIES>
 			<ORDER_PARTIES_REFERENCE>

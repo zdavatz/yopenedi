@@ -1,0 +1,687 @@
+[{
+    "UNB": "UNOC:3+4028684000006:14+4047943000007:14+200505:1306+2158",
+    "index": 1,
+    "children": []
+}, {
+    "UNH": "0001+ORDERS:D:96A:UN",
+    "index": 2,
+    "children": [{
+        "BGM": "220+0351485311",
+        "index": 3
+    }, {
+        "DTM": "137:20200427:102",
+        "index": 4
+    }, {
+        "DTM": "2:20200505:102",
+        "index": 5
+    }, {
+        "FTX": "PUR++001+bitte die Handlingspauschale entsprechend mit in REchnung stellen:MFG:A.Migenda",
+        "index": 6
+    }, {
+        "RFF": "AJK:SONDERBESTELLUNG",
+        "index": 7
+    }, {
+        "RFF": "PD",
+        "index": 8
+    }, {
+        "RFF": "ZZZ",
+        "index": 9
+    }, {
+        "RFF": "IT:3603347",
+        "index": 10
+    }]
+}, {
+    "NAD": "BY+4028684035121::9",
+    "index": 11,
+    "children": [{
+        "CTA": "UC+:MIGENDA",
+        "index": 12
+    }, {
+        "COM": "49 (0)8142/6521805:TE",
+        "index": 13
+    }, {
+        "CTA": "UC+Andreas Migenda",
+        "index": 14
+    }, {
+        "COM": "Andreas.Migenda�rexel.de:EM",
+        "index": 15
+    }]
+}, {
+    "NAD": "SU+4047943000007::9",
+    "index": 16,
+    "children": []
+}, {
+    "NAD": "DP+4028684035121::9",
+    "index": 17,
+    "children": [{
+        "CUX": "2:EUR:9",
+        "index": 18
+    }]
+}, {
+    "LIN": "1",
+    "index": 19,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 20
+    }, {
+        "PIA": "5+1206520:SA::92",
+        "index": 21
+    }, {
+        "IMD": "F++:::1206520",
+        "index": 22
+    }, {
+        "IMD": "F++:::Wellschlauch PA 6 V0 NW4,5 schwarz:ungeschlitzt",
+        "index": 23
+    }, {
+        "IMD": "F++:::Angebot 01053963 31.03.2020:gultig bis 30.04.2020",
+        "index": 24
+    }, {
+        "QTY": "21:100:MTR",
+        "index": 25
+    }, {
+        "FTX": "PUR++001+Angebot 01053963 31.03.2020:gultig bis 30.04.2020",
+        "index": 26
+    }, {
+        "PRI": "AAA:25.29:::100",
+        "index": 27
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 28
+    }]
+}, {
+    "LIN": "2",
+    "index": 29,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 30
+    }, {
+        "PIA": "5+1206540:SA::92",
+        "index": 31
+    }, {
+        "IMD": "F++:::1206540",
+        "index": 32
+    }, {
+        "IMD": "F++:::Wellschlauch PA 6 V0 NW4,5 schwarz:geschlitzt",
+        "index": 33
+    }, {
+        "QTY": "21:100:MTR",
+        "index": 34
+    }, {
+        "PRI": "AAA:24.63:::100",
+        "index": 35
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 36
+    }]
+}, {
+    "LIN": "3",
+    "index": 37,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 38
+    }, {
+        "PIA": "5+1206521:SA::92",
+        "index": 39
+    }, {
+        "IMD": "F++:::1206521",
+        "index": 40
+    }, {
+        "IMD": "F++:::Wellschlauch PA 6 V0 NW7,5 schwarz:ungeschlitzt",
+        "index": 41
+    }, {
+        "QTY": "21:50:MTR",
+        "index": 42
+    }, {
+        "PRI": "AAA:32.88:::100",
+        "index": 43
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 44
+    }]
+}, {
+    "LIN": "4",
+    "index": 45,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 46
+    }, {
+        "PIA": "5+1206541:SA::92",
+        "index": 47
+    }, {
+        "IMD": "F++:::1206541",
+        "index": 48
+    }, {
+        "IMD": "F++:::Wellschlauch PA 6 V0 NW7,5 schwarz:geschlitzt",
+        "index": 49
+    }, {
+        "QTY": "21:50:MTR",
+        "index": 50
+    }, {
+        "PRI": "AAA:32.88:::100",
+        "index": 51
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 52
+    }]
+}, {
+    "LIN": "5",
+    "index": 53,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 54
+    }, {
+        "PIA": "5+1206522:SA::92",
+        "index": 55
+    }, {
+        "IMD": "F++:::1206522",
+        "index": 56
+    }, {
+        "IMD": "F++:::Wellschlauch PA 6 V0 NW8,5 schwarz:ungeschlitzt",
+        "index": 57
+    }, {
+        "QTY": "21:50:MTR",
+        "index": 58
+    }, {
+        "PRI": "AAA:36.82:::100",
+        "index": 59
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 60
+    }]
+}, {
+    "LIN": "6",
+    "index": 61,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 62
+    }, {
+        "PIA": "5+1206542:SA::92",
+        "index": 63
+    }, {
+        "IMD": "F++:::1206542",
+        "index": 64
+    }, {
+        "IMD": "F++:::Wellschlauch PA 6 V0 NW8,5 schwarz:geschlitzt",
+        "index": 65
+    }, {
+        "QTY": "21:50:MTR",
+        "index": 66
+    }, {
+        "PRI": "AAA:45.16:::100",
+        "index": 67
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 68
+    }]
+}, {
+    "LIN": "7",
+    "index": 69,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 70
+    }, {
+        "PIA": "5+1206523:SA::92",
+        "index": 71
+    }, {
+        "IMD": "F++:::1206523",
+        "index": 72
+    }, {
+        "IMD": "F++:::Wellschlauch PA 6 V0 NW10 schwarz u:ngeschlitzt",
+        "index": 73
+    }, {
+        "QTY": "21:50:MTR",
+        "index": 74
+    }, {
+        "PRI": "AAA:40.6:::100",
+        "index": 75
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 76
+    }]
+}, {
+    "LIN": "8",
+    "index": 77,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 78
+    }, {
+        "PIA": "5+1206543:SA::92",
+        "index": 79
+    }, {
+        "IMD": "F++:::1206543",
+        "index": 80
+    }, {
+        "IMD": "F++:::Wellschlauch PA 6 V0 NW10 schwarz g:eschlitzt",
+        "index": 81
+    }, {
+        "QTY": "21:50:MTR",
+        "index": 82
+    }, {
+        "PRI": "AAA:40.6:::100",
+        "index": 83
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 84
+    }]
+}, {
+    "LIN": "9",
+    "index": 85,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 86
+    }, {
+        "PIA": "5+1926654:SA::92",
+        "index": 87
+    }, {
+        "IMD": "F++:::1926654",
+        "index": 88
+    }, {
+        "IMD": "F++:::Wellschlauch PP NW4,5 schwarz gesch:litzt",
+        "index": 89
+    }, {
+        "QTY": "21:100:MTR",
+        "index": 90
+    }, {
+        "PRI": "AAA:13.86:::100",
+        "index": 91
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 92
+    }]
+}, {
+    "LIN": "10",
+    "index": 93,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 94
+    }, {
+        "PIA": "5+1926604:SA::92",
+        "index": 95
+    }, {
+        "IMD": "F++:::1926604",
+        "index": 96
+    }, {
+        "IMD": "F++:::Wellschlauch PP NW4,5 schwarz unges:chlitzt",
+        "index": 97
+    }, {
+        "QTY": "21:100:MTR",
+        "index": 98
+    }, {
+        "PRI": "AAA:13.86:::100",
+        "index": 99
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 100
+    }]
+}, {
+    "LIN": "11",
+    "index": 101,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 102
+    }, {
+        "PIA": "5+1926657:SA::92",
+        "index": 103
+    }, {
+        "IMD": "F++:::1926657",
+        "index": 104
+    }, {
+        "IMD": "F++:::Wellschlauch PP NW7,5 schwarz gesch:litzt",
+        "index": 105
+    }, {
+        "QTY": "21:50:MTR",
+        "index": 106
+    }, {
+        "PRI": "AAA:13.08:::100",
+        "index": 107
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 108
+    }]
+}, {
+    "LIN": "12",
+    "index": 109,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 110
+    }, {
+        "PIA": "5+1926607:SA::92",
+        "index": 111
+    }, {
+        "IMD": "F++:::1926607",
+        "index": 112
+    }, {
+        "IMD": "F++:::Wellschlauch PP NW7,5 schwarz unges:chlitzt",
+        "index": 113
+    }, {
+        "QTY": "21:50:MTR",
+        "index": 114
+    }, {
+        "PRI": "AAA:13.08:::100",
+        "index": 115
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 116
+    }]
+}, {
+    "LIN": "13",
+    "index": 117,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 118
+    }, {
+        "PIA": "5+1926660:SA::92",
+        "index": 119
+    }, {
+        "IMD": "F++:::1926660",
+        "index": 120
+    }, {
+        "IMD": "F++:::Wellschlauch PP NW10 schwarz geschl:itzt",
+        "index": 121
+    }, {
+        "QTY": "21:50:MTR",
+        "index": 122
+    }, {
+        "PRI": "AAA:16.82:::100",
+        "index": 123
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 124
+    }]
+}, {
+    "LIN": "14",
+    "index": 125,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 126
+    }, {
+        "PIA": "5+1926610:SA::92",
+        "index": 127
+    }, {
+        "IMD": "F++:::1926610",
+        "index": 128
+    }, {
+        "IMD": "F++:::Wellschlauch PP NW10 schwarz unge-:schlitzt",
+        "index": 129
+    }, {
+        "QTY": "21:50:MTR",
+        "index": 130
+    }, {
+        "PRI": "AAA:16.82:::100",
+        "index": 131
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 132
+    }]
+}, {
+    "LIN": "15",
+    "index": 133,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 134
+    }, {
+        "PIA": "5+1927904:SA::92",
+        "index": 135
+    }, {
+        "IMD": "F++:::1927904",
+        "index": 136
+    }, {
+        "IMD": "F++:::PP NW 4,5 AHW SW geschl.",
+        "index": 137
+    }, {
+        "QTY": "21:100:MTR",
+        "index": 138
+    }, {
+        "PRI": "AAA:15.99:::100",
+        "index": 139
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 140
+    }]
+}, {
+    "LIN": "16",
+    "index": 141,
+    "children": [{
+        "PIA": "5+0000029:BP::92",
+        "index": 142
+    }, {
+        "PIA": "5+1927964:SA::92",
+        "index": 143
+    }, {
+        "IMD": "F++:::1927964",
+        "index": 144
+    }, {
+        "IMD": "F++:::PP NW 4,5 AHW SW",
+        "index": 145
+    }, {
+        "IMD": "F++:::Angebot 01053963 31.03.2020:Preisgultigkeit 30.04.2020",
+        "index": 146
+    }, {
+        "QTY": "21:100:MTR",
+        "index": 147
+    }, {
+        "FTX": "PUR++001+Angebot 01053963 31.03.2020:Preisgultigkeit 30.04.2020",
+        "index": 148
+    }, {
+        "PRI": "AAA:15.99:::100",
+        "index": 149
+    }, {
+        "RFF": "AAG:Sonderpreis",
+        "index": 150
+    }, {
+        "UNS": "S",
+        "index": 151
+    }]
+}, {
+    "UNT": "151+0001",
+    "close": "UNH",
+    "skip": true,
+    "index": 152
+}, {
+    "UNH": "0002+ORDERS:D:96A:UN",
+    "index": 153,
+    "children": [{
+        "BGM": "220+0941087811",
+        "index": 154
+    }, {
+        "DTM": "137:20200421:102",
+        "index": 155
+    }, {
+        "DTM": "2:20200427:102",
+        "index": 156
+    }, {
+        "FTX": "PUR++001+bitte um eine AB mit Liefertermin",
+        "index": 157
+    }, {
+        "RFF": "AJK:DIREKTLIEFERUNG",
+        "index": 158
+    }, {
+        "RFF": "CR:1145018685",
+        "index": 159
+    }, {
+        "RFF": "PD",
+        "index": 160
+    }, {
+        "RFF": "IT:9404117",
+        "index": 161
+    }]
+}, {
+    "NAD": "BY+4028684094012::9",
+    "index": 162,
+    "children": [{
+        "CTA": "UC+:LOIDL",
+        "index": 163
+    }, {
+        "COM": "49 (0)871/974826-33:TE",
+        "index": 164
+    }, {
+        "CTA": "UC+Tobias Loidl",
+        "index": 165
+    }, {
+        "COM": "Tobias.Loidl�rexel.de:EM",
+        "index": 166
+    }]
+}, {
+    "NAD": "SU+4047943000007::9",
+    "index": 167,
+    "children": []
+}, {
+    "NAD": "DP+++REXEL LANDSHUT  ABHOLTHEKE:SELBSTABHOLUNG DURCH:LEISTUNGSEMPFANGER+OTTOSTR. 16 A+LANDSHUT++",
+    "index": 168,
+    "children": [{
+        "CUX": "2:EUR:9",
+        "index": 169
+    }]
+}, {
+    "LIN": "1++4047943214497:EN",
+    "index": 170,
+    "children": [{
+        "PIA": "5+2933373:BP::92",
+        "index": 171
+    }, {
+        "PIA": "5+7217702:SA::91",
+        "index": 172
+    }, {
+        "IMD": "F++:::FLACHKOPFDICHTUNG 12",
+        "index": 173
+    }, {
+        "IMD": "F++:::Flachkopfabdichtung passend fur PG1:3,5, PG16, M20 12.0x15.0 Gummi",
+        "index": 174
+    }, {
+        "QTY": "21:900:PCE",
+        "index": 175
+    }, {
+        "PRI": "AAA:18.69:::100",
+        "index": 176
+    }]
+}, {
+    "LIN": "2++4047943214497:EN",
+    "index": 177,
+    "children": [{
+        "PIA": "5+2933373:BP::92",
+        "index": 178
+    }, {
+        "PIA": "5+7217702:SA::91",
+        "index": 179
+    }, {
+        "IMD": "F++:::FLACHKOPFDICHTUNG 12",
+        "index": 180
+    }, {
+        "IMD": "F++:::Flachkopfabdichtung passend fur PG1:3,5, PG16, M20 12.0x15.0 Gummi",
+        "index": 181
+    }, {
+        "QTY": "21:100:PCE",
+        "index": 182
+    }, {
+        "PRI": "AAA:18.69:::100",
+        "index": 183
+    }, {
+        "UNS": "S",
+        "index": 184
+    }]
+}, {
+    "UNT": "33+0002",
+    "close": "UNH",
+    "skip": true,
+    "index": 185
+}, {
+    "UNH": "0003+ORDERS:D:96A:UN",
+    "index": 186,
+    "children": [{
+        "BGM": "220+0943080175",
+        "index": 187
+    }, {
+        "DTM": "137:20200416:102",
+        "index": 188
+    }, {
+        "DTM": "2:20200424:102",
+        "index": 189
+    }, {
+        "RFF": "AJK:LAGERBESTELLUNG",
+        "index": 190
+    }]
+}, {
+    "NAD": "BY+4028684094012::9",
+    "index": 191,
+    "children": [{
+        "CTA": "UC+:MIGENDA",
+        "index": 192
+    }, {
+        "COM": "49 (0)8142/6521805:TE",
+        "index": 193
+    }, {
+        "CTA": "UC+Andreas Migenda",
+        "index": 194
+    }, {
+        "COM": "Andreas.Migenda�rexel.de:EM",
+        "index": 195
+    }]
+}, {
+    "NAD": "SU+4047943000007::9",
+    "index": 196,
+    "children": []
+}, {
+    "NAD": "DP+4028684094012::9",
+    "index": 197,
+    "children": [{
+        "CUX": "2:EUR:9",
+        "index": 198
+    }]
+}, {
+    "LIN": "1++4047943262498:EN",
+    "index": 199,
+    "children": [{
+        "PIA": "5+2371967:BP::92",
+        "index": 200
+    }, {
+        "PIA": "5+5308949:SA::91",
+        "index": 201
+    }, {
+        "IMD": "F++:::935344121",
+        "index": 202
+    }, {
+        "IMD": "F++:::Kabelverschraubung M 20 Polyamid sc:hwarz",
+        "index": 203
+    }, {
+        "QTY": "21:1500:PCE",
+        "index": 204
+    }, {
+        "PRI": "AAA:21.63:::100",
+        "index": 205
+    }]
+}, {
+    "LIN": "2++4047943133859:EN",
+    "index": 206,
+    "children": [{
+        "PIA": "5+2902452:BP::92",
+        "index": 207
+    }, {
+        "PIA": "5+4224103:SA::91",
+        "index": 208
+    }, {
+        "IMD": "F++:::935370796",
+        "index": 209
+    }, {
+        "IMD": "F++:::Kabelverschraubung lange Dichtung M:20 Messing vernickelt",
+        "index": 210
+    }, {
+        "QTY": "21:650:PCE",
+        "index": 211
+    }, {
+        "PRI": "AAA:167.3:::100",
+        "index": 212
+    }, {
+        "UNS": "S",
+        "index": 213
+    }]
+}, {
+    "UNT": "29+0003",
+    "close": "UNH",
+    "skip": true,
+    "index": 214
+}, {
+    "UNZ": "3+2158",
+    "close": "UNB",
+    "skip": true,
+    "index": 215
+}]
