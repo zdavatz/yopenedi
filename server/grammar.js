@@ -236,7 +236,7 @@ Grammar = [{
     "name": "QTY",
     "tag": "QTY",
     renderx: '<QUANTITY>$qty</QUANTITY><ORDER_UNIT>$unit</ORDER_UNIT>',
-    renderold '<QUANTITY>$qty</QUANTITY><bmecat:ORDER_UNIT>$unit</bmecat:ORDER_UNIT>',
+    renderold: '<QUANTITY>$qty</QUANTITY><bmecat:ORDER_UNIT>$unit</bmecat:ORDER_UNIT>',
     render: '<bmecat:ORDER_UNIT>$unit</bmecat:ORDER_UNIT><QUANTITY>$qty</QUANTITY>',
     match: [
         [''],
