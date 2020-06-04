@@ -1,71 +1,71 @@
 /**
-* 
-*/
-
-
-
+ * 
+ */
 const fs = require('fs');
 const path = require('path');
+import Parse from './parse.js'
 /* -------------------------------------------------------------------------- */
 console.log('___init_IO___')
+/* -------------------------------------------------------------------------- */
+project = {}
+project.path = process.env['METEOR_SHELL_DIR'] + '/../../../'
+project.public = process.env['METEOR_SHELL_DIR'] + '/../../../public/';
+project.private = project.path + '/private/'
+/* -------------------------------------------------------------------------- */
+project.edifact_orders = project.path + '/edifact_orders/'
+project.opentrans_orders = project.path + '/opentrans_orders/'
+project.edifact_orders_done = project.path + 'edifact_orders_done/'
+files = {}
 
 /* -------------------------------------------------------------------------- */
 
-
-project = {}
-
-project.path = process.env['METEOR_SHELL_DIR'] + '/../../../'
-project.public = process.env['METEOR_SHELL_DIR'] + '/../../../public/';
-project.private = meteorPath + '/private/'
-project.edifact_orders = meteorPath + '/edifact_orders/'
-project.opentrans_orders  = meteorPath + '/opentrans_orders/'
-
-
-
-files = {}
-
-files.readDir = function(dir){
-    readFiles(dir, (filepath, name, ext, stat) => {
-        console.log("________________________");
-        console.log('file path:', filepath);
-
-        var text = fs.readFileSync(filepath, 'utf8');
-        // fs.writeFileSync('foo.txt', text, 'utf8');
-        console.log(text)
-        // console.log('file name:', name);
-        // console.log('file extension:', ext);
-        // console.log('file information:', stat);
-        console.log("________________________");
-      })
+// console.log(parseEdiDoc)
+project.readDir = function (dir,func) {
+  readFiles(dir, (fileData) => {
+    var doc = fs.readFileSync(fileData.filepath, 'utf8');
+    var xml = Parse.parseEdiDoc(doc)
+    writeFile(project.opentrans_orders + fileData.name + '.xml', xml)
+  })
 }
+/* -------------------------------------------------------------------------- */
 
-files.readDir(project.edifact_orders)
+function writeFile(file, data) {
+  console.log('Writing file..........', file)
+  fs.writeFile(file, data, 'utf8', function (err) {
+    if (err) {
+      return console.log(err);
+    } else {
+      console.log("Writing Mew File [Success]", file)
+    }
+  });
+}
+/* -------------------------------------------------------------------------- */
+
+project.readDir(project.edifact_orders)
+
+
+/* -------------------------------------------------------------------------- */
 
 function readFiles(dir, processFile) {
-    // read directory
-    fs.readdir(dir, (error, fileNames) => {
-      if (error) throw error;
-  
-      fileNames.forEach(filename => {
-
-        const name = path.parse(filename).name;
-
-        const ext = path.parse(filename).ext;
-
-        const filepath = path.resolve(dir, filename);
-
-        fs.stat(filepath, function(error, stat) {
-          if (error) throw error;
-
-          const isFile = stat.isFile();
-  
-          // exclude folders
-          if (isFile) {
-            // callback, do something with the file
-            processFile(filepath, name, ext, stat);
-          }
-        });
+  // read directory
+  fs.readdir(dir, (error, fileNames) => {
+    if (error) throw error;
+    fileNames.forEach(filename => {
+      var fileData = {}
+      fileData.name = path.parse(filename).name;
+      fileData.ext = path.parse(filename).ext;
+      fileData.filepath = path.resolve(dir, filename);
+      fs.stat(fileData.filepath, function (error, stat) {
+        if (error) throw error;
+        var isFile = stat.isFile();
+        // exclude folders
+        if (isFile) {
+          // callback, do something with the file
+          processFile(fileData);
+        }
       });
     });
-  }
-
+  });
+}
+module.exports = project
+module.exports = files

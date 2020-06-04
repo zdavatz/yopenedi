@@ -1,62 +1,7 @@
-/**
- * 
- # Skipped TAGS
-    - RFF
-*/
-const fs = require('fs');
-const path = require('path');
 const _ = require('lodash');
-const format = require('xml-formatter');
 import './grammar.js'
-/* -------------------------------------------------------------------------- */
-meteorPath = process.env['METEOR_SHELL_DIR'] + '/../../../'
-publicPath = process.env['METEOR_SHELL_DIR'] + '/../../../public/';
-meteorPrivate = meteorPath + '/private/'
-meteorExport = meteorPath + '/exported/'
-/* -------------------------------------------------------------------------- */
-var fileName = 'noname_order_sample_from_REXEL_03062020'
-var doc = Assets.getText(fileName)
-/* -------------------------------------------------------------------------- */
-var keys = [];
-var tags = [];
-var headkeys = [];
-var ediData = [];
-var linesArr = []
-/* -------------------------------------------------------------------------- */
-var start = ["UNB", "UNG", "UNH", "LIN"]
-var skip = ["UNT", "UNE", "UNZ"]
-var struc = []
-var out = []
-var order = []
-var parent, prev;
-var structuredData;
-/* -------------------------------------------------------------------------- */
 
-var dataToReplace = [{
-    replace: "<PARTY_ROLE>SU</PARTY_ROLE>",
-    value: "<PARTY_ROLE>supplier</PARTY_ROLE>"
-},
-{
-    replace: "<PARTY_ROLE>DP</PARTY_ROLE>",
-    value: "<PARTY_ROLE>delivery</PARTY_ROLE>"
-},
-{
-    replace: "<PARTY_ROLE>BY</PARTY_ROLE>",
-    value: "<PARTY_ROLE>buyer</PARTY_ROLE>"
-}
-]
-/* -------------------------------------------------------------------------- */
-out.push('<?xml version="1.0" encoding="utf-8" standalone="yes"?>')
-out.push(`
-<ORDER type="standard" xmlns="http://www.opentrans.org/XMLSchema/2.1" xmlns:bmecat="http://www.bmecat.org/bmecat/2005" version="2.1">
-<ORDER_HEADER>
-<CONTROL_INFO>
-    <GENERATOR_INFO>yopenedi</GENERATOR_INFO>
-    <GENERATION_DATE>` + new Date() + `</GENERATION_DATE>
-</CONTROL_INFO>
-</ORDER_HEADER>
-`)
-/* -------------------------------------------------------------------------- */
+
 parseEDI = {}
 parseEDI.regex = {
     line: /['\n\r]+/,
@@ -64,8 +9,73 @@ parseEDI.regex = {
     element: /(\?.|[^\+])/g,
     component: /(\?.|[^:])+/g
 }
+
 /* -------------------------------------------------------------------------- */
-setKeys(doc)
+
+// var fileName = 'noname_order_sample_from_REXEL_02062020_1'
+// var doc = Assets.getText(fileName)
+
+/* -------------------------------------------------------------------------- */
+
+var keys = [];
+var tags = [];
+var ediData = [];
+var linesArr = []
+
+
+
+var dataToReplace = [{
+        replace: "<PARTY_ROLE>SU</PARTY_ROLE>",
+        value: "<PARTY_ROLE>supplier</PARTY_ROLE>"
+    },
+    {
+        replace: "<PARTY_ROLE>DP</PARTY_ROLE>",
+        value: "<PARTY_ROLE>delivery</PARTY_ROLE>"
+    },
+    {
+        replace: "<PARTY_ROLE>BY</PARTY_ROLE>",
+        value: "<PARTY_ROLE>buyer</PARTY_ROLE>"
+    }
+]
+
+/* -------------------------------------------------------------------------- */
+
+parse = {}
+
+
+parse.parseEdiDoc = function (doc) {
+    console.log('______')
+    setKeys(doc)
+    var jsonReady = generateStructuredArr()
+    var newXML = jsonToXML(jsonReady)
+    var newXML = replaceTags(newXML)
+    return newXML;
+}
+
+
+/* -------------------------------------------------------------------------- */
+
+
+
+function setKeys(doc) {
+    var lines = doc.split(/['\n\r]+/);
+    lines = lines.map(function (line) {
+        if (line) {
+            var key = line.substring(0, 3)
+            keys.push({
+                [key]: line
+            })
+            tags.push(key)
+            linesArr.push(line)
+            var segs = getSegment(line)
+            ediData.push(segs);
+        }
+    });
+    console.log(ediData[3])
+    return lines;
+    //
+}
+
 /* -------------------------------------------------------------------------- */
 function getSegment(line) {
     var segs = line.match(parseEDI.regex.segment)
@@ -77,10 +87,7 @@ function getSegment(line) {
     var segs = segs.map((seg) => {
         if (seg !== key) {
             if (seg.indexOf(":") > -1) {
-                // elements[1] = seg.match(/(\?.|[^:])+/g)
                 elements[1] = seg.split(':');
-                // console.log(elements[1]);
-                // console.log(seg.split(':'));
             } else {
                 elements[0].push(seg)
             }
@@ -100,19 +107,12 @@ function getSegment(line) {
     //
     if (grammar && grammar.render && grammar.match) {
         // var matchedData = matchData(lineData, grammar.match)
-        console.error('No Matched Data Grammar keys')
+        console.log('{getSegment}: Matching Data: Rendering Segement Data: ',key)
         var matchedData = matchDataBlock(elements, grammar.match)
+    } else {
+        console.error('{getSegment}::No Matched Data Grammar keys.{Render:Match}',)
+        
     }
-    var testKeys = ['NAD', 'BGM', "DTM", "FTX", "RFF", "QTY", "CTA", "COM", "LIN", "NAD", "IMD", "PRI", "PIA", "BGM", "UNZ"]
-    if (key == testKeys[0] || key == "CTA") {
-        // console.log('----------', key, '------------')
-        // console.log('GetSegment: Start: ', elements, ": ", grammar.match)
-        // console.log('GetSegment: Output: ', matchedData)
-        // console.log('=========')
-    }
-    //
-    // dataElements => Contains Elements that seperated by ":"
-    // Line Data => Contains Comp+ DataSlements
     var out = {
         key,
         line,
@@ -124,79 +124,111 @@ function getSegment(line) {
     var out = _.assign(out, grammar)
     return out;
 }
+
+
 /* -------------------------------------------------------------------------- */
-// GENERATE HEAD {PARENT KEYS}
-function setHeaderKeyArr(tagArr) {
-    _.each(tagArr, (tag, index) => {
-        if (_.includes(start, tag)) {
-            headkeys.push(tag)
+
+/* -------------------------------------------------------------------------- */
+// Render XML // REPLACE THE DATA 
+// MATCH DATA WITH RENDERED LINE
+function getXMLElement(index) {
+    // console.log('getXMLElement',ediData[index].key)
+    if (!ediData[index]) {
+        return
+    }
+    var elementsAll = ediData[index].elements
+    var line = ediData[index].render
+    var data = ediData[index].matchedData
+    if (!data) {
+        console.error('{getXMLElement}::There is No Data for:', ediData[index].key)
+        return
+    }
+    // console.log(ediData[index])
+    if (ediData[index].cases && ediData[index].cases[0]) {
+        var casee = ediData[index].cases
+        var find = _.find(data, (o) => {
+            if (o[casee[0]]) {
+                return o[casee[0]]
+            }
+        })
+        var key = casee[0];
+        var line = ediData[index][find[key]]
+        // console.log({
+        //     casee,
+        //     data,
+        //     key,
+        //     find,
+        //     line
+        // })
+    }
+    // Looping and replacing line:
+    for (i = 0; i < data.length; i++) {
+        var key = _.keys(data[i])[0]
+        if (ediData[index].cases && !key == ediData[index].cases[0]) {
+            var line = ediData[index].exc(data[i][key])
         }
-    })
+        var line = line.replace(key, data[i][key])
+    }
+    return line
 }
 /* -------------------------------------------------------------------------- */
-/* -------------------------------------------------------------------------- */
-// //
-// var getElemetData = function (line) {
-//     return line.match(/(\?.|[^:])+/g)
-// }
-var heads = []
-/* -------------------------------------------------------------------------- */
-// SETTING DOC KEYS PER LINES
-function setKeys(doc) {
-    var lines = doc.split(/['\n\r]+/);
-    lines = lines.map(function (line) {
-        if (line) {
-            var key = line.substring(0, 3)
-            keys.push({
-                [key]: line
-            })
-            tags.push(key)
-            linesArr.push(line)
-            var segs = getSegment(line)
-            ediData.push(segs);
-            // console.log('----SUCCESS---- Segment', segs)
-        }
-        // return line
-    });
+/**
+ * matchDataBlock
+ * GENERATE MatchedBlock for the Data.
+ *  USED for SIMPLE TAGS
+
+ */
+// matchDataBlock( [ [ '', '220', '0351485311' ], [] ], [["","$code","$id"],[]])
+// matchDataBlock( [ [ '', '220', '0351485311' ], ["EU","EURO", "CH"] ], [["","$code","$id"],["$re","$curr", "$country"]])
+function matchDataBlock(dataArr, grammarArr) {
+    if (!grammarArr || !dataArr) {
+        console.log('matchDataBlock: ERROR')
+        throw new Meteor.Error('grammarArr Match has error', "error")
+    }
+    var output = []
     //
-}
-/* -------------------------------------------------------------------------- */
-// Generates The Grammer Tags for all current Documet Auto !== Manual
-// USED TO SET GRAMMAR ARRAY VALUE
-var grammarKeys = [];
-function generateGrammerTags(tags) {
-    var tags = _.uniq(tags);
-    _.each(tags, (tag, index) => {
-        grammarKeys.push({
-            name: tag,
-            tag: "",
-            render: "",
-            match: "",
-            parent: "",
-            children: "",
-            isHeader: ""
+    _.each(grammarArr, (elementsArr, index) => {
+        _.each(elementsArr, (ele, i) => {
+            if (ele.length) {
+                output.push({
+                    [ele]: dataArr[index][i] ? dataArr[index][i] : ""
+                })
+            }
         })
     })
+    //
+    // console.log('matchDataBlock: Output', output)
+    return output;
 }
+
 /* -------------------------------------------------------------------------- */
-function getGrammar(key, object) {
-    var grammar = _.find(Grammar, (o) => {
-        return o.name == [key]
+
+function setEnclosedTags(arr, tag, enclosed) {
+    var newArr = []
+    _.each(arr, (el, index) => {
+        if (el.tag == tag) {
+            console.log('______ HEAD', tag)
+            if (arr[index - 1]["tag"] !== tag) {
+                newArr.push({
+                    tag: enclosed
+                })
+            }
+            newArr.push(el)
+            if (arr[index + 1]["tag"] !== tag) {
+                newArr.push({
+                    tag: enclosed,
+                    close: enclosed
+                })
+            }
+        } else {
+            newArr.push(el)
+        }
     })
-    if (grammar && grammar[object]) {
-        // console.log('getGrammar: ', grammar[object])
-        return grammar[object];
-    }
+    return newArr;
 }
-// getGrammar("BGM", "tag")
+
+
 /* -------------------------------------------------------------------------- */
-function getRenderedData(index) {
-    if (!index || !ediData[index]) {
-        throw new Meteor.Error('findRenderedData', 'Index Error')
-    }
-    // console.log("+++++++++++++++++++++++++", ediData[index])
-    return ediData[index]
-}
 /* -------------------------------------------------------------------------- */
 function generateStructuredArr() {
     var structuredArr = []
@@ -274,7 +306,8 @@ function generateStructuredArr() {
             })
         } else {
             var parentTag = structuredArr[structuredArr.length - 1]
-            if (!parentTag) {
+            // SKIP if there no Parent Tag or the Tag does not contact children
+            if (!parentTag || !parentTag.children) {
                 return
             }
             // console.log({parentTag}, parentTag.children)
@@ -300,13 +333,7 @@ function generateStructuredArr() {
     // }, structuredArr)
     return arr;
 }
-/* -------------------------------------------------------------------------- */
-var jsonReady = generateStructuredArr()
-// // console.log(JSON.stringify(jsonReady))
-var newXML = jsonToXML(jsonReady)
-var newXML = replaceTags(newXML)
-writeFile('json.export.json', JSON.stringify(jsonReady))
-writeFile(fileName + 'xml.export.xml', newXML)
+
 /* -------------------------------------------------------------------------- */
 // var arr = ["UNH", "UNH", "NAD", "NAD", "NAD", "CUX", "LIN", "LIN", "LIN", "UNH"]
 // setEnclosedTags(arr, 'NAD', 'Pareties')
@@ -334,35 +361,7 @@ function setEnclosedTags(arr, tag, enclosed) {
     })
     return newArr;
 }
-/* -------------------------------------------------------------------------- */
-var arr = ["UNH", "UNH", "NAD", "NAD", "NAD", "CUX", "LIN", "LIN", "LIN", "UNH"]
-// setTagBeforeAfter(arr, "Batats", "BGM", "PRODUCTS")
-function setTagBeforeAfter(arr, tag, start, close) {
-    console.log('setTagBeforeAfter', {
-        arr,
-        tag,
-        start,
-        close
-    })
-    var newArr = []
-    _.each(arr, (el, index) => {
-        if (el.tag == start.tag) {
-            newArr.push({
-                tag: tag
-            })
-            newArr.push(el)
-        } else if (el.tag == close.tag) {
-            newArr.push(el)
-            newArr.push({
-                tag: tag,
-                close: enclosed
-            })
-        } else {
-            newArr.push(el)
-        }
-    })
-    return newArr;
-}
+
 /* -------------------------------------------------------------------------- */
 // check LENGTH 
 // STRUCJSON //
@@ -394,19 +393,25 @@ function generatePriceLineAmount(arr) {
                     // console.log({price})
                 }
             })
-            if(qty && price){
+            if (qty && price) {
                 priceLinePrice = qty * price;
                 priceLinePrice = priceLinePrice.toFixed(2)
                 var newTag = {
                     name: "PRICE_LINE_AMOUNT",
                     tag: "PRICE_LINE_AMOUNT",
-                    data: [[priceLinePrice],[]],
-                    render: '<PRICE_LINE_AMOUNT>'+ priceLinePrice +'</PRICE_LINE_AMOUNT>',
+                    data: [
+                        [priceLinePrice],
+                        []
+                    ],
+                    render: '<PRICE_LINE_AMOUNT>' + priceLinePrice + '</PRICE_LINE_AMOUNT>',
                     isRendered: true
                 }
                 arr[index].children.push(newTag)
                 console.log('_______________________D', {
-                    qty, price, priceLinePrice,newTag
+                    qty,
+                    price,
+                    priceLinePrice,
+                    newTag
                 })
             }
             // console.log(jsonElem.children)
@@ -415,9 +420,6 @@ function generatePriceLineAmount(arr) {
     return arr
 }
 /* -------------------------------------------------------------------------- */
-function generateSummary() {
-    // PRICE_LINE_AMOUNT
-}
 function jsonToXML(jsonArr) {
     console.log('------------------')
     var keepOpen = ["UNB", "UNG", "UNH"]
@@ -503,9 +505,9 @@ function jsonToXML(jsonArr) {
                 _.each(jsonElem.children, (child, i) => {
                     //
                     // SETTING CACULATED DATA: (PRICE_LINE_AMOUNT)
-                    if(!child.index){
-                        xml.push(child.render)                        
-                    }else{
+                    if (!child.index) {
+                        xml.push(child.render)
+                    } else {
                         xml.push(getXMLElement(child.index))
                     }
                     // console.log("PARENT: ", parent.tag, '->  Child: ', child.tag)
@@ -545,84 +547,14 @@ function jsonToXML(jsonArr) {
     var xml = xml.join("")
     return xml;
 }
-/* -------------------------------------------------------------------------- */
-// OLD XML RENDERING FUNCTION
-function renderXML() {
-    _.each(tags, (tag, index) => {
-        var prev = tag;
-        var line = linesArr[index].substring(4, 100)
-        var i = index;
-        // SKIP UNA
-        if (tag == "UNA") {
-            return
-        }
-        if (struc.length == 0 && tag) {
-            struc.push("Root")
-        }
-        // return;
-        // IF is Parent
-        // LIN: {START} CREATE PRODUCTS ARRAY HEADER
-        if (tag == "LIN" && (order[order.length - 1] !== "LIN")) {
-            out.push("<PRODUCTS>")
-        }
-        //
-        if (_.includes(start, tag)) {
-            // HEADERS ARRAY
-            order.push(tag)
-            // PARSE HEADER
-            if (struc[struc.length - 1] !== tag) {
-                // console.log("New Tag", tag, struc[struc.length - 1])
-                struc.push(tag)
-                heads.push(tag)
-                //attr="' + line + '"
-                out.push('<' + tag + '>')
-                // REMOVED 25 MAY
-                // out.push(getXMLElement(index))
-                // NEXT IF NOT THE SAME AS THE CURRENT TAG (LIN)
-            } else if (struc[struc.length - 1] === tag) {
-                // used to close the tag
-                out.push("</" + tag + ">")
-                out.push("<" + tag + ">")
-                // REMOVED
-                // out.push(getXMLElement(index))
-            }
-            var parent = struc[struc.length - 2]
-            var k = struc[struc.length - 1]
-            // console.log('Tag: ', tag, 'Parent: ', parent, k)
-        } else {
-            if (ediData[index].matchedData) {
-                // console.log('____________ HAS DATA INDEX ___________')
-                var x = getXMLElement(index)
-                out.push(x)
-            } else {
-                //  attr="' + line + '"
-                out.push('<' + tag + '>' + line + "</" + tag + ">")
-            }
-            // out.push('<' + tag + ' attr="' + line + '">'+ getXMLElement(tag,index,line) + "</" + tag + ">")
-        }
-        // // Closing Tag 
-        if (_.includes(skip, tag)) {
-            out.push("</" + struc[struc.length - 1] + ">")
-            if (struc[struc.length - 1] == "LIN") {
-                out.push("</PRODUCTS>")
-            }
-            // console.log('CLOSING: ', "</" + struc[struc.length - 1] + ">")
-            // console.log('struc',struc)
-            // console.log('************Closing: ', struc[struc.length - 1], tag, "</" + struc[struc.length - 1] + ">")
-            // console.log("Removing: ", struc, struc[struc.length - 1])
-            struc.splice(struc.lastIndexOf(tag), 1);
-            // console.log("Removed: ", struc, tag)
-        }
-    })
-    out.push("</" + order[0] + ">")
-    out.push('</ORDER>')
-    var xml = out.join("")
-    return xml;
-}
+
 /* -------------------------------------------------------------------------- */
 
+/* -------------------------------------------------------------------------- */
+
+
 // USED TO REPLACE CERTAIN TAGS 
-function replaceTags(xml){
+function replaceTags(xml) {
     for (i = 0; i < dataToReplace.length; i++) {
         var tag = dataToReplace[i].replace
         let re = new RegExp(tag, 'g');
@@ -631,159 +563,18 @@ function replaceTags(xml){
     return xml
 }
 
-// REPLACE XML TAGS
-// LIN => PRODUCT
-parseEDI.setTags = function (xml) {
-    for (i = 0; i < Grammar.length; i++) {
-        var tag = Grammar[i].name
-        let re = new RegExp(`\\b${tag}\\b`, 'g');
-        var xml = xml.replace(re, Grammar[i].tag);
-    }
-    return xml
-}
-/* -------------------------------------------------------------------------- */
-// Render XML // REPLACE THE DATA 
-// MATCH DATA WITH RENDERED LINE
-function getXMLElement(index) {
-    // console.log('getXMLElement',ediData[index].key)
-    if (!ediData[index]) {
-        return
-    }
-    var elementsAll = ediData[index].elements
-    var line = ediData[index].render
-    var data = ediData[index].matchedData
-    if (!data) {
-        console.error('No Data', ediData[index].key)
-        return
-    }
-    // console.log(ediData[index])
-    if (ediData[index].cases && ediData[index].cases[0]) {
-        var casee = ediData[index].cases
-        var find = _.find(data, (o) => {
-            if (o[casee[0]]) {
-                return o[casee[0]]
-            }
-        })
-        var key = casee[0];
-        var line = ediData[index][find[key]]
-        // console.log({
-        //     casee,
-        //     data,
-        //     key,
-        //     find,
-        //     line
-        // })
-    }
-    // Looping and replacing line:
-    for (i = 0; i < data.length; i++) {
-        var key = _.keys(data[i])[0]
-        if (ediData[index].cases && !key == ediData[index].cases[0]) {
-            var line = ediData[index].exc(data[i][key])
-        }
-        var line = line.replace(key, data[i][key])
-    }
-    return line
-}
-/* -------------------------------------------------------------------------- */
-/**
- * matchDataBlock
- * GENERATE MatchedBlock for the Data.
- *  USED for SIMPLE TAGS
 
- */
-// matchDataBlock( [ [ '', '220', '0351485311' ], [] ], [["","$code","$id"],[]])
-// matchDataBlock( [ [ '', '220', '0351485311' ], ["EU","EURO", "CH"] ], [["","$code","$id"],["$re","$curr", "$country"]])
-function matchDataBlock(dataArr, grammarArr) {
-    if (!grammarArr || !dataArr) {
-        console.log('matchDataBlock: ERROR')
-        throw new Meteor.Error('grammarArr Match has error', "error")
-    }
-    var output = []
-    //
-    _.each(grammarArr, (elementsArr, index) => {
-        _.each(elementsArr, (ele, i) => {
-            if (ele.length) {
-                output.push({
-                    [ele]: dataArr[index][i] ? dataArr[index][i] : ""
-                })
-            }
-        })
+/* -------------------------------------------------------------------------- */
+function getGrammar(key, object) {
+    var grammar = _.find(Grammar, (o) => {
+        return o.name == [key]
     })
-    //
-    // console.log('matchDataBlock: Output', output)
-    return output;
+    if (grammar && grammar[object]) {
+        // console.log('getGrammar: ', grammar[object])
+        return grammar[object];
+    }
 }
 
-function writeFile(file, data) {
-    console.log('Writing file..........', file)
-    fs.writeFile(meteorExport + './' + file, data, 'utf8', function (err) {
-        if (err) {
-            return console.log(err);
-        } else {
-            console.log("Writing Mew File [Success]", file)
-        }
-    });
-}
 /* -------------------------------------------------------------------------- */
 
-// 
-/* -------------------------------------------------------------------------- */
-// AN EXPERIMENT TO CREARE ON_LEVEL_JSON
-function generateStructuredJSON() {
-    var arr = []
-    strucJSON = [] //
-    var orderJSON = []
-    var parent = ["UNB", "UNG", "UNH", "LIN", "NAD", "CUX"]
-    var start = ["UNB", "UNG", "UNH", "LIN"]
-    var skip = ["UNT", "UNE", "UNZ"]
-    var looped = ["LIN", "NAD"] //
-    _.each(tags, (tag, index) => {
-        var line = linesArr[index].substring(4, 100)
-        var el = {
-            tag: tag,
-            line: line,
-            index: index
-        }
-        // Controller Arr
-        if (_.includes(start, tag)) {
-            if (strucJSON.length == 0 && tag) {
-                strucJSON.push("Root")
-            }
-            if (strucJSON[strucJSON.length - 1] !== tag) {
-                // console.log("New Tag", tag, strucJSON[strucJSON.length - 1])
-                console.log('PARENT: ', strucJSON[strucJSON.length - 1], '> ', tag)
-                strucJSON.push(tag)
-            } else if (strucJSON[strucJSON.length - 1] === tag) {
-                // console.log("LOOP: =======================", tag, strucJSON[strucJSON.length - 1])
-            }
-        }
-        if (_.includes(skip, tag)) {
-            // console.log('SKIP START', tag, strucJSON)
-            strucJSON.splice(strucJSON.lastIndexOf(tag), 1);
-            // console.log('SKIP END RM', tag, strucJSON)
-            // orderJSON.push(tag)
-            // Adding Skipp Tags 
-            el.close = strucJSON[strucJSON.length - 1]
-            el.skip = true
-            // return
-        }
-        if (_.includes(parent, tag)) {
-            orderJSON.push(tag)
-            el.parent = strucJSON[strucJSON.length - 2]
-            el.isParent = true
-        } else {
-            parentTag = strucJSON[strucJSON.length - 1]
-            if (!parentTag) {
-                return
-            }
-            el.parentTag = parentTag;
-            el.isChild = true
-        }
-        arr.push(el)
-    })
-    var arr = setEnclosedTags(arr, "NAD", "PARTIES")
-    var arr = setEnclosedTags(arr, "LIN", "PRODUCTS")
-    return arr
-}
-writeFile('json.export.lines.json', JSON.stringify(generateStructuredJSON()))
-/* -------------------------------------------------------------------------- */
+module.exports = parse
