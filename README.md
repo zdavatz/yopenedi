@@ -9,12 +9,6 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
 
 ## FAQ
 ### EDIFACT D.96A
-<<<<<<< HEAD
-* [Stackoverflow](https://stackoverflow.com/questions/11295551/is-there-a-really-simple-way-to-process-edifact-for-example-d96a)
-* [edifact-parser](https://www.npmjs.com/package/edifact-parser)
-* [Truugo](https://www.truugo.com/edifact/d96a/orders/)
-* [Edicat](https://github.com/notpeter/edicat)
-=======
 * [Stackoverflow](https://stackoverflow.com/questions/11295551/is-there-a-really-simple-way-to-process-edifact-for-example-d96a)\
 ** Just split at the sytax chars: first at `'` to get the segments, than at `+` to get data elements of that segments and at `:` to get the individual components.
 * [edifact-parser](https://www.npmjs.com/package/edifact-parser)
@@ -24,7 +18,6 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
 #### Useful Windows Tools
 * [EDI Notepad](https://download.cnet.com/EDI-Notepad/3000-20411_4-76182031.html)
 * [R2ediviewer](http://r2ediviewer.de/index.html)
->>>>>>> d501482b99f2122d0c6cc1afc692bff211969322
 ### Opentrans 2.1
 * [Opentrans 2.1 XSD](https://www.opentrans.de/XMLSchema/2.1/opentrans_2_1.xsd)
 ### AS2 Gateway
