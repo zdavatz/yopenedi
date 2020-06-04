@@ -5,3 +5,5 @@ keys.json
 tasks.todo
 res.md
 new_issues.md
+tmp
+tmp/*
