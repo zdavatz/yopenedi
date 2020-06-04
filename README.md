@@ -33,6 +33,10 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
 * `certbot certonly --server https://acme-v02.api.letsencrypt.org/directory --manual --preferred-challenges dns -d 'test.yopenedi.ch'`
 
 ## Digital Ocean deployment
+### Meteor setup
+* `curl https://install.meteor.com/ | sh`
+* `meteor npm i`
+* `meteor --settings settings.json`
 ### Apache setup
 ```
 <VirtualHost *:80>
