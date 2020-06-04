@@ -1,20 +1,30 @@
 # yopenedi
 OpenTrans 2.1/EDIFACT D.96A File converter
-1. Convert Files to and from OpenTrans 2.1/[EDIFACT D.96A](http://www.unece.org/trade/untdid/d96a/content.htm)
-2. [Noname order sample from REXEL](https://1drv.ms/u/s!AgbWsnOPcbiN7iyEebz5pdfK6Arz?e=p9vhYD)
-3. [Sample XML Files from OpenTrans 2.1](https://1drv.ms/u/s!AgbWsnOPcbiN7hNOj5J96OsS2svQ?e=OnPvPZ)
-4. Send files as attachment in EDIFACT D.96A format to xmlxonv@ywesee.com and convert them to the OpenTrans 2.1 format.
-5. Upload converted files to an FTP-Server.
-6. Import OpenTrans 2.1 files from FTP and convert them to EDIFACT D.96A and send the converted file as Email-Attachment from xmlxonv@ywesee.com to a dedicated Email address.
-7. Send Opentrans 2.1 XML files to this [URL](https://connect.boni.ch/OpaccOne/B2B/Channel/XmlOverHttp/ywesee)
-8. Receive Opentrans 2.1 XML files at this [URL](https://yopenedi.ch/input)
+1. Convert order Files to and from OpenTrans 2.1/[EDIFACT D.96A](http://www.unece.org/trade/untdid/d96a/content.htm)\
+Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82047602-5c4bb800-96b3-11ea-9b7d-5560743676dd.jpeg) Tags. They contain the order information like Buyer, Seller, Contact Address and itmes list. UNB is just the message header. Each order file will only contain one combination of UNH/UNT that needs be converted into Opentrans 2.1 XML ([Sample Order XML Files from OpenTrans 2.1](https://onedrive.live.com/?authkey=%21AE6Pkn3o6xLay9A&cid=8DB8718F73B2D606&id=8DB8718F73B2D606%2114103&parId=8DB8718F73B2D606%2114099&o=OneUp))
+2. Send order files as attachment in EDIFACT D.96A format to xmlxonv@ywesee.com and convert them to the OpenTrans 2.1 format.
+3. Import OpenTrans 2.1 files from FTP and convert them to EDIFACT D.96A and send the converted file as Email-Attachment from xmlxonv@ywesee.com to a dedicated Email address.
+4. Send Opentrans 2.1 XML files to this [URL](https://connect.boni.ch/OpaccOne/B2B/Channel/XmlOverHttp/ywesee)
+5. Receive Opentrans 2.1 XML files at this [URL](https://yopenedi.ch/input)
 
 ## FAQ
 ### EDIFACT D.96A
+<<<<<<< HEAD
 * [Stackoverflow](https://stackoverflow.com/questions/11295551/is-there-a-really-simple-way-to-process-edifact-for-example-d96a)
 * [edifact-parser](https://www.npmjs.com/package/edifact-parser)
 * [Truugo](https://www.truugo.com/edifact/d96a/orders/)
 * [Edicat](https://github.com/notpeter/edicat)
+=======
+* [Stackoverflow](https://stackoverflow.com/questions/11295551/is-there-a-really-simple-way-to-process-edifact-for-example-d96a)\
+** Just split at the sytax chars: first at `'` to get the segments, than at `+` to get data elements of that segments and at `:` to get the individual components.
+* [edifact-parser](https://www.npmjs.com/package/edifact-parser)
+* [Truugo](https://www.truugo.com/edifact/d96a/orders/)
+* [Edicat](https://github.com/notpeter/edicat)
+* [Edivisualizer](https://stackoverflow.com/questions/32889967/what-algorithm-to-use-to-format-an-edifact-file)
+#### Useful Windows Tools
+* [EDI Notepad](https://download.cnet.com/EDI-Notepad/3000-20411_4-76182031.html)
+* [R2ediviewer](http://r2ediviewer.de/index.html)
+>>>>>>> d501482b99f2122d0c6cc1afc692bff211969322
 ### Opentrans 2.1
 * [Opentrans 2.1 XSD](https://www.opentrans.de/XMLSchema/2.1/opentrans_2_1.xsd)
 ### AS2 Gateway

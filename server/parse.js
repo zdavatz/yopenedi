@@ -14,7 +14,7 @@ publicPath = process.env['METEOR_SHELL_DIR'] + '/../../../public/';
 meteorPrivate = meteorPath + '/private/'
 meteorPrivate = meteorPath + '/exported/'
 /* -------------------------------------------------------------------------- */
-var fileName = '3_order_sample_from_REXEL_utf-8'
+var fileName = 'noname_order_sample_from_REXEL_03062020'
 var doc = Assets.getText(fileName)
 /* -------------------------------------------------------------------------- */
 var keys = [];

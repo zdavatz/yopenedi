@@ -194,7 +194,8 @@ Grammar = [{
 }, {
     "name": "LIN",
     "tag": "ORDER_ITEM",
-    "render": `<LINE_ITEM_ID>$id</LINE_ITEM_ID><PRODUCT_CUSTOM_ID>$productID</PRODUCT_CUSTOM_ID><PRODUCT_LANG>$lang</PRODUCT_LANG>`,
+    render: '<bmecat:INTERNATIONAL_PID type="ean">$productID</bmecat:INTERNATIONAL_PID>',
+    "renderx": `<LINE_ITEM_ID>$id</LINE_ITEM_ID><PRODUCT_CUSTOM_ID>$productID</PRODUCT_CUSTOM_ID><PRODUCT_LANG>$lang</PRODUCT_LANG>`,
     match: [
         ["", "$id"],
         ["$productID", "$lang"]
@@ -206,7 +207,8 @@ Grammar = [{
     "name": "PIA",
     desc: "ITEM ID",
     "tag": "PIA",
-    "render": `
+    render:'',
+    "renderOLD": `
     <PRODUCT_ID>
     <CODE>$code</CODE>
     <ID>$ID_CODE</ID>
@@ -222,7 +224,7 @@ Grammar = [{
 }, {
     "name": "IMD",
     "tag": "ITEM_DESCRIPTION",
-    render: '<ITEM_DESCRIPTION>$ID</ITEM_DESCRIPTION>',
+    render: '<ITEM_DESCRIPTION>$CODE - $ID</ITEM_DESCRIPTION>',
     match: [
         ["", "$CODE"],
         ["", "", "", "$ID"]
@@ -234,7 +236,8 @@ Grammar = [{
     "name": "QTY",
     "tag": "QTY",
     renderx: '<QUANTITY>$qty</QUANTITY><ORDER_UNIT>$unit</ORDER_UNIT>',
-    render: '<QUANTITY>$qty</QUANTITY><bmecat:ORDER_UNIT>$unit</bmecat:ORDER_UNIT>',
+    renderold '<QUANTITY>$qty</QUANTITY><bmecat:ORDER_UNIT>$unit</bmecat:ORDER_UNIT>',
+    render: '<bmecat:ORDER_UNIT>$unit</bmecat:ORDER_UNIT><QUANTITY>$qty</QUANTITY>',
     match: [
         [''],
         ['$code', '$qty', '$unit']

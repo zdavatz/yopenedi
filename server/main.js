@@ -12,10 +12,11 @@ const {
 
 import './parse.js'
 
-return
+
 
 
 // import './email.js'
+return
 
 //https://www.npmjs.com/package/edifact-parser
 
