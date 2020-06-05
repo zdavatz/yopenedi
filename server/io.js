@@ -3,7 +3,8 @@
  */
 const fs = require('fs');
 const path = require('path');
-import Parse from './parse.js'
+// import Parse from './parse.draft.final.js'
+import Parse from './parse.edi.js'
 /* -------------------------------------------------------------------------- */
 console.log('___init_IO___')
 /* -------------------------------------------------------------------------- */
@@ -23,7 +24,8 @@ files = {}
 project.readDir = function (dir,func) {
   readFiles(dir, (fileData) => {
     var doc = fs.readFileSync(fileData.filepath, 'utf8');
-    var xml = Parse.parseEdiDoc(doc)
+    var xml = Parse.renderEDI(doc)
+    console.log('---Writing File', fileData.name)
     writeFile(project.opentrans_orders + fileData.name + '.xml', xml)
   })
 }

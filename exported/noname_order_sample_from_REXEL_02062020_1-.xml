@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<ORDER type="standard" xmlns="http://www.opentrans.org/XMLSchema/2.1" xmlns:bmecat="http://www.bmecat.org/bmecat/2005"
+    version="2.1">
+    <ORDER_HEADER>
+        <CONTROL_INFO>
+            <GENERATOR>Yopenedi</GENERATOR>
+            <GENERATION_DATE>Thu Jun 04 2020 22:14:29 GMT+0300 (GMT+03:00)</GENERATION_DATE>
+        </CONTROL_INFO>
+        <ORDER_INFO>
+            <ORDER_SUMMARY>
+                <TOTAL_ITEM_NUM>11</TOTAL_ITEM_NUM>
+                <TOTAL_AMOUNT>1080.25</TOTAL_AMOUNT>
+            </ORDER_SUMMARY>
+</ORDER>

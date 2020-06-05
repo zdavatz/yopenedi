@@ -111,11 +111,11 @@ Grammar = [{
 }, {
     "name": "NAD",
     "tag": "PARTY",
-    render: `
+    renderxx: `
     <bmecat:PARTY_ID>$ID</bmecat:PARTY_ID>
     <PARTY_ROLE>$ROLE</PARTY_ROLE>
     <bmecat:PARTY_ID type="supplier_specific">$CODE</bmecat:PARTY_ID>`,
-    renderx: `
+    render: `
     <PARTY>
     <PARTY_ID type="iln">$ID</PARTY_ID>
     <PARTY_ROLE>$ROLE</PARTY_ROLE>
