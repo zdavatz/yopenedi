@@ -86,28 +86,43 @@ Grammar = [{
 }, {
     "name": "FTX",
     "tag": "FreeText",
-    render:'',
-    "renderX": "<FreeText><CODE>$code</CODE><CONTENT>$FREETXT1 - $FREETXT2</CONTENT></FreeText>",
+    renderX:'',
+    "render": "<FreeText><CODE>$code</CODE><CONTENT>$FREETXT1 - $FREETXT2</CONTENT></FreeText>",
     "match": [
         ["", "$code", "$REF"],
         ["$FREETXT1", "$FREETXT2"]
     ],
+ 
     "parent": "",
     "children": "",
     "isHeader": ""
 }, {
     "name": "RFF",
     "tag": "REFERENCE",
-    render:'',
-    "renderOld": "<REFERENCE>$code - $value</REFERENCE>",
+    renderx:'',
+    "render": "<REFERENCE> $value  - $extra</REFERENCE>",
     "match": [
-        ["", "$code", "$REF"],
-        ["$value", "$extra"]
+        ["", "$value", "$REF"],
+        ["$code", "$extra"]
     ],
     "parent": "",
     "children": "",
     "isHeader": "",
-    isSkipped: true,
+    AJK: "<UDX.JA.DeliveryConditionCode>$value</UDX.JA.DeliveryConditionCode><UDX.JA.DeliveryConditionDetails>$extra</UDX.JA.DeliveryConditionDetails>",
+    //<REFERENCETTTT> $value  - $extra</REFERENCETTTT>
+    // isSkipped: true,
+    cases: ["$code"],
+    isLineRendered : true,
+    exc: function (id) {
+        if(this[id]){
+            var line = this[id]
+            return line
+        }
+
+    },
+    lineRender: function(id){
+
+    }
 }, {
     "name": "NAD",
     "tag": "PARTY",

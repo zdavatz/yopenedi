@@ -1,7 +1,7 @@
 /* -------------------------------------------------------------------------- */
 /**
  * Parse Edi
-*/
+ */
 /* -------------------------------------------------------------------------- */
 const fs = require('fs');
 const path = require('path');
@@ -20,17 +20,17 @@ parseEDI.regex = {
 /* -------------------------------------------------------------------------- */
 
 var dataToReplace = [{
-    replace: "<PARTY_ROLE>SU</PARTY_ROLE>",
-    value: "<PARTY_ROLE>supplier</PARTY_ROLE>"
-},
-{
-    replace: "<PARTY_ROLE>DP</PARTY_ROLE>",
-    value: "<PARTY_ROLE>delivery</PARTY_ROLE>"
-},
-{
-    replace: "<PARTY_ROLE>BY</PARTY_ROLE>",
-    value: "<PARTY_ROLE>buyer</PARTY_ROLE>"
-}
+        replace: "<PARTY_ROLE>SU</PARTY_ROLE>",
+        value: "<PARTY_ROLE>supplier</PARTY_ROLE>"
+    },
+    {
+        replace: "<PARTY_ROLE>DP</PARTY_ROLE>",
+        value: "<PARTY_ROLE>delivery</PARTY_ROLE>"
+    },
+    {
+        replace: "<PARTY_ROLE>BY</PARTY_ROLE>",
+        value: "<PARTY_ROLE>buyer</PARTY_ROLE>"
+    }
 ]
 
 /* -------------------------------------------------------------------------- */
@@ -43,14 +43,14 @@ var doc = Assets.getText(fileName)
 // ediData JSON collection
 // tags arr
 
-function renderStructuredData(doc){
+function renderStructuredData(doc) {
     var tags = [];
     var ediData = [];
 
     var lines = doc.split(/['\n\r]+/);
 
     lines.map(function (line) {
-        if(!line){
+        if (!line) {
             return
         }
         var key = line.substring(0, 3)
@@ -59,7 +59,10 @@ function renderStructuredData(doc){
         ediData.push(segs);
     })
 
-    return {tags,ediData}
+    return {
+        tags,
+        ediData
+    }
 }
 /* -------------------------------------------------------------------------- */
 
@@ -92,7 +95,7 @@ function setEnclosedTags(arr, tag, enclosed) {
 }
 /* -------------------------------------------------------------------------- */
 
-function generatePriceLineAmount(arr,ediData) {
+function generatePriceLineAmount(arr, ediData) {
     _.each(arr, (jsonElem, index) => {
         // console.log(jsonElem)
         var price, qty, priceLinePrice;
@@ -118,19 +121,25 @@ function generatePriceLineAmount(arr,ediData) {
                     // console.log({price})
                 }
             })
-            if(qty && price){
+            if (qty && price) {
                 priceLinePrice = qty * price;
                 priceLinePrice = priceLinePrice.toFixed(2)
                 var newTag = {
                     name: "PRICE_LINE_AMOUNT",
                     tag: "PRICE_LINE_AMOUNT",
-                    data: [[priceLinePrice],[]],
-                    render: '<PRICE_LINE_AMOUNT>'+ priceLinePrice +'</PRICE_LINE_AMOUNT>',
+                    data: [
+                        [priceLinePrice],
+                        []
+                    ],
+                    render: '<PRICE_LINE_AMOUNT>' + priceLinePrice + '</PRICE_LINE_AMOUNT>',
                     isRendered: true
                 }
                 arr[index].children.push(newTag)
                 console.log('_______________________D', {
-                    qty, price, priceLinePrice,newTag
+                    qty,
+                    price,
+                    priceLinePrice,
+                    newTag
                 })
             }
             // console.log(jsonElem.children)
@@ -151,7 +160,7 @@ function generateStructuredArr(jsonData) {
     var start = ["UNB", "UNG", "UNH", "LIN"]
     var skip = ["UNT", "UNE", "UNZ"]
     var looped = ["LIN", "NAD"] //
-    var skipRendering = ["RFF", ""]
+    // var skipRendering = ["RFF", ""]
     _.each(tags, (tag, index) => {
         var prev = tag;
         var line = ediData[index]["line"].substring(4, 100)
@@ -236,7 +245,7 @@ function generateStructuredArr(jsonData) {
     // Inject enclose tags looped
     var arr = setEnclosedTags(structuredArr, "NAD", "PARTIES")
     var arr = setEnclosedTags(arr, "LIN", "PRODUCTS")
-    var arr = generatePriceLineAmount(arr,ediData)
+    var arr = generatePriceLineAmount(arr, ediData)
     // var arr = setTagBeforeAfter(arr, "ORDER_HEADER", "BGM", "PRODUCTS")
     // console.log({
     //     strucJSON,
@@ -248,7 +257,7 @@ function generateStructuredArr(jsonData) {
 
 /* -------------------------------------------------------------------------- */
 // Render JSON to XML***
-function renderXML(json){
+function renderXML(json) {
 
 }
 
@@ -256,8 +265,10 @@ function renderXML(json){
 
 
 function getSegment(line) {
-    console.log('getSegment',{line})
-    if(!line){
+    console.log('getSegment', {
+        line
+    })
+    if (!line) {
         return
     }
     var segs = line.match(parseEDI.regex.segment)
@@ -334,20 +345,23 @@ function matchDataBlock(dataArr, grammarArr) {
 
 /* -------------------------------------------------------------------------- */
 
-function getXMLElement(index,ediData) {
+function getXMLElement(index, ediData) {
     // console.log('getXMLElement',ediData[index].key)
     if (!ediData[index]) {
         return
     }
+    // ediData = ediData[index];
     var elementsAll = ediData[index].elements
     var line = ediData[index].render
     var data = ediData[index].matchedData
     if (!data) {
-        console.error(ediData[index].key +' No Data Skipping' )
+        console.error(ediData[index].key + ' No Data Skipping')
         return
     }
-    // console.log(ediData[index])
+
     if (ediData[index].cases && ediData[index].cases[0]) {
+
+        console.log('++', ediData[index], ediData[index].cases)
         var casee = ediData[index].cases
         var find = _.find(data, (o) => {
             if (o[casee[0]]) {
@@ -356,19 +370,20 @@ function getXMLElement(index,ediData) {
         })
         var key = casee[0];
         var line = ediData[index][find[key]]
-        // console.log({
-        //     casee,
-        //     data,
-        //     key,
-        //     find,
-        //     line
-        // })
+        console.log('===', line)
+
+
+
     }
     // Looping and replacing line:
     for (i = 0; i < data.length; i++) {
+
         var key = _.keys(data[i])[0]
+        console.log('______________ ', key, ediData[index].key)
         if (ediData[index].cases && !key == ediData[index].cases[0]) {
+
             var line = ediData[index].exc(data[i][key])
+            console.log('------', line)
         }
         var line = line.replace(key, data[i][key])
     }
@@ -389,7 +404,7 @@ function getGrammar(key, object) {
 /* -------------------------------------------------------------------------- */
 
 
-function replaceTags(xml){
+function replaceTags(xml) {
     for (i = 0; i < dataToReplace.length; i++) {
         var tag = dataToReplace[i].replace
         let re = new RegExp(tag, 'g');
@@ -400,7 +415,7 @@ function replaceTags(xml){
 
 /* -------------------------------------------------------------------------- */
 
-function jsonToXML(jsonArr,jsonData) {
+function jsonToXML(jsonArr, jsonData) {
     var ediData = jsonData.ediData;
 
     console.log('------------------')
@@ -483,21 +498,21 @@ function jsonToXML(jsonArr,jsonData) {
             var parent = jsonElem
             // console.log("Children Renderring", jsonElem.children.length, jsonElem.tag)
             if (jsonElem.children.length) {
-                xml.push(getXMLElement(jsonElem.index,ediData))
+                xml.push(getXMLElement(jsonElem.index, ediData))
                 _.each(jsonElem.children, (child, i) => {
                     //
                     // SETTING CACULATED DATA: (PRICE_LINE_AMOUNT)
-                    if(!child.index){
-                        xml.push(child.render)                        
-                    }else{
-                        xml.push(getXMLElement(child.index,ediData))
+                    if (!child.index) {
+                        xml.push(child.render)
+                    } else {
+                        xml.push(getXMLElement(child.index, ediData))
                     }
                     // console.log("PARENT: ", parent.tag, '->  Child: ', child.tag)
                 })
             } else {
                 // xml.push(jsonElem.line)
                 // xml.push('<!-- has no children NOCHILDREN-->')
-                xml.push(getXMLElement(jsonElem.index,ediData))
+                xml.push(getXMLElement(jsonElem.index, ediData))
             }
             // KEEP THE EDIFACT META TAG OPEN
             if (!_.includes(keepOpen, jsonElem.tag)) {
@@ -547,13 +562,13 @@ function jsonToXML(jsonArr,jsonData) {
 
 // renderEDI(doc)
 parse = {}
-parse.renderEDI = function(){
+parse.renderEDI = function () {
     var json = renderStructuredData(doc)
     var processedJSON = generateStructuredArr(json)
     // console.log({processedJSON})
-    var xml = jsonToXML(processedJSON,json)
+    var xml = jsonToXML(processedJSON, json)
     var xml = replaceTags(xml)
-    // console.log(xml)
+    console.log(xml)
     return xml;
 }
 
