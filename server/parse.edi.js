@@ -19,6 +19,22 @@ parseEDI.regex = {
 
 /* -------------------------------------------------------------------------- */
 
+var dataToReplace = [{
+    replace: "<PARTY_ROLE>SU</PARTY_ROLE>",
+    value: "<PARTY_ROLE>supplier</PARTY_ROLE>"
+},
+{
+    replace: "<PARTY_ROLE>DP</PARTY_ROLE>",
+    value: "<PARTY_ROLE>delivery</PARTY_ROLE>"
+},
+{
+    replace: "<PARTY_ROLE>BY</PARTY_ROLE>",
+    value: "<PARTY_ROLE>buyer</PARTY_ROLE>"
+}
+]
+
+/* -------------------------------------------------------------------------- */
+
 
 var fileName = 'noname_order_sample_from_REXEL_03062020'
 var doc = Assets.getText(fileName)
@@ -372,6 +388,18 @@ function getGrammar(key, object) {
 
 /* -------------------------------------------------------------------------- */
 
+
+function replaceTags(xml){
+    for (i = 0; i < dataToReplace.length; i++) {
+        var tag = dataToReplace[i].replace
+        let re = new RegExp(tag, 'g');
+        var xml = xml.replace(re, dataToReplace[i].value);
+    }
+    return xml
+}
+
+/* -------------------------------------------------------------------------- */
+
 function jsonToXML(jsonArr,jsonData) {
     var ediData = jsonData.ediData;
 
@@ -524,6 +552,7 @@ parse.renderEDI = function(){
     var processedJSON = generateStructuredArr(json)
     // console.log({processedJSON})
     var xml = jsonToXML(processedJSON,json)
+    var xml = replaceTags(xml)
     // console.log(xml)
     return xml;
 }
