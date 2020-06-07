@@ -3,14 +3,18 @@
  */
 package openedi.exe;
 
-import openedi.converter.Library;
+import openedi.converter.Reader;
+
+import java.io.FileInputStream;
 
 public class App {
-    public String getGreeting() {
-        return "Hello world." + Library.someLibraryMethod();
-    }
-
-    public static void main(String[] args) {
-        System.out.println(new App().getGreeting());
+    public static void main(String[] args) throws Exception {
+        try {
+            Reader reader = new Reader();
+            FileInputStream stream = new FileInputStream("../samples/noname_order_sample_from_REXEL");
+            reader.run(stream);
+        } catch (Exception e) {
+            System.out.println("Exception " + e.toString());
+        }
     }
 }

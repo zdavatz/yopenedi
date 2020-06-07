@@ -25,6 +25,9 @@ dependencies {
     implementation 'com.google.guava:guava:28.0-jre'
     compile project(':openedi-converter')
 
+    implementation 'org.milyn.edi.unedifact:d96a-mapping:1.7.1.0'
+    implementation 'org.milyn:milyn-smooks-edi:1.7.1'
+
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
 }
