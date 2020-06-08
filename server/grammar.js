@@ -109,7 +109,7 @@ Grammar = [{
     "children": "",
     "isHeader": "",
     
-    AJK: "<UDX.JA.DeliveryConditionCode>$code</UDX.JA.DeliveryConditionCode><UDX.JA.DeliveryConditionDetails>$extra</UDX.JA.DeliveryConditionDetails>",
+    AJK: "<HEADER_UDX><UDX.JA.DeliveryConditionCode>$code</UDX.JA.DeliveryConditionCode><UDX.JA.DeliveryConditionDetails>$extra</UDX.JA.DeliveryConditionDetails></HEADER_UDX>",
     //<REFERENCETTTT> $value  - $extra</REFERENCETTTT>
     // isSkipped: true,
     cases: ["$code"],
@@ -126,7 +126,7 @@ Grammar = [{
     }
 }, {
     "name": "NAD",
-    "tag": "PARTY",
+    "tag": "",
     renderxx: `
     <bmecat:PARTY_ID>$ID</bmecat:PARTY_ID>
     <PARTY_ROLE>$ROLE</PARTY_ROLE>

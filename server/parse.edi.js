@@ -183,6 +183,30 @@ function generatePriceLineAmount(arr, ediData) {
 /* -------------------------------------------------------------------------- */
 
 
+function UDX_reOrder(arr){
+    var tmp;
+    _.each(arr, (jsonElem, index) => {
+        // console.log(jsonElem)
+        if(jsonElem.tag == "UNH"){
+            // console.log(jsonElem.children)
+            _.each(jsonElem.children,(elm,childIndex)=>{
+                if(elm.tag == 'RFF'){
+                    console.log({elm})
+                    tmp = elm
+                }
+            })
+        }
+
+        if(jsonElem.tag == "CUX"){
+            console.log('_CURRENY INDEX',jsonElem, index)
+            arr.splice(8,0,tmp)
+        }
+    }) 
+
+    return arr
+}
+
+
 /* -------------------------------------------------------------------------- */
 
 function generateStructuredArr(jsonData) {
@@ -281,7 +305,11 @@ function generateStructuredArr(jsonData) {
     var arr = setEnclosedTags(structuredArr, "NAD", "PARTIES");
     var arr = setEnclosedTags(arr, "LIN", "PRODUCTS");
     var arr = generatePriceLineAmount(arr, ediData);
-    // var arr = generateTotalOrder(arr,ediData); 
+
+    // ORDER >>>>>>>>
+    // var arr = UDX_reOrder(arr)
+    // TEMP >>>>>>>>>
+    // var arr = generateTotalOrder(arr,ediData);
     // var arr = setTagBeforeAfter(arr, "ORDER_HEADER", "BGM", "PRODUCTS")
     // console.log({
     //     strucJSON,
