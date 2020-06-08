@@ -549,12 +549,13 @@ function jsonToXML(jsonArr, jsonData) {
                         xml.push(child.render)
                     } else {
 
-                        // 
-                        if(child.tag == "RFF"){
-                            console.log('++++++++++++++++++ RFF')
-                            rffTag = getXMLElement(child.index, ediData)
-                            return
-                        }
+                        // // 
+                        // if(child.tag == "RFF"){
+                        //     console.log('++++++++++++++++++ RFF')
+                        //     rffTag = getXMLElement(child.index, ediData)
+                        //     return
+                        // }
+                        // //
 
                         xml.push(xml.push(getXMLElement(child.index, ediData)))
 
@@ -569,9 +570,9 @@ function jsonToXML(jsonArr, jsonData) {
 
                 //
                 xml.push(getXMLElement(jsonElem.index, ediData))
-                if(jsonElem.tag == "CUX"){
-                    xml.push(rffTag)
-                }
+                // if(jsonElem.tag == "CUX"){
+                //     xml.push(rffTag)
+                // }
                 //
             }
             // KEEP THE EDIFACT META TAG OPEN
