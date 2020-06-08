@@ -360,6 +360,7 @@ function getXMLElement(index, ediData) {
         console.error(ediData[index].key + ' No Data Skipping')
         return
     }
+    //
 
     if (dataElem.cases && dataElem.cases[0]) {
 

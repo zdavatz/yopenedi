@@ -7,3 +7,5 @@ res.md
 new_issues.md
 tmp
 tmp/*
+opentrans_orders/*
+edifact_orders/*

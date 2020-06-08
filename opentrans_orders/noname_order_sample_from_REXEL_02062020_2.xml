@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?><ORDER type="standard" xmlns="http://www.opentrans.org/XMLSchema/2.1" xmlns:bmecat="http://www.bmecat.org/bmecat/2005" version="2.1"><ORDER_HEADER><CONTROL_INFO>
     <GENERATOR>Yopenedi</GENERATOR>
-    <GENERATION_DATE>Mon Jun 08 2020 12:16:11 GMT+0300 (GMT+03:00)</GENERATION_DATE>
+    <GENERATION_DATE>Mon Jun 08 2020 12:22:39 GMT+0300 (GMT+03:00)</GENERATION_DATE>
     </CONTROL_INFO><ORDER_INFO>
     <ORDER_ID>220-0353047266</ORDER_ID><ORDER_DATE>20200603</ORDER_DATE>
     <DELIVERY_DATE type="optional">
