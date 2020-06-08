@@ -9,3 +9,5 @@ tmp
 tmp/*
 opentrans_orders/*
 edifact_orders/*
+opentrans_orders/
+edifact_orders/
