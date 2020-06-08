@@ -350,39 +350,36 @@ function getXMLElement(index, ediData) {
     if (!ediData[index]) {
         return
     }
+
+    var dataElem = ediData[index]
     // ediData = ediData[index];
-    var elementsAll = ediData[index].elements
-    var line = ediData[index].render
-    var data = ediData[index].matchedData
+    var elementsAll = dataElem.elements
+    var line = dataElem.render
+    var data = dataElem.matchedData
     if (!data) {
         console.error(ediData[index].key + ' No Data Skipping')
         return
     }
 
-    if (ediData[index].cases && ediData[index].cases[0]) {
+    if (dataElem.cases && dataElem.cases[0]) {
 
-        console.log('++', ediData[index], ediData[index].cases)
-        var casee = ediData[index].cases
+        var casee = dataElem.cases
         var find = _.find(data, (o) => {
             if (o[casee[0]]) {
                 return o[casee[0]]
             }
         })
         var key = casee[0];
-        var line = ediData[index][find[key]]
-        console.log('===', line)
-
-
-
+        var line = dataElem[find[key]]
     }
     // Looping and replacing line:
     for (i = 0; i < data.length; i++) {
 
         var key = _.keys(data[i])[0]
-        console.log('______________ ', key, ediData[index].key)
-        if (ediData[index].cases && !key == ediData[index].cases[0]) {
+        console.log('______________ ', key, dataElem.key)
+        if (dataElem.cases && !key == dataElem.cases[0]) {
 
-            var line = ediData[index].exc(data[i][key])
+            var line = dataElem.exc(data[i][key])
             console.log('------', line)
         }
         var line = line.replace(key, data[i][key])

@@ -109,7 +109,7 @@ Grammar = [{
     "children": "",
     "isHeader": "",
     
-    AJK: "<UDX.JA.DeliveryConditionCode> $code </UDX.JA.DeliveryConditionCode><UDX.JA.DeliveryConditionDetails> $extra </UDX.JA.DeliveryConditionDetails>",
+    AJK: "<UDX.JA.DeliveryConditionCode>$code</UDX.JA.DeliveryConditionCode><UDX.JA.DeliveryConditionDetails>$extra</UDX.JA.DeliveryConditionDetails>",
     //<REFERENCETTTT> $value  - $extra</REFERENCETTTT>
     // isSkipped: true,
     cases: ["$code"],
