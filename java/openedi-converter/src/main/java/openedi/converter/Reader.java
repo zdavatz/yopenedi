@@ -1,19 +1,12 @@
 package openedi.converter;
 
+import org.apache.commons.lang3.builder.MultilineRecursiveToStringStyle;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.milyn.SmooksException;
 import org.milyn.edi.unedifact.d96a.D96AInterchangeFactory;
-import org.milyn.edi.unedifact.d96a.ORDERS.Orders;
-import org.milyn.edi.unedifact.d96a.ORDERS.SegmentGroup1;
-import org.milyn.edi.unedifact.d96a.ORDERS.SegmentGroup2;
-import org.milyn.edi.unedifact.d96a.ORDERS.SegmentGroup5;
-import org.milyn.edi.unedifact.d96a.common.COMCommunicationContact;
-import org.milyn.edi.unedifact.d96a.common.CTAContactInformation;
-import org.milyn.edi.unedifact.d96a.common.DTMDateTimePeriod;
-import org.milyn.edi.unedifact.d96a.common.NADNameAndAddress;
-import org.milyn.edi.unedifact.d96a.common.field.C056DepartmentOrEmployeeDetails;
-import org.milyn.edi.unedifact.d96a.common.field.C076CommunicationContact;
-import org.milyn.edi.unedifact.d96a.common.field.C506Reference;
-import org.milyn.edi.unedifact.d96a.common.field.C507DateTimePeriod;
+import org.milyn.edi.unedifact.d96a.ORDERS.*;
+import org.milyn.edi.unedifact.d96a.common.*;
+import org.milyn.edi.unedifact.d96a.common.field.*;
 import org.milyn.smooks.edi.unedifact.model.UNEdifactInterchange;
 import org.milyn.smooks.edi.unedifact.model.r41.UNEdifactInterchange41;
 import org.milyn.smooks.edi.unedifact.model.r41.UNEdifactMessage41;
@@ -21,18 +14,21 @@ import org.xml.sax.SAXException;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+
+import static openedi.converter.Utility.*;
 
 public class Reader {
 
     protected void processStream(InputStream stream) {
         try {
-
             D96AInterchangeFactory factory = D96AInterchangeFactory.getInstance();
             UNEdifactInterchange interchange = factory.fromUNEdifact(stream);
             if (interchange instanceof  UNEdifactInterchange41) {
                 UNEdifactInterchange41 i = (UNEdifactInterchange41)interchange;
                 List<UNEdifactMessage41> messages = i.getMessages();
+                ArrayList<Order> orderList = new ArrayList<>();
                 for (UNEdifactMessage41 m41 : messages) {
                     Object message = m41.getMessage();
                     if (!(message instanceof Orders)) {
@@ -71,8 +67,32 @@ public class Reader {
                         } else if (nad.getE3035PartyQualifier().equals("DP")) {
                             party.role = Party.Role.Delivery;
                         }
-                        party.id = nad.getC082PartyIdentificationDetails().getE3039PartyIdIdentification();
-                        party.supplierSpecificPartyId = nad.getC082PartyIdentificationDetails().getE3055CodeListResponsibleAgencyCoded();
+                        C082PartyIdentificationDetails partyDetails = nad.getC082PartyIdentificationDetails();
+                        if (partyDetails != null) {
+                            party.id = partyDetails.getE3039PartyIdIdentification();
+                            party.supplierSpecificPartyId = partyDetails.getE3055CodeListResponsibleAgencyCoded();
+                            C080PartyName partyName = nad.getC080PartyName();
+                            if (partyName != null) {
+                                party.name = concatStrings(" ",
+                                        partyName.getE30361PartyName(),
+                                        partyName.getE30362PartyName(),
+                                        partyName.getE30363PartyName(),
+                                        partyName.getE30364PartyName(),
+                                        partyName.getE30365PartyName()
+                                );
+                            }
+                            C059Street street = nad.getC059Street();
+                            if (street != null) {
+                                party.street = concatStrings(" ",
+                                        street.getE30421StreetAndNumberPOBox(),
+                                        street.getE30422StreetAndNumberPOBox(),
+                                        street.getE30423StreetAndNumberPOBox()
+                                );
+                            }
+                            party.city = nad.getE3164CityName();
+                            party.zip = nad.getE3251PostcodeIdentification();
+                            party.countryCoded = nad.getE3207CountryCoded();
+                        }
 
                         for (SegmentGroup5 segmentGroup5 : segmentGroup2.getSegmentGroup5()) {
                             ContactDetail contactDetail = new ContactDetail();
@@ -88,7 +108,7 @@ public class Reader {
                             // TODO:
                             // E3139 Contact function code should be mapped to CONTACT_ROLE
                             // e.g. AT in E3139 means Technical contact
-                            // then we have <bmecat:CONTACT_ROLE type="others" />
+                            // then we have <bmecat:CONTACT_ROLE type="technical" />
                             // But the sample we have has E3139 as "UC", I cannot find the corresponding value in:
                             // https://service.unece.org/trade/untdid/d19b/tred/tred3139.htm
                             // > contactInfo.getE3139ContactFunctionCoded()
@@ -108,11 +128,59 @@ public class Reader {
                         }
                         order.addParty(party);
                     }
+                    for (SegmentGroup7 segmentGroup7 : orders.getSegmentGroup7()) {
+                        try {
+                            order.currencyCoded = segmentGroup7.getCUXCurrencies().getC5041CurrencyDetails().getE6345CurrencyCoded();
+                        } catch (NullPointerException e){}
+                    }
+                    for (SegmentGroup25 segmentGroup25 : orders.getSegmentGroup25()) {
+                        OrderItem orderItem = new OrderItem();
+                        for (PIAAdditionalProductId productId : segmentGroup25.getPIAAdditionalProductId()) {
+                            if (productId.getE4347ProductIdFunctionQualifier().equals("5")) { // 5 means this is "product id"
+                                C212ItemNumberIdentification numberId = productId.getC2121ItemNumberIdentification();
+                                if (numberId.getE7143ItemNumberTypeCoded().equals("EN")) { // EN means this is EAN
+                                    orderItem.ean = numberId.getE7140ItemNumber();
+                                }
+                            }
+                        }
+
+                        // A product in Edifact can have many descriptions,
+                        // but in OpenTrans there can only be "short" or "long".
+                        // We find the shortest and the longest here, is this ok?
+                        ArrayList<String> descriptions = new ArrayList<String>();
+                        for (IMDItemDescription itemDescription : segmentGroup25.getIMDItemDescription()) {
+                            try {
+                                descriptions.add(itemDescription.getC273ItemDescription().getE70081ItemDescription());
+                            } catch (NullPointerException e){}
+                        }
+                        orderItem.descriptionShort = shortestInList(descriptions);
+                        if (descriptions.size() > 1) {
+                            orderItem.descriptionLong = longestInList(descriptions);
+                        }
+                        for (QTYQuantity quantity : segmentGroup25.getQTYQuantity()) {
+                            try {
+                                C186QuantityDetails quantityDetails = quantity.getC186QuantityDetails();
+                                if (quantityDetails.getE6063QuantityQualifier().equals("21")) { // Ordered quantity
+                                    orderItem.quantity = quantityDetails.getE6060Quantity();
+                                    orderItem.quantityUnit = quantityDetails.getE6411MeasureUnitQualifier();
+                                }
+                            } catch (NullPointerException e){}
+                        }
+                        for (SegmentGroup28 segmentGroup28 : segmentGroup25.getSegmentGroup28()) {
+                            try {
+                                PRIPriceDetails priceDetails = segmentGroup28.getPRIPriceDetails();
+                                C509PriceInformation priceInfo = priceDetails.getC509PriceInformation();
+                                if (priceInfo.getE5125PriceQualifier().equals("AAA")) {
+                                    orderItem.price = priceInfo.getE5118Price();
+                                }
+                            } catch (NullPointerException e){}
+                        }
+                        order.addOrderItem(orderItem);
+                    }
+                    System.out.println(new ReflectionToStringBuilder(order, new MultilineRecursiveToStringStyle()).toString());
+                    orderList.add(order);
                 }
             }
-            System.out.println("interchange: " + interchange.toString());
-            // StringWriter ediOutStream = new StringWriter();
-            // factory.toUNEdifact(unEdifactInterchange, ediOutStream);
         } catch (Exception e) {
             System.out.println("error: " + e.getMessage());
         }

@@ -1,5 +1,7 @@
 package openedi.converter;
 
+import java.util.ArrayList;
+
 public class Party {
     enum Role {
         Buyer,
@@ -9,8 +11,14 @@ public class Party {
     public String id;
     public Role role;
     public String supplierSpecificPartyId;
+    public String name;
+    public String street;
+    public String city;
+    public String zip;
+    public String countryCoded;
 
+    public ArrayList<ContactDetail> contactDetails = new ArrayList<>();
     public void addContactDetail(ContactDetail contactDetail) {
-        // TODO
+        contactDetails.add(contactDetail);
     }
 }
