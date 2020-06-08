@@ -33,6 +33,9 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
 * `certbot certonly --server https://acme-v02.api.letsencrypt.org/directory --manual --preferred-challenges dns -d 'test.yopenedi.ch'`
 
 ## Digital Ocean deployment
+### Input and Output files
+* Input files: `yopenedi/edifact_orders`
+* Output files: `yopenedi/opentrans_orders`
 ### Meteor setup
 * `curl https://install.meteor.com/ | sh`
 * `meteor npm i`
