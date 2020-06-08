@@ -9,7 +9,6 @@ const _ = require('lodash');
 import moment from 'moment';
 import './grammar.js'
 /* -------------------------------------------------------------------------- */
-
 parseEDI = {}
 parseEDI.regex = {
     line: /['\n\r]+/,
@@ -17,9 +16,7 @@ parseEDI.regex = {
     element: /(\?.|[^\+])/g,
     component: /(\?.|[^:])+/g
 }
-
 /* -------------------------------------------------------------------------- */
-
 var dataToReplace = [{
         replace: "<PARTY_ROLE>SU</PARTY_ROLE>",
         value: "<PARTY_ROLE>supplier</PARTY_ROLE>"
@@ -33,23 +30,17 @@ var dataToReplace = [{
         value: "<PARTY_ROLE>buyer</PARTY_ROLE>"
     }
 ]
-
 /* -------------------------------------------------------------------------- */
-
-
 var fileName = 'noname_order_sample_from_REXEL_03062020'
 var doc = Assets.getText(fileName)
 /* -------------------------------------------------------------------------- */
 // Render JSON structured Data */
 // ediData JSON collection
 // tags arr
-
 function renderStructuredData(doc) {
     var tags = [];
     var ediData = [];
-
     var lines = doc.split(/['\n\r]+/);
-
     lines.map(function (line) {
         if (!line) {
             return
@@ -59,14 +50,12 @@ function renderStructuredData(doc) {
         var segs = getSegment(line)
         ediData.push(segs);
     })
-
     return {
         tags,
         ediData
     }
 }
 /* -------------------------------------------------------------------------- */
-
 /* -------------------------------------------------------------------------- */
 // var arr = ["UNH", "UNH", "NAD", "NAD", "NAD", "CUX", "LIN", "LIN", "LIN", "UNH"]
 // setEnclosedTags(arr, 'NAD', 'Pareties')
@@ -95,14 +84,12 @@ function setEnclosedTags(arr, tag, enclosed) {
     return newArr;
 }
 /* -------------------------------------------------------------------------- */
-
 function generatePriceLineAmount(arr, ediData) {
     var totalQTY = 0;
     var totalPrice = 0;
     _.each(arr, (jsonElem, index) => {
         // console.log(jsonElem)
         var price, qty, priceLinePrice;
-
         if (jsonElem.tag == "LIN") {
             _.each(jsonElem.children, (child) => {
                 if (child.tag == "QTY") {
@@ -126,8 +113,6 @@ function generatePriceLineAmount(arr, ediData) {
                 }
             })
             if (qty && price) {
-                
-
                 priceLinePrice = qty * price;
                 priceLinePrice = priceLinePrice.toFixed(2)
                 var newTag = {
@@ -137,7 +122,7 @@ function generatePriceLineAmount(arr, ediData) {
                         [priceLinePrice],
                         []
                     ],
-                    value : priceLinePrice,
+                    value: priceLinePrice,
                     render: '<PRICE_LINE_AMOUNT>' + priceLinePrice + '</PRICE_LINE_AMOUNT>',
                     isRendered: true
                 }
@@ -156,60 +141,55 @@ function generatePriceLineAmount(arr, ediData) {
             // console.log(jsonElem.children)
         }
     })
-
-
     var total = {
         name: "ORDER_SUMMARY",
         tag: "ORDER_SUMMARY",
-        data: [[],[totalQTY,totalPrice]],
+        data: [
+            [],
+            [totalQTY, totalPrice]
+        ],
         // value : priceLinePrice,
-        render: '<ORDER_SUMMARY><TOTAL_ITEM_NUM>'+totalQTY+'</TOTAL_ITEM_NUM><TOTAL_AMOUNT>'+totalPrice+'</TOTAL_AMOUNT></ORDER_SUMMARY>',
+        render: '<ORDER_SUMMARY><TOTAL_ITEM_NUM>' + totalQTY + '</TOTAL_ITEM_NUM><TOTAL_AMOUNT>' + totalPrice + '</TOTAL_AMOUNT></ORDER_SUMMARY>',
         isRendered: true
     }
-
-    console.log('TOTAL++++++++++',total)
+    console.log('TOTAL++++++++++', total)
     arr.push(total)
-
     // xml.push(`
     // <ORDER_SUMMARY>
     //     <TOTAL_ITEM_NUM>11</TOTAL_ITEM_NUM>
     //     <TOTAL_AMOUNT>1080.25</TOTAL_AMOUNT>
     // </ORDER_SUMMARY>
     // `)
-
-    console.log('==========',{totalQTY,totalPrice})
+    console.log('==========', {
+        totalQTY,
+        totalPrice
+    })
     return arr
 }
-
 /* -------------------------------------------------------------------------- */
-
-
-function UDX_reOrder(arr){
+function UDX_reOrder(arr) {
     var tmp;
     _.each(arr, (jsonElem, index) => {
         // console.log(jsonElem)
-        if(jsonElem.tag == "UNH"){
+        if (jsonElem.tag == "UNH") {
             // console.log(jsonElem.children)
-            _.each(jsonElem.children,(elm,childIndex)=>{
-                if(elm.tag == 'RFF'){
-                    console.log({elm})
+            _.each(jsonElem.children, (elm, childIndex) => {
+                if (elm.tag == 'RFF') {
+                    console.log({
+                        elm
+                    })
                     tmp = elm
                 }
             })
         }
-
-        if(jsonElem.tag == "CUX"){
-            console.log('_CURRENY INDEX',jsonElem, index)
-            arr.splice(8,0,tmp)
+        if (jsonElem.tag == "CUX") {
+            console.log('_CURRENY INDEX', jsonElem, index)
+            arr.splice(8, 0, tmp)
         }
-    }) 
-
+    })
     return arr
 }
-
-
 /* -------------------------------------------------------------------------- */
-
 function generateStructuredArr(jsonData) {
     var tags = jsonData.tags;
     var ediData = jsonData.ediData;
@@ -291,12 +271,6 @@ function generateStructuredArr(jsonData) {
             if (!parentTag || !parentTag.children) {
                 return
             }
-
-            if(tag == "DTM"){
-               
-                var data = [data[0], setDateFormat(data[1]), data[2]]
-                console.log('==========================DTM=========================',data)
-            }
             // console.log({parentTag}, parentTag.children)
             parentTag.children.push({
                 tag: tag,
@@ -312,7 +286,6 @@ function generateStructuredArr(jsonData) {
     var arr = setEnclosedTags(structuredArr, "NAD", "PARTIES");
     var arr = setEnclosedTags(arr, "LIN", "PRODUCTS");
     var arr = generatePriceLineAmount(arr, ediData);
-
     // ORDER >>>>>>>>
     // var arr = UDX_reOrder(arr)
     // TEMP >>>>>>>>>
@@ -325,18 +298,13 @@ function generateStructuredArr(jsonData) {
     // }, structuredArr)
     return arr;
 }
-
 /* -------------------------------------------------------------------------- */
 // DATE FORMAT 
-
-function setDateFormat(date){
+function setDateFormat(date) {
     var date = moment(date).format('YYYY-MM-DD');
     return date
 }
-
 /* -------------------------------------------------------------------------- */
-
-
 function getSegment(line) {
     // console.log('getSegment', {
     //     line
@@ -393,7 +361,6 @@ function getSegment(line) {
     return out;
 }
 /* -------------------------------------------------------------------------- */
-
 function matchDataBlock(dataArr, grammarArr) {
     if (!grammarArr || !dataArr) {
         console.log('matchDataBlock: ERROR')
@@ -414,16 +381,12 @@ function matchDataBlock(dataArr, grammarArr) {
     // console.log('matchDataBlock: Output', output)
     return output;
 }
-
-
 /* -------------------------------------------------------------------------- */
-
 function getXMLElement(index, ediData) {
     // console.log('getXMLElement',ediData[index].key)
     if (!ediData[index]) {
         return
     }
-
     var dataElem = ediData[index]
     // ediData = ediData[index];
     var elementsAll = dataElem.elements
@@ -434,9 +397,7 @@ function getXMLElement(index, ediData) {
         return
     }
     //
-
     if (dataElem.cases && dataElem.cases[0]) {
-
         var casee = dataElem.cases
         var find = _.find(data, (o) => {
             if (o[casee[0]]) {
@@ -446,22 +407,24 @@ function getXMLElement(index, ediData) {
         var key = casee[0];
         var line = dataElem[find[key]]
     }
-    // Looping and replacing line:
+    // Looping and replacing $DATA_ELEMENTS
     for (i = 0; i < data.length; i++) {
-
         var key = _.keys(data[i])[0]
         // console.log('______________ ', key, dataElem.key)
         if (dataElem.cases && !key == dataElem.cases[0]) {
-
             var line = dataElem.exc(data[i][key])
             // console.log('------', line)
         }
-        var line = line.replace(key, data[i][key])
+        var dataBlock = data[i][key]
+        // console.log('XML RENDER ELEMENT',key,dataBlock)
+        if (key == "$DTM") {
+          var dataBlock = setDateFormat(dataBlock)
+        }
+        var line = line.replace(key, dataBlock)
     }
     return line
 }
 /* -------------------------------------------------------------------------- */
-
 function getGrammar(key, object) {
     var grammar = _.find(Grammar, (o) => {
         return o.name == [key]
@@ -471,10 +434,7 @@ function getGrammar(key, object) {
         return grammar[object];
     }
 }
-
 /* -------------------------------------------------------------------------- */
-
-
 function replaceTags(xml) {
     for (i = 0; i < dataToReplace.length; i++) {
         var tag = dataToReplace[i].replace
@@ -483,9 +443,7 @@ function replaceTags(xml) {
     }
     return xml
 }
-
 /* -------------------------------------------------------------------------- */
-
 function jsonToXML(jsonArr, jsonData) {
     var ediData = jsonData.ediData;
     console.log('------------------')
@@ -523,15 +481,12 @@ function jsonToXML(jsonArr, jsonData) {
         //     return
         // }
         //---------------- Handle Close Tags -----------------------//
-
-
-        if(jsonElem.tag == "ORDER_SUMMARY"){
+        if (jsonElem.tag == "ORDER_SUMMARY") {
             console.log('===============ORDER_SUMMARY==================')
             xml.push(jsonElem.render)
             console.log('===============SUCCESS:: ORDER_SUMMARY==================')
             return
         }
-
         /** 
          * 
          * 1- SKIP TAG  remove from the controller array
@@ -609,7 +564,6 @@ function jsonToXML(jsonArr, jsonData) {
             //
             xml.push("</" + jsonElem.tag + ">")
         }
-
     })
     // console.log({
     //     struc
@@ -625,8 +579,6 @@ function jsonToXML(jsonArr, jsonData) {
     var xml = xml.join("")
     return xml;
 }
-
-
 /* -------------------------------------------------------------------------- */
 // Render edi to a file**
 // Input File Data 
@@ -639,8 +591,6 @@ function jsonToXML(jsonArr, jsonData) {
 //     // console.log(xml)
 //     return xml;
 // }
-
-
 // renderEDI(doc)
 parse = {}
 parse.renderEDI = function () {
@@ -652,6 +602,4 @@ parse.renderEDI = function () {
     // console.log(xml)
     return xml;
 }
-
-
 module.exports = parse
