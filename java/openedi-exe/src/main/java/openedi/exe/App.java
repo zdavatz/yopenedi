@@ -5,14 +5,16 @@ package openedi.exe;
 
 import openedi.converter.Reader;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.nio.file.FileSystems;
 
 public class App {
     public static void main(String[] args) throws Exception {
         try {
+            // TODO: better CLI instruction and arg handling
             Reader reader = new Reader();
-            FileInputStream stream = new FileInputStream("../samples/noname_order_sample_from_REXEL");
-            reader.run(stream);
+            reader.run(System.in);
         } catch (Exception e) {
             System.out.println("Exception " + e.toString());
         }

@@ -36,3 +36,7 @@ application {
     // Define the main class for the application.
     mainClassName = 'openedi.exe.App'
 }
+
+run{
+    standardInput = System.in
+}
