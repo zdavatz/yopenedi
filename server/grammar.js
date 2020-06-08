@@ -240,7 +240,8 @@ Grammar = [{
 }, {
     "name": "IMD",
     "tag": "ITEM_DESCRIPTION",
-    render: '<ITEM_DESCRIPTION>$CODE - $ID</ITEM_DESCRIPTION>',
+    // render: '<ITEM_DESCRIPTION>$CODE - $ID</ITEM_DESCRIPTION>',
+    render: '',
     match: [
         ["", "$CODE"],
         ["", "", "", "$ID"]
