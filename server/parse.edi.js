@@ -291,6 +291,12 @@ function generateStructuredArr(jsonData) {
             if (!parentTag || !parentTag.children) {
                 return
             }
+
+            if(tag == "DTM"){
+               
+                var data = [data[0], setDateFormat(data[1]), data[2]]
+                console.log('==========================DTM=========================',data)
+            }
             // console.log({parentTag}, parentTag.children)
             parentTag.children.push({
                 tag: tag,
@@ -321,7 +327,12 @@ function generateStructuredArr(jsonData) {
 }
 
 /* -------------------------------------------------------------------------- */
+// DATE FORMAT 
 
+function setDateFormat(date){
+    var date = moment(date).format('YYYY-MM-DD');
+    return date
+}
 
 /* -------------------------------------------------------------------------- */
 
