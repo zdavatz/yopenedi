@@ -462,7 +462,6 @@ function jsonToXML(jsonArr, jsonData) {
     </CONTROL_INFO>`)
     //
     // ORDER_INFO
-    var rffTag;
     xml.push('<ORDER_INFO>')
     _.each(jsonArr, (jsonElem) => {
         var tag = jsonElem.tag;
@@ -520,9 +519,7 @@ function jsonToXML(jsonArr, jsonData) {
         if (tag == "PARTIES") {
             // console.log('++++++++++++++ PARTIES')
             if (jsonElem.close) {
-                
                 xml.push("</" + getGrammar(tag, 'tag') + ">")
-               
             } else {
                 xml.push("<" + getGrammar(tag, 'tag') + ">")
             }
@@ -542,23 +539,15 @@ function jsonToXML(jsonArr, jsonData) {
                     //
                     // SETTING CACULATED DATA: (PRICE_LINE_AMOUNT)
 
-
+                    if(child.tag == "RFF"){
+                        console.log('++++++++++++++++++ RFF')
+                    }
 
 
                     if (!child.index) {
                         xml.push(child.render)
                     } else {
-
-                        // // 
-                        // if(child.tag == "RFF"){
-                        //     console.log('++++++++++++++++++ RFF')
-                        //     rffTag = getXMLElement(child.index, ediData)
-                        //     return
-                        // }
-                        // //
-
-                        xml.push(xml.push(getXMLElement(child.index, ediData)))
-
+                        xml.push(getXMLElement(child.index, ediData))
                     }
                     // console.log("PARENT: ", parent.tag, '->  Child: ', child.tag)
                 })
@@ -566,14 +555,7 @@ function jsonToXML(jsonArr, jsonData) {
               
                 // xml.push(jsonElem.line)
                 // xml.push('<!-- has no children NOCHILDREN-->')
-
-
-                //
                 xml.push(getXMLElement(jsonElem.index, ediData))
-                // if(jsonElem.tag == "CUX"){
-                //     xml.push(rffTag)
-                // }
-                //
             }
             // KEEP THE EDIFACT META TAG OPEN
             if (!_.includes(keepOpen, jsonElem.tag)) {
