@@ -74,7 +74,7 @@ function setEnclosedTags(arr, tag, enclosed) {
     var newArr = []
     _.each(arr, (el, index) => {
         if (el.tag == tag) {
-            console.log('______ HEAD', tag)
+            // console.log('______ HEAD', tag)
             if (arr[index - 1]["tag"] !== tag) {
                 newArr.push({
                     tag: enclosed
@@ -96,9 +96,12 @@ function setEnclosedTags(arr, tag, enclosed) {
 /* -------------------------------------------------------------------------- */
 
 function generatePriceLineAmount(arr, ediData) {
+    var totalQTY = 0;
+    var totalPrice = 0;
     _.each(arr, (jsonElem, index) => {
         // console.log(jsonElem)
         var price, qty, priceLinePrice;
+
         if (jsonElem.tag == "LIN") {
             _.each(jsonElem.children, (child) => {
                 if (child.tag == "QTY") {
@@ -122,6 +125,8 @@ function generatePriceLineAmount(arr, ediData) {
                 }
             })
             if (qty && price) {
+                
+
                 priceLinePrice = qty * price;
                 priceLinePrice = priceLinePrice.toFixed(2)
                 var newTag = {
@@ -131,11 +136,16 @@ function generatePriceLineAmount(arr, ediData) {
                         [priceLinePrice],
                         []
                     ],
+                    value : priceLinePrice,
                     render: '<PRICE_LINE_AMOUNT>' + priceLinePrice + '</PRICE_LINE_AMOUNT>',
                     isRendered: true
                 }
                 arr[index].children.push(newTag)
-                console.log('_______________________D', {
+                //
+                totalQTY = totalQTY + parseFloat(qty);
+                totalPrice = totalPrice + parseFloat(priceLinePrice);
+                //
+                console.log('generatePriceLineAmount: ', {
                     qty,
                     price,
                     priceLinePrice,
@@ -145,8 +155,33 @@ function generatePriceLineAmount(arr, ediData) {
             // console.log(jsonElem.children)
         }
     })
+
+
+    var total = {
+        name: "ORDER_SUMMARY",
+        tag: "ORDER_SUMMARY",
+        data: [[],[totalQTY,totalPrice]],
+        // value : priceLinePrice,
+        render: '<ORDER_SUMMARY><TOTAL_ITEM_NUM>'+totalQTY+'</TOTAL_ITEM_NUM><TOTAL_AMOUNT>'+totalPrice+'</TOTAL_AMOUNT></ORDER_SUMMARY>',
+        isRendered: true
+    }
+
+    console.log('TOTAL++++++++++',total)
+    arr.push(total)
+
+    // xml.push(`
+    // <ORDER_SUMMARY>
+    //     <TOTAL_ITEM_NUM>11</TOTAL_ITEM_NUM>
+    //     <TOTAL_AMOUNT>1080.25</TOTAL_AMOUNT>
+    // </ORDER_SUMMARY>
+    // `)
+
+    console.log('==========',{totalQTY,totalPrice})
     return arr
 }
+
+/* -------------------------------------------------------------------------- */
+
 
 /* -------------------------------------------------------------------------- */
 
@@ -243,9 +278,10 @@ function generateStructuredArr(jsonData) {
         }
     })
     // Inject enclose tags looped
-    var arr = setEnclosedTags(structuredArr, "NAD", "PARTIES")
-    var arr = setEnclosedTags(arr, "LIN", "PRODUCTS")
-    var arr = generatePriceLineAmount(arr, ediData)
+    var arr = setEnclosedTags(structuredArr, "NAD", "PARTIES");
+    var arr = setEnclosedTags(arr, "LIN", "PRODUCTS");
+    var arr = generatePriceLineAmount(arr, ediData);
+    // var arr = generateTotalOrder(arr,ediData); 
     // var arr = setTagBeforeAfter(arr, "ORDER_HEADER", "BGM", "PRODUCTS")
     // console.log({
     //     strucJSON,
@@ -256,18 +292,15 @@ function generateStructuredArr(jsonData) {
 }
 
 /* -------------------------------------------------------------------------- */
-// Render JSON to XML***
-function renderXML(json) {
 
-}
 
 /* -------------------------------------------------------------------------- */
 
 
 function getSegment(line) {
-    console.log('getSegment', {
-        line
-    })
+    // console.log('getSegment', {
+    //     line
+    // })
     if (!line) {
         return
     }
@@ -357,7 +390,7 @@ function getXMLElement(index, ediData) {
     var line = dataElem.render
     var data = dataElem.matchedData
     if (!data) {
-        console.error(ediData[index].key + ' No Data Skipping')
+        // console.error(ediData[index].key + ' No Data ::: Skipping')
         return
     }
     //
@@ -377,11 +410,11 @@ function getXMLElement(index, ediData) {
     for (i = 0; i < data.length; i++) {
 
         var key = _.keys(data[i])[0]
-        console.log('______________ ', key, dataElem.key)
+        // console.log('______________ ', key, dataElem.key)
         if (dataElem.cases && !key == dataElem.cases[0]) {
 
             var line = dataElem.exc(data[i][key])
-            console.log('------', line)
+            // console.log('------', line)
         }
         var line = line.replace(key, data[i][key])
     }
@@ -435,10 +468,11 @@ function jsonToXML(jsonArr, jsonData) {
     xml.push('<ORDER_INFO>')
     _.each(jsonArr, (jsonElem) => {
         var tag = jsonElem.tag;
-        console.log('Processing:', tag)
+        // console.log('Processing:', tag)
         if (struc.length == 0 && tag) {
             struc.push("Root")
         }
+        //
         if (_.includes(start, tag)) {
             if (struc[struc.length - 1] !== tag) {
                 struc.push(tag)
@@ -450,6 +484,15 @@ function jsonToXML(jsonArr, jsonData) {
         //     return
         // }
         //---------------- Handle Close Tags -----------------------//
+
+
+        if(jsonElem.tag == "ORDER_SUMMARY"){
+            console.log('===============ORDER_SUMMARY==================')
+            xml.push(jsonElem.render)
+            console.log('===============SUCCESS:: ORDER_SUMMARY==================')
+            return
+        }
+
         /** 
          * 
          * 1- SKIP TAG  remove from the controller array
@@ -469,7 +512,7 @@ function jsonToXML(jsonArr, jsonData) {
         //----------------------------------------------------------
         // PRODUCTS // SHOULD FIX
         if (tag == "PRODUCTS") {
-            console.log('++++++++++++++ PRODUCTS')
+            // console.log('++++++++++++++ PRODUCTS')
             if (jsonElem.close) {
                 xml.push("</" + getGrammar(tag, 'tag') + ">")
             } else {
@@ -479,7 +522,7 @@ function jsonToXML(jsonArr, jsonData) {
             return
         }
         if (tag == "PARTIES") {
-            console.log('++++++++++++++ PARTIES')
+            // console.log('++++++++++++++ PARTIES')
             if (jsonElem.close) {
                 xml.push("</" + getGrammar(tag, 'tag') + ">")
             } else {
@@ -527,16 +570,17 @@ function jsonToXML(jsonArr, jsonData) {
             //
             xml.push("</" + jsonElem.tag + ">")
         }
+
     })
     // console.log({
     //     struc
     // })
-    xml.push(`
-    <ORDER_SUMMARY>
-        <TOTAL_ITEM_NUM>11</TOTAL_ITEM_NUM>
-        <TOTAL_AMOUNT>1080.25</TOTAL_AMOUNT>
-    </ORDER_SUMMARY>
-    `)
+    // xml.push(`
+    // <ORDER_SUMMARY>
+    //     <TOTAL_ITEM_NUM>11</TOTAL_ITEM_NUM>
+    //     <TOTAL_AMOUNT>1080.25</TOTAL_AMOUNT>
+    // </ORDER_SUMMARY>
+    // `)
     xml.push('</ORDER>')
     xml.push('')
     var xml = xml.join("")
@@ -566,7 +610,7 @@ parse.renderEDI = function () {
     // console.log({processedJSON})
     var xml = jsonToXML(processedJSON, json)
     var xml = replaceTags(xml)
-    console.log(xml)
+    // console.log(xml)
     return xml;
 }
 

@@ -350,8 +350,5 @@ Grammar = [{
 },{
     name: "CONTROL_INFO ",
     tag: "CONTROL_INFO "
-},{
-    name: "ORDER_SUMMARY ",
-    tag: "ORDER_SUMMARY "
 }
 ]
