@@ -6,6 +6,7 @@
 const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
+import moment from 'moment';
 import './grammar.js'
 /* -------------------------------------------------------------------------- */
 
@@ -476,7 +477,6 @@ function replaceTags(xml) {
 
 function jsonToXML(jsonArr, jsonData) {
     var ediData = jsonData.ediData;
-
     console.log('------------------')
     var keepOpen = ["UNB", "UNG", "UNH"]
     var start = ["UNB", "UNG", "UNH"]
@@ -489,7 +489,7 @@ function jsonToXML(jsonArr, jsonData) {
     xml.push('<ORDER_HEADER>')
     xml.push(`<CONTROL_INFO>
     <GENERATOR>Yopenedi</GENERATOR>
-    <GENERATION_DATE>` + new Date() + `</GENERATION_DATE>
+    <GENERATION_DATE>` + moment().format("YYYY-MM-DDTHH:MM:SS") + `</GENERATION_DATE>
     </CONTROL_INFO>`)
     //
     // ORDER_INFO
