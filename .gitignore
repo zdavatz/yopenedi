@@ -11,3 +11,5 @@ opentrans_orders/*
 edifact_orders/*
 opentrans_orders/
 edifact_orders/
+exported/
+exported/*
