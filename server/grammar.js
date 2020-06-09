@@ -50,12 +50,12 @@ Grammar = [{
     "tag": "DTM",
     "render": `
     <DELIVERY_DATE type="optional">
-        <DELIVERY_START_DATE>$DTM</DELIVERY_START_DATE>
+        <DELIVERY_START_DATE>DTM</DELIVERY_START_DATE>
         <DELIVERY_END_DATE>$FORMAT</DELIVERY_END_DATE>
     </DELIVERY_DATE>`,
     "match": [
         [],
-        ["$CODE", "$DTM", "$FORMAT"]
+        ["$CODE", "DTM", "$FORMAT"]
     ],
     cases: ["$CODE"],
     11: ``,
@@ -65,7 +65,7 @@ Grammar = [{
     "X13": ``,
     2: `
     <DELIVERY_DATE type="optional">
-    <DELIVERY_START_DATE>$DTM</DELIVERY_START_DATE></DELIVERY_DATE>`,
+    <DELIVERY_START_DATE>DTM</DELIVERY_START_DATE><DELIVERY_END_DATE>DTM</DELIVERY_END_DATE></DELIVERY_DATE>`,
     137: `<ORDER_DATE>$DTM</ORDER_DATE>`,
     162: ``,
     191: ``,

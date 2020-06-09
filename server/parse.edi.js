@@ -417,10 +417,15 @@ function getXMLElement(index, ediData) {
         }
         var dataBlock = data[i][key]
         // console.log('XML RENDER ELEMENT',key,dataBlock)
-        if (key == "$DTM") {
+
+
+        if (key == "DTM") {
           var dataBlock = setDateFormat(dataBlock)
         }
-        var line = line.replace(key, dataBlock)
+        //#19
+        var re = new RegExp(`\\b${key}\\b`, 'gi');
+        var line = line.replace(re, dataBlock)
+
     }
     return line
 }
