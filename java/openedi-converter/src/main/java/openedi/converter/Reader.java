@@ -135,11 +135,22 @@ public class Reader {
                     }
                     for (SegmentGroup25 segmentGroup25 : orders.getSegmentGroup25()) {
                         OrderItem orderItem = new OrderItem();
-                        for (PIAAdditionalProductId productId : segmentGroup25.getPIAAdditionalProductId()) {
-                            if (productId.getE4347ProductIdFunctionQualifier().equals("5")) { // 5 means this is "product id"
-                                C212ItemNumberIdentification numberId = productId.getC2121ItemNumberIdentification();
-                                if (numberId.getE7143ItemNumberTypeCoded().equals("EN")) { // EN means this is EAN
-                                    orderItem.ean = numberId.getE7140ItemNumber();
+                        LINLineItem lineItem = segmentGroup25.getLINLineItem();
+                        if (lineItem != null) {
+                            C212ItemNumberIdentification c212id = lineItem.getC212ItemNumberIdentification();
+                            if (c212id != null) {
+                                if ("EN".equals(c212id.getE7143ItemNumberTypeCoded())) {
+                                    orderItem.ean = c212id.getE7140ItemNumber();
+                                }
+                            }
+                        }
+                        if (orderItem.ean == null || ! orderItem.ean.isEmpty()) {
+                            for (PIAAdditionalProductId productId : segmentGroup25.getPIAAdditionalProductId()) {
+                                if (productId.getE4347ProductIdFunctionQualifier().equals("5")) { // 5 means this is "product id"
+                                    C212ItemNumberIdentification numberId = productId.getC2121ItemNumberIdentification();
+                                    if (numberId.getE7143ItemNumberTypeCoded().equals("EN")) { // EN means this is EAN
+                                        orderItem.ean = numberId.getE7140ItemNumber();
+                                    }
                                 }
                             }
                         }
