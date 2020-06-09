@@ -95,20 +95,20 @@ function generatePriceLineAmount(arr, ediData) {
                 if (child.tag == "QTY") {
                     var data = ediData[child.index].matchedData;
                     var find = _.find(data, (o) => {
-                        if (o["$qty"]) {
-                            return o["$qty"]
+                        if (o["qty"]) {
+                            return o["qty"]
                         }
                     })
-                    qty = find["$qty"]
+                    qty = find["qty"]
                 }
                 if (child.tag == "PRI") {
                     var data = ediData[child.index].matchedData;
                     var find = _.find(data, (o) => {
-                        if (o["$PRICE"]) {
-                            return o["$PRICE"]
+                        if (o["PRICE"]) {
+                            return o["PRICE"]
                         }
                     })
-                    price = find['$PRICE']
+                    price = find['PRICE']
                     // console.log({price})
                 }
             })
