@@ -210,7 +210,7 @@ Grammar = [{
 }, {
     "name": "LIN",
     "tag": "ORDER_ITEM",
-    render: '<bmecat:INTERNATIONAL_PID type="ean">$productID</bmecat:INTERNATIONAL_PID>',
+    render: '<LINE_ITEM_ID>$id</LINE_ITEM_ID><bmecat:INTERNATIONAL_PID type="ean">$productID</bmecat:INTERNATIONAL_PID>',
     "renderx": `<LINE_ITEM_ID>$id</LINE_ITEM_ID><PRODUCT_CUSTOM_ID>$productID</PRODUCT_CUSTOM_ID><PRODUCT_LANG>$lang</PRODUCT_LANG>`,
     match: [
         ["", "$id"],
