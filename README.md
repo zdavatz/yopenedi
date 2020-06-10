@@ -2,10 +2,11 @@
 OpenTrans 2.1/EDIFACT D.96A File converter
 1. Convert order Files to and from OpenTrans 2.1/[EDIFACT D.96A](http://www.unece.org/trade/untdid/d96a/content.htm)\
 Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82047602-5c4bb800-96b3-11ea-9b7d-5560743676dd.jpeg) Tags. They contain the order information like Buyer, Seller, Contact Address and itmes list. UNB is just the message header. Each order file will only contain one combination of UNH/UNT that needs be converted into Opentrans 2.1 XML ([Sample Order XML Files from OpenTrans 2.1](https://onedrive.live.com/?authkey=%21AE6Pkn3o6xLay9A&cid=8DB8718F73B2D606&id=8DB8718F73B2D606%2114103&parId=8DB8718F73B2D606%2114099&o=OneUp))
-2. Send order files as attachment in EDIFACT D.96A format to xmlxonv@ywesee.com and convert them to the OpenTrans 2.1 format.
-3. Import OpenTrans 2.1 files from FTP and convert them to EDIFACT D.96A and send the converted file as Email-Attachment from xmlxonv@ywesee.com to a dedicated Email address.
+2. Send order files as attachment in EDIFACT D.96A format to an IMAP Email address and convert them to the OpenTrans 2.1 format.
+3. Import OpenTrans 2.1 files from FTP and convert them to EDIFACT D.96A and send the converted file as Email-Attachment from an IMAP Email address to a dedicated Email address.
 4. Send Opentrans 2.1 XML files to this [URL](https://connect.boni.ch/OpaccOne/B2B/Channel/XmlOverHttp/ywesee)
 5. Receive Opentrans 2.1 XML files at this [URL](https://yopenedi.ch/input)
+6. Input files go into the folder `edifact_orders`, converted files go into the folder `opentrans_orders`
 
 ## FAQ
 ### EDIFACT D.96A
