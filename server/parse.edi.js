@@ -31,16 +31,20 @@ var dataToReplace = [{
     }
 ]
 /* -------------------------------------------------------------------------- */
-var fileName = 'noname_order_sample_from_REXEL_03062020'
-var doc = Assets.getText(fileName)
+// var fileName = 'noname_order_sample_from_REXEL_03062020'
+// var doc = Assets.getText(fileName)
 /* -------------------------------------------------------------------------- */
 // Render JSON structured Data */
 // ediData JSON collection
 // tags arr
 function renderStructuredData(doc) {
+    console.log({doc})
     var tags = [];
     var ediData = [];
     var lines = doc.split(/['\n\r]+/);
+    if(!lines || !lines.length){
+        throw new Meteor.Error('edifact-error','Edifact file problem: Please validate the edifact file')
+    }
     lines.map(function (line) {
         if (!line) {
             return
@@ -424,6 +428,10 @@ function getXMLElement(index, ediData) {
         }
         //#19
         var re = new RegExp(`\\b${key}\\b`, 'gi');
+        if(!line){
+            console.error('Error: getXMLElement, line is not rendered')
+            return
+        }
         var line = line.replace(re, dataBlock)
 
     }
@@ -606,7 +614,7 @@ function jsonToXML(jsonArr, jsonData) {
 // }
 // renderEDI(doc)
 parse = {}
-parse.renderEDI = function () {
+parse.renderEDI = function (doc) {
     var json = renderStructuredData(doc)
     var processedJSON = generateStructuredArr(json)
     // console.log({processedJSON})
