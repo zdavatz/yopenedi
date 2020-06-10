@@ -7,5 +7,5 @@ This repository has multiple Gradle projects.
 To run `openedi-exe`:
 
 ```
-./gradlew openedi-exe:run < edifact file
+make run OUT='./testout' < edifact file
 ```

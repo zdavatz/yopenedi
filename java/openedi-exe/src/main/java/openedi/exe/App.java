@@ -3,18 +3,52 @@
  */
 package openedi.exe;
 
+import openedi.converter.Converter;
+import openedi.converter.OpenTrans.Writer;
+import openedi.converter.Order;
 import openedi.converter.Reader;
+import org.apache.commons.cli.*;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.nio.file.FileSystems;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
 
 public class App {
     public static void main(String[] args) throws Exception {
+        Options options = new Options();
+        Option outputOption = new Option("o", "out", true, "the folder to output");
+        outputOption.setType(String.class);
+        options.addOption(outputOption);
+        CommandLineParser parser = new DefaultParser();
+        CommandLine cmd = parser.parse( options, args);
+        if (!cmd.hasOption("out")) {
+            HelpFormatter formatter = new HelpFormatter();
+            formatter.printHelp( "openedi-exe", options );
+            return;
+        }
+        String outPath = cmd.getOptionValue("out");
+        File outDir = new File(outPath);
+        if (!outDir.isAbsolute()) {
+            outDir = new File("..", outPath);
+        }
+        if (!outDir.exists()) {
+            outDir.mkdirs();
+        }
+
         try {
-            // TODO: better CLI instruction and arg handling
+            InputStream s = System.in;
             Reader reader = new Reader();
-            reader.run(System.in);
+            ArrayList<Order> ediOrders = reader.run(s);
+            for (Order edi : ediOrders) {
+                openedi.converter.OpenTrans.Order otOrder = Converter.orderToOpenTrans(edi);
+                Writer w = new Writer();
+
+                FileOutputStream out = new FileOutputStream(new File(outDir, otOrder.id + ".xml"));
+                w.write(otOrder, out);
+                out.close();
+            }
         } catch (Exception e) {
             System.out.println("Exception " + e.toString());
         }
