@@ -26,7 +26,10 @@ dependencies {
     compile project(':openedi-converter')
 
     implementation 'org.milyn.edi.unedifact:d96a-mapping:1.7.1.0'
+    implementation 'org.milyn.edi.unedifact:d96a-binding:1.7.1.0'
     implementation 'org.milyn:milyn-smooks-edi:1.7.1'
+
+    implementation 'commons-cli:commons-cli:1.4'
 
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
