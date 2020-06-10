@@ -429,6 +429,7 @@ function getXMLElement(index, ediData) {
         //#19
         var re = new RegExp(`\\b${key}\\b`, 'gi');
         if(!line){
+            console.log({dataBlock,line,dataElem})
             console.error('Error: getXMLElement, line is not rendered')
             return
         }
