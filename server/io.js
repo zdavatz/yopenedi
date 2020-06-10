@@ -2,6 +2,7 @@
  * 
  */
 const fs = require('fs');
+
 const path = require('path');
 // import Parse from './parse.draft.final.js'
 import Parse from './parse.edi.js'
@@ -29,6 +30,9 @@ project.readDir = function (dir,func) {
     writeFile(project.opentrans_orders + fileData.name + '.xml', xml)
   })
 }
+
+
+
 /* -------------------------------------------------------------------------- */
 
 function writeFile(file, data) {

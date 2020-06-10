@@ -38,12 +38,14 @@ var dataToReplace = [{
 // ediData JSON collection
 // tags arr
 function renderStructuredData(doc) {
-    console.log({doc})
+    console.log({
+        doc
+    })
     var tags = [];
     var ediData = [];
     var lines = doc.split(/['\n\r]+/);
-    if(!lines || !lines.length){
-        throw new Meteor.Error('edifact-error','Edifact file problem: Please validate the edifact file')
+    if (!lines || !lines.length) {
+        throw new Meteor.Error('edifact-error', 'Edifact file problem: Please validate the edifact file')
     }
     lines.map(function (line) {
         if (!line) {
@@ -135,12 +137,12 @@ function generatePriceLineAmount(arr, ediData) {
                 totalQTY = totalQTY + parseFloat(qty);
                 totalPrice = totalPrice + parseFloat(priceLinePrice);
                 //
-                console.log('generatePriceLineAmount: ', {
-                    qty,
-                    price,
-                    priceLinePrice,
-                    newTag
-                })
+                // console.log('generatePriceLineAmount: ', {
+                //     qty,
+                //     price,
+                //     priceLinePrice,
+                //     newTag
+                // })
             }
             // console.log(jsonElem.children)
         }
@@ -156,7 +158,7 @@ function generatePriceLineAmount(arr, ediData) {
         render: '<ORDER_SUMMARY><TOTAL_ITEM_NUM>' + totalQTY + '</TOTAL_ITEM_NUM><TOTAL_AMOUNT>' + totalPrice + '</TOTAL_AMOUNT></ORDER_SUMMARY>',
         isRendered: true
     }
-    console.log('TOTAL++++++++++', total)
+    // console.log('TOTAL++++++++++', total)
     arr.push(total)
     // xml.push(`
     // <ORDER_SUMMARY>
@@ -164,10 +166,10 @@ function generatePriceLineAmount(arr, ediData) {
     //     <TOTAL_AMOUNT>1080.25</TOTAL_AMOUNT>
     // </ORDER_SUMMARY>
     // `)
-    console.log('==========', {
-        totalQTY,
-        totalPrice
-    })
+    // console.log('==========', {
+    //     totalQTY,
+    //     totalPrice
+    // })
     return arr
 }
 /* -------------------------------------------------------------------------- */
@@ -345,7 +347,7 @@ function getSegment(line) {
     })
     var grammar = grammar ? grammar : null;
     var matchedData = null;
-    //
+    // MATCH DATA
     if (grammar && grammar.render && grammar.match) {
         // var matchedData = matchData(lineData, grammar.match)
         console.error('No Matched Data Grammar keys')
@@ -386,7 +388,67 @@ function matchDataBlock(dataArr, grammarArr) {
     return output;
 }
 /* -------------------------------------------------------------------------- */
+//
+/* -------------------------------------------------------------------------- */
+//
 function getXMLElement(index, ediData) {
+    if (!ediData[index]) {
+        return
+    }
+    var dataElem = ediData[index]
+    // ediData = ediData[index];
+    var elementsAll = dataElem.elements
+    var line = dataElem.render
+    var data = dataElem.matchedData
+
+    if (!data) {
+        return
+    }//
+
+    if (dataElem.exe) {
+        console.log('======exe======')
+        var options = {next: ediData[index + 1], prev: ediData[index - 1]};
+        var line = dataElem.exe(data,options)
+        if (dataElem.name == "IMD") {
+            console.log('=============',JSON.stringify(data), {line})
+        }
+    }
+
+
+    // Looping and replacing $DATA_ELEMENTS
+    for (i = 0; i < data.length; i++) {
+        var key = _.keys(data[i])[0]
+
+        var dataBlock = data[i][key]
+        // console.log('XML RENDER ELEMENT',key,dataBlock)
+
+
+        if (key == "DTM") {
+            var dataBlock = setDateFormat(dataBlock)
+        }
+        //#19
+        var re = new RegExp(`\\b${key}\\b`, 'gi');
+        if (!line) {
+            // console.log({
+            //     dataBlock,
+            //     line,
+            //     dataElem
+            // })
+            // console.log(dataElem.matchedData)
+            // console.error('Error: getXMLElement, line is not rendered')
+            return
+        }
+        var line = line.replace(re, dataBlock)
+
+    }
+
+
+    return line
+}
+
+
+
+function getXMLElementX(index, ediData) {
     // console.log('getXMLElement',ediData[index].key)
     if (!ediData[index]) {
         return
@@ -400,6 +462,10 @@ function getXMLElement(index, ediData) {
         // console.error(ediData[index].key + ' No Data ::: Skipping')
         return
     }
+
+    if (dataElem.key == "RFF") {
+        return
+    }
     //
     if (dataElem.cases && dataElem.cases[0]) {
         var casee = dataElem.cases
@@ -409,6 +475,7 @@ function getXMLElement(index, ediData) {
             }
         })
         var key = casee[0];
+        console.log('==============', key, dataElem.matchedData)
         var line = dataElem[find[key]]
     }
     // Looping and replacing $DATA_ELEMENTS
@@ -424,12 +491,17 @@ function getXMLElement(index, ediData) {
 
 
         if (key == "DTM") {
-          var dataBlock = setDateFormat(dataBlock)
+            var dataBlock = setDateFormat(dataBlock)
         }
         //#19
         var re = new RegExp(`\\b${key}\\b`, 'gi');
-        if(!line){
-            console.log({dataBlock,line,dataElem})
+        if (!line) {
+            console.log({
+                dataBlock,
+                line,
+                dataElem
+            })
+            console.log(dataElem.matchedData)
             // console.error('Error: getXMLElement, line is not rendered')
             return
         }
@@ -553,9 +625,9 @@ function jsonToXML(jsonArr, jsonData) {
                     //
                     // SETTING CACULATED DATA: (PRICE_LINE_AMOUNT)
 
-                    if(child.tag == "RFF"){
-                        console.log('++++++++++++++++++ RFF')
-                    }
+                    // if (child.tag == "RFF") {
+                    //     console.log('++++++++++++++++++ RFF')
+                    // }
 
 
                     if (!child.index) {
@@ -566,7 +638,7 @@ function jsonToXML(jsonArr, jsonData) {
                     // console.log("PARENT: ", parent.tag, '->  Child: ', child.tag)
                 })
             } else {
-              
+
                 // xml.push(jsonElem.line)
                 // xml.push('<!-- has no children NOCHILDREN-->')
                 xml.push(getXMLElement(jsonElem.index, ediData))
@@ -624,4 +696,6 @@ parse.renderEDI = function (doc) {
     // console.log(xml)
     return xml;
 }
+
+
 module.exports = parse
