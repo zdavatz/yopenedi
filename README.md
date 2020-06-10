@@ -6,7 +6,6 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
 3. Import OpenTrans 2.1 files from FTP and convert them to EDIFACT D.96A and send the converted file as Email-Attachment from an IMAP Email address to a dedicated Email address.
 4. Send Opentrans 2.1 XML files to this [URL](https://connect.boni.ch/OpaccOne/B2B/Channel/XmlOverHttp/ywesee)
 5. Receive Opentrans 2.1 XML files at this [URL](https://yopenedi.ch/input)
-6. Input files go into the folder `edifact_orders`, converted files go into the folder `opentrans_orders`
 
 ## FAQ
 ### EDIFACT D.96A
