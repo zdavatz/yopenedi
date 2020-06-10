@@ -16,8 +16,8 @@ public class Party {
     public String city;
     public String zip;
     public String countryCoded;
-
     public ArrayList<ContactDetail> contactDetails = new ArrayList<>();
+
     public void addContactDetail(ContactDetail contactDetail) {
         contactDetails.add(contactDetail);
     }

@@ -1,6 +1,9 @@
 package openedi.converter;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 
 public class Utility {
 
@@ -38,5 +41,12 @@ public class Utility {
             }
         }
         return current;
+    }
+
+    public static String formatDateISO(Date date) {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'"); // Quoted "Z" to indicate UTC, no timezone offset
+        df.setTimeZone(tz);
+        return df.format(date);
     }
 }
