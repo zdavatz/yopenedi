@@ -298,7 +298,7 @@ Grammar = [{
                 close = "</PRODUCT_ID>"
             }
             var code = getData('ID', data);
-            if(code && parseInt(code["ID"])){
+            if(code && code["ID"].length <= 11){
                 return this.short + close;
             }else{
                 return this.long + close;
