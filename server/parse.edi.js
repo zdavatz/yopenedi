@@ -400,11 +400,9 @@ function getXMLElement(index, ediData) {
     var elementsAll = dataElem.elements
     var line = dataElem.render
     var data = dataElem.matchedData
-
     if (!data) {
         return
     }//
-
     if (dataElem.exe) {
         console.log('======exe======')
         var options = {next: ediData[index + 1], prev: ediData[index - 1]};
@@ -413,41 +411,24 @@ function getXMLElement(index, ediData) {
             console.log('=============',JSON.stringify(data), {line})
         }
     }
-
-
     // Looping and replacing $DATA_ELEMENTS
     for (i = 0; i < data.length; i++) {
         var key = _.keys(data[i])[0]
-
         var dataBlock = data[i][key]
         // console.log('XML RENDER ELEMENT',key,dataBlock)
-
-
         if (key == "DTM") {
             var dataBlock = setDateFormat(dataBlock)
         }
         //#19
         var re = new RegExp(`\\b${key}\\b`, 'gi');
         if (!line) {
-            // console.log({
-            //     dataBlock,
-            //     line,
-            //     dataElem
-            // })
-            // console.log(dataElem.matchedData)
-            // console.error('Error: getXMLElement, line is not rendered')
             return
         }
         var line = line.replace(re, dataBlock)
-
     }
-
-
     return line
 }
-
-
-
+//=========** OLD ================*/
 function getXMLElementX(index, ediData) {
     // console.log('getXMLElement',ediData[index].key)
     if (!ediData[index]) {
@@ -462,7 +443,6 @@ function getXMLElementX(index, ediData) {
         // console.error(ediData[index].key + ' No Data ::: Skipping')
         return
     }
-
     if (dataElem.key == "RFF") {
         return
     }
@@ -488,8 +468,6 @@ function getXMLElementX(index, ediData) {
         }
         var dataBlock = data[i][key]
         // console.log('XML RENDER ELEMENT',key,dataBlock)
-
-
         if (key == "DTM") {
             var dataBlock = setDateFormat(dataBlock)
         }
@@ -506,7 +484,6 @@ function getXMLElementX(index, ediData) {
             return
         }
         var line = line.replace(re, dataBlock)
-
     }
     return line
 }
@@ -549,6 +526,9 @@ function jsonToXML(jsonArr, jsonData) {
     //
     // ORDER_INFO
     xml.push('<ORDER_INFO>')
+
+    // RFF TAG
+   var rffTag = [];
     _.each(jsonArr, (jsonElem) => {
         var tag = jsonElem.tag;
         // console.log('Processing:', tag)
@@ -562,10 +542,7 @@ function jsonToXML(jsonArr, jsonData) {
             }
         }
         // EXCEPTION !!!!
-        // if (tag == "PRODUCTS" && !tag.close) {
-        //     xml.push('</ORDER_INFO></ORDER_HEADER>')
-        //     return
-        // }
+
         //---------------- Handle Close Tags -----------------------//
         if (jsonElem.tag == "ORDER_SUMMARY") {
             console.log('===============ORDER_SUMMARY==================')
@@ -579,23 +556,23 @@ function jsonToXML(jsonArr, jsonData) {
          * 2- Add end tag
          * */
         if (_.includes(skip, tag)) {
-            // console.log('Skipping:', tag)
-            // console.log('Removing ', struc[struc.length - 1], struc)
-            // console.log('===============', getGrammar(struc[struc.length - 1], "tag"))
-            // xml.push("</" + struc[struc.length - 1] + ">")
+
             if (getGrammar(struc[struc.length - 1], "tag")) {
                 xml.push("</" + getGrammar(struc[struc.length - 1], "tag") + ">");
             }
             struc.splice(struc.lastIndexOf(tag), 1);
             return
         }
-        //----------------------------------------------------------
+        //----------------------------------------------------------//
         // PRODUCTS // SHOULD FIX
         if (tag == "PRODUCTS") {
             // console.log('++++++++++++++ PRODUCTS')
             if (jsonElem.close) {
                 xml.push("</" + getGrammar(tag, 'tag') + ">")
             } else {
+
+                // ADD UDX_HEADER "RFF TAG"
+                xml.push(rffTag[0])
                 xml.push('</ORDER_INFO></ORDER_HEADER>')
                 xml.push("<" + getGrammar(tag, 'tag') + ">")
             }
@@ -610,7 +587,7 @@ function jsonToXML(jsonArr, jsonData) {
                 xml.push("<" + getGrammar(tag, 'tag') + ">")
             }
             return
-        }
+        }//
         /* -------------------------------------------------------------------------- */
         // IF HAS CHILDREN
         if (jsonElem.children) {
@@ -624,12 +601,13 @@ function jsonToXML(jsonArr, jsonData) {
                 _.each(jsonElem.children, (child, i) => {
                     //
                     // SETTING CACULATED DATA: (PRICE_LINE_AMOUNT)
-
-                    // if (child.tag == "RFF") {
-                    //     console.log('++++++++++++++++++ RFF')
-                    // }
-
-
+                    // RFF TAG
+                    if (child.tag == "RFF") {
+                        
+                        rffTag.push(getXMLElement(child.index, ediData))
+                        console.log('++++++++++++++++++ RFF',rffTag)
+                        return
+                    }
                     if (!child.index) {
                         xml.push(child.render)
                     } else {
@@ -638,7 +616,6 @@ function jsonToXML(jsonArr, jsonData) {
                     // console.log("PARENT: ", parent.tag, '->  Child: ', child.tag)
                 })
             } else {
-
                 // xml.push(jsonElem.line)
                 // xml.push('<!-- has no children NOCHILDREN-->')
                 xml.push(getXMLElement(jsonElem.index, ediData))
@@ -696,6 +673,4 @@ parse.renderEDI = function (doc) {
     // console.log(xml)
     return xml;
 }
-
-
 module.exports = parse
