@@ -8,5 +8,5 @@
  */
 
 rootProject.name = 'openedi'
-include 'openedi-converter'
-include 'openedi-exe'
+include 'cli'
+include 'converter'
