@@ -18,9 +18,15 @@ import java.util.ArrayList;
 public class App {
     public static void main(String[] args) throws Exception {
         Options options = new Options();
+
         Option outputOption = new Option("o", "out", true, "the folder to output");
         outputOption.setType(String.class);
         options.addOption(outputOption);
+
+        Option inputOption = new Option("i", "in", true, "The path to input file - Stdin is used if this is not provided");
+        outputOption.setType(String.class);
+        options.addOption(inputOption);
+
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse( options, args);
         if (!cmd.hasOption("out")) {
@@ -28,27 +34,33 @@ public class App {
             formatter.printHelp( "openedi-exe", options );
             return;
         }
+
         String outPath = cmd.getOptionValue("out");
         File outDir = new File(outPath);
-        if (!outDir.isAbsolute()) {
-            outDir = new File("..", outPath);
-        }
         if (!outDir.exists()) {
             outDir.mkdirs();
         }
 
         try {
-            InputStream s = System.in;
+            InputStream s;
+            if (cmd.hasOption("in")) {
+                s = new FileInputStream(cmd.getOptionValue("in"));
+            } else {
+                s = System.in;
+            }
             Reader reader = new Reader();
             ArrayList<Order> ediOrders = reader.run(s);
+            System.out.println("Detected " + ediOrders.size() + " orders");
             for (Order edi : ediOrders) {
                 openedi.converter.OpenTrans.Order otOrder = Converter.orderToOpenTrans(edi);
+                File targetFile = new File(outDir, otOrder.id + ".xml");
+                System.out.println("Outputing order(id=" + otOrder.id + ") to " + targetFile.getAbsolutePath());
                 Writer w = new Writer();
-
-                FileOutputStream out = new FileOutputStream(new File(outDir, otOrder.id + ".xml"));
+                FileOutputStream out = new FileOutputStream(targetFile);
                 w.write(otOrder, out);
                 out.close();
             }
+            System.out.println("Done");
         } catch (Exception e) {
             System.out.println("Exception " + e.toString());
         }
