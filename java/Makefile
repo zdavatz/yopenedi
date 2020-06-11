@@ -1,8 +1,8 @@
-identifier="com.maxl.java.aips2sqlite"
+identifier="com.ywesee.java.yopenedi"
 
-run:
-	./gradlew openedi-exe:run --args='--out $(OUT)'
-.PHONEY: run
+jar:
+	./gradlew openedi-exe:shadowJar
+.PHONEY: jar
 
 clean:
 	./gradlew clean
