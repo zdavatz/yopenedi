@@ -1,7 +1,7 @@
 identifier="com.ywesee.java.yopenedi"
 
 jar:
-	./gradlew openedi-exe:shadowJar
+	./gradlew cli:shadowJar
 .PHONEY: jar
 
 clean:

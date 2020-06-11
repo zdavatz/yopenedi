@@ -13,7 +13,7 @@ make jar
 To run:
 
 ```
-java -jar ./openedi-exe/build/libs/openedi-exe-1.0-all.jar -o testout -i ./edifile
+java -jar ./cli/build/libs/cli-1.0-all.jar -o testout -i ./edifile
 # or
-java -jar ./openedi-exe/build/libs/openedi-exe-1.0-all.jar -o testout < ./edifile
+java -jar ./cli/build/libs/cli-1.0-all.jar -o testout < ./edifile
 ```
