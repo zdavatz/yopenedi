@@ -12,6 +12,7 @@
     "base64-stream": "^1.0.0",
     "edi": "^1.1.0",
     "edifact-parser": "0.0.4",
+    "fs-extra": "^9.0.1",
     "imap": "^0.8.19",
     "jquery": "^3.4.1",
     "jstoxml": "^1.6.6",

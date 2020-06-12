@@ -5,12 +5,24 @@
  */
 const fs = require('fs')
 const Imap = require("imap")
-
 inspect = require('util').inspect;
+
+import './io.js'
 
 var {
   Base64Decode
 } = require('base64-stream');
+
+
+var child_process = require('child_process');
+
+import _ from 'lodash';
+import {
+  writeFile
+} from 'fs';
+
+
+
 // const nodemailer = require("nodemailer")
 // const mailparser = require("mailparser")
 //
@@ -45,17 +57,56 @@ if (!settings || !settings.private || !settings.private.imap) {
 }
 
 
-// return 
+
+
+
+/* -------------------------------------------------------------------------- */
+
+function runCmd(cmd) {
+  var resp = child_process.execSync(cmd);
+  var result = resp.toString('UTF8');
+  return result;
+}
+
+/* -------------------------------------------------------------------------- */
 
 
 
 
 
+var messages = []
+var messagesData = []
+
+
+
+
+function getFiles() {
+  // _.each(messages, (msg) => {
+  for (i = 0; i < messages.length; i++) {
+    var message = messages[i]
+    if (!message) {
+      return
+    }
+    console.log('GetFiles: Getting Message: ', message)
+    var cmd = 'grab_one_message ' + message
+    var result = runCmd(cmd);
+
+
+    messagesData[0] = result
+    console.log('***** WRITING::::::: Message: ',message)
+    fs.writeFile(project.edifact_orders + message + '_',  messagesData[0], 'utf8', (err, result) => {
+      if (err) {
+        console.log(err);
+      }
+    });
+  }
+}
 
 /* -------------------------------------------------------------------------- */
 /*                       Reading emails                                       */
 /* -------------------------------------------------------------------------- */
 
+// return
 var imap = new Imap({
   user: imapSettings.username,
   password: imapSettings.password,
@@ -67,6 +118,9 @@ var imap = new Imap({
     rejectUnauthorized: false
   }
 });
+
+
+// return 
 
 function openInbox(cb) {
   imap.openBox('INBOX', true, cb);
@@ -91,7 +145,9 @@ imap.once('ready', Meteor.bindEnvironment(function () {
     // });
 
     //, , ['SINCE', 'October 2, 2013'] 
-    imap.search(['UNSEEN'], Meteor.bindEnvironment(function (err, results) {
+    //UNSEEN
+    //ALL
+    imap.search(['ALL'], Meteor.bindEnvironment(function (err, results) {
       if (err) {
         console.log('you are already up to date');
       }
@@ -116,25 +172,21 @@ imap.once('ready', Meteor.bindEnvironment(function () {
       });
 
       f.on('message', Meteor.bindEnvironment(function (msg, seqno) {
-        console.log('Message #%d', seqno);
+        // console.log('Message #%d', seqno);
         var prefix = '(#' + seqno + ') ';
 
-        //
-        //
-        //
 
-        var itemId;
 
         msg.on('body', function (stream, info) {
 
-          console.log('msg', info)
+          // console.log('msg', info)
           var buffer = '';
           stream.on('data', function (chunk) {
             buffer += chunk.toString('utf8');
           });
           // Register the email
           stream.once('end', function () {
-            console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
+            // console.log(prefix + 'Parsed header: %s', inspect(Imap.parseHeader(buffer)));
             // console.log('Imap.parseHeader(buffer)',Imap.parseHeader(buffer))
             msgObj.header = Imap.parseHeader(buffer)
           });
@@ -142,9 +194,13 @@ imap.once('ready', Meteor.bindEnvironment(function () {
         //
         // Reading attachments
         msg.once('attributes', function (attrs) {
+          // console.log('uid = ' + attrs.uid);
+          messages.push(attrs.uid)
 
+          return
           // console.log(prefix + 'Attributes: %s', inspect(attrs, false, 8));
           var attachments = findAttachmentParts(attrs.struct);
+          console.log('==========', attachments)
           if (!attachments.length) {
             console.log('Skipped: The Email has no attachment')
             return
@@ -156,6 +212,7 @@ imap.once('ready', Meteor.bindEnvironment(function () {
           }
           // console.log('ATTACHMENT:',attachments)
           for (var i = 0, len = attachments.length; i < len; ++i) {
+            // PASS MESSAGE UUID to the attachment Object>>
             var attachment = attachments[i];
             console.log(prefix + 'Fetching attachment %s', attachment.params.name);
             var f = imap.fetch(attrs.uid, {
@@ -174,35 +231,36 @@ imap.once('ready', Meteor.bindEnvironment(function () {
             // console.log({attachment})
             // f.on('message', console.log('SUCCESS'));
             // return
+            // USED TO WRITE THE FILE
             f.on('message', buildAttMessageFunction(attachment));
           }
         });
         //
         msg.once('end', Meteor.bindEnvironment(function () {
           //
-          msgObj.checkedAt = msgObj.createdAt = new Date()
-          msgObj.subject = msgObj.header.subject[0]
-          msgObj.date = msgObj.header.date[0]
-          msgObj.msgIdx = msgObj.filesIds + msgObj.header.date[0].replace(/\s/g, '');
-          console.log("*************", msgObj.msgIdx)
-          var isExist = Items.find({
-            msgId: msgObj.msgId
-          }).fetch()
-          if (isExist.length == 0) {
+          // msgObj.checkedAt = msgObj.createdAt = new Date()
+          // msgObj.subject = msgObj.header.subject[0]
+          // msgObj.date = msgObj.header.date[0]
+          // msgObj.msgIdx = msgObj.filesIds + msgObj.header.date[0].replace(/\s/g, '');
+          // console.log("*************", msgObj.msgIdx)
+          // var isExist = Items.find({
+          //   msgId: msgObj.msgId
+          // }).fetch()
+          // if (isExist.length == 0) {
 
-            console.log('$$$$Found: New Email')
-            Items.insert(msgObj, function (err) {
-              if (!err) {
-                console.log('Success: New Email Record %s', msgObj.subject)
-              }
-            })
-          } else {
-            console.log('***************')
-            console.log('Checking if exists:', isExist[0].msgId, " == ", msgObj.msgId)
-            console.log('Checking if exists:', isExist[0].msgIdx, " == ", msgObj.msgIdx)
-            console.log('Found:Exists Records', msgObj.subject, "*****************")
-            console.log('***************')
-          }
+          //   console.log('$$$$Found: New Email')
+          //   Items.insert(msgObj, function (err) {
+          //     if (!err) {
+          //       console.log('Success: New Email Record %s', msgObj.subject)
+          //     }
+          //   })
+          // } else {
+          //   console.log('***************')
+          //   console.log('Checking if exists:', isExist[0].msgId, " == ", msgObj.msgId)
+          //   console.log('Checking if exists:', isExist[0].msgIdx, " == ", msgObj.msgIdx)
+          //   console.log('Found:Exists Records', msgObj.subject, "*****************")
+          //   console.log('***************')
+          // }
           //
           // console.log(prefix + 'Finished, Checking count:', Items.find().count() );
         }));
@@ -213,13 +271,15 @@ imap.once('ready', Meteor.bindEnvironment(function () {
         console.log('Fetch error: ' + err);
       });
       f.once('end', Meteor.bindEnvironment(function () {
-        console.log('Done fetching all messages!');
-        console.log('End, Emails count:', Items.find().count());
+        // console.log('Done fetching all messages!');
+        // console.log('End, Emails count:', Items.find().count());
+        console.log('Messeges: UIDs',{
+          messages
+        })
+        getFiles()
         imap.end();
       }));
-
-
-    // Get Unseen Inbox
+      // Get Unseen Inbox
     })) // get unseen
 
   })); // end bind
@@ -233,10 +293,19 @@ imap.once('end', function () {
   console.log('Connection ended');
 });
 
-imap.connect();
+
+
+
+App.checkMessages = function(){
+  console.log('Checking Messages......')
+  imap.connect();
+}
+
+
+
 
 ////
-Items.remove({})
+// Items.remove({})
 //
 
 /* -------------------------------------------------------------------------- */
@@ -305,3 +374,6 @@ var log = {}
 log.items = Items.find().fetch()
 
 console.log(log.items.length)
+
+module.exports = App
+// module.exports = files
