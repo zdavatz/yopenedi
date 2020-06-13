@@ -4,6 +4,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.util.ArrayList;
 
+import static com.ywesee.java.yopenedi.converter.Utility.notNullOrEmpty;
+
 public class Party {
     public enum Role {
         Customer,
@@ -43,43 +45,55 @@ public class Party {
         s.writeEndElement(); // PARTY_ROLE
 
         s.writeStartElement("ADDRESS");
-        s.writeStartElement("bmecat:NAME");
-        s.writeCharacters(this.name); // TODO, if this is too long, split into NAME2, NAME3
-        s.writeEndElement(); // NAME
-
-        s.writeStartElement("bmecat:STREET");
-        s.writeCharacters(this.street);
-        s.writeEndElement(); // STREET
-
-        s.writeStartElement("bmecat:ZIP");
-        s.writeCharacters(this.zip);
-        s.writeEndElement(); // ZIP
-
-        s.writeStartElement("bmecat:CITY");
-        s.writeCharacters(this.city);
-        s.writeEndElement(); // CITY
-
-        // TODO: country?
-
-        s.writeStartElement("bmecat:COUNTRY_CODED");
-        s.writeCharacters(this.countryCoded);
-        s.writeEndElement(); // COUNTRY_CODED
-
-        s.writeStartElement("bmecat:EMAIL");
-        // TODO: confirm if this is ok:
-        for (ContactDetail cd : this.contactDetails) {
-            if (cd.email != null && cd.email.length()> 0) {
-                s.writeCharacters(cd.email);
-                break;
-            }
+        if (notNullOrEmpty(this.name)) {
+            s.writeStartElement("bmecat:NAME");
+            s.writeCharacters(this.name); // TODO, if this is too long, split into NAME2, NAME3
+            s.writeEndElement(); // NAME
         }
-        s.writeEndElement(); // EMAIL
-
-        s.writeEndElement(); // ADDRESS
 
         for (ContactDetail cd : this.contactDetails) {
             cd.write(s);
         }
+
+        String emailString = null;
+        for (ContactDetail cd : this.contactDetails) {
+            if (notNullOrEmpty(cd.email)) {
+                emailString = cd.email;
+                break;
+            }
+        }
+        if (notNullOrEmpty(emailString)) {
+            s.writeStartElement("bmecat:EMAIL");
+            // TODO: confirm if this is ok:
+            s.writeCharacters(emailString);
+            s.writeEndElement(); // EMAIL
+        }
+
+        if (notNullOrEmpty(this.street)) {
+            s.writeStartElement("bmecat:STREET");
+            s.writeCharacters(this.street);
+            s.writeEndElement(); // STREET
+        }
+
+        if (notNullOrEmpty(this.zip)) {
+            s.writeStartElement("bmecat:ZIP");
+            s.writeCharacters(this.zip);
+            s.writeEndElement(); // ZIP
+        }
+
+        if (notNullOrEmpty(this.city)) {
+            s.writeStartElement("bmecat:CITY");
+            s.writeCharacters(this.city);
+            s.writeEndElement(); // CITY
+        }
+
+        if (notNullOrEmpty(this.countryCoded)) {
+            s.writeStartElement("bmecat:COUNTRY_CODED");
+            s.writeCharacters(this.countryCoded);
+            s.writeEndElement(); // COUNTRY_CODED
+        }
+
+        s.writeEndElement(); // ADDRESS
 
         s.writeEndElement(); // PARTY
     }
