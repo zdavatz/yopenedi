@@ -17,9 +17,6 @@ var {
 var child_process = require('child_process');
 
 import _ from 'lodash';
-import {
-  writeFile
-} from 'fs';
 
 
 
@@ -79,7 +76,7 @@ var messagesData = []
 
 
 
-
+// Items.remove({})
 function getFiles() {
   // _.each(messages, (msg) => {
   for (i = 0; i < messages.length; i++) {
@@ -89,18 +86,31 @@ function getFiles() {
     }
     console.log('GetFiles: Getting Message: ', message)
     var cmd = 'grab_one_message ' + message
-    var result = runCmd(cmd);
 
 
-    messagesData[0] = result
-    console.log('***** WRITING::::::: Message: ',message)
-    fs.writeFile(project.edifact_orders + message + '_',  messagesData[0], 'utf8', (err, result) => {
-      if (err) {
-        console.log(err);
-      }
-    });
+    var isChecked = Items.findOne({message:message})
+    if(!isChecked){
+      console.log('Message Already Checked: ', message)
+      var result = runCmd(cmd);
+      messagesData[0] = result
+      console.log('***** WRITING::::::: Message: ',message)
+      fs.writeFile(project.edifact_orders + message + '_',  messagesData[0], 'utf8', (err, result) => {
+        if (err) {
+          console.log(err);
+        }
+      });
+      var createdAt = downloadedAt = new Date()
+      Items.insert({message:message, createdAt: createdAt, downloadedAt: downloadedAt}) 
+    }else{
+      console.log('Message already checked',message)
+    }
+
+
   }
+
+  console.log('======== ALL MESSAGES HAvE BEEN DOWNLOADED ==========')
 }
+
 
 /* -------------------------------------------------------------------------- */
 /*                       Reading emails                                       */
@@ -373,7 +383,7 @@ function buildAttMessageFunction(attachment) {
 var log = {}
 log.items = Items.find().fetch()
 
-console.log(log.items.length)
+console.log("Items Length",log.items.length)
 
 module.exports = App
 // module.exports = files

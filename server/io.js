@@ -22,7 +22,7 @@ files = {}
 /* -------------------------------------------------------------------------- */
 
 project.emptyDir = function (dir) {
-  console.log('====Cleaning ' + dir + ' ======')
+  console.log('==== Cleaning ' + dir + ' ======')
   fse.emptyDirSync(dir)
 }
 
@@ -49,7 +49,7 @@ project.processEdifactDir = function (dir, func) {
     writeFile(project.opentrans_orders + fileData.name + '.xml', xml)
     // Move the file to another folder
     writeFile(project.edifact_orders_done + fileData.name, doc)
-    project.rm(fileData.filepath)
+    // project.rm(fileData.filepath)
   })
   project.emptyDir(project.opentrans_orders)
 }

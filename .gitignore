@@ -10,3 +10,4 @@ tmp
 tmp/*
 opentrans_orders/*
 edifact_orders/*
+edifact_orders_done/*
