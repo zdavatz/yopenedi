@@ -49,4 +49,8 @@ public class Utility {
         df.setTimeZone(tz);
         return df.format(date);
     }
+
+    public static boolean notNullOrEmpty(String s) {
+        return s != null && !s.isEmpty();
+    }
 }

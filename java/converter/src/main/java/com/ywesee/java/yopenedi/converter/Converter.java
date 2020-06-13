@@ -5,16 +5,22 @@ import com.ywesee.java.yopenedi.converter.OpenTrans.Order;
 import com.ywesee.java.yopenedi.converter.OpenTrans.OrderItem;
 import com.ywesee.java.yopenedi.converter.OpenTrans.Party;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.stream.Collectors;
+
+import static com.ywesee.java.yopenedi.converter.Utility.formatDateISO;
 
 public class Converter {
     static public Order orderToOpenTrans(com.ywesee.java.yopenedi.converter.Order order) {
         Order o = new Order();
         o.id = order.id;
-        // TODO: format date?
-        o.deliveryStartDate = order.deliveryStartDate;
-        o.deliveryEndDate = order.deliveryEndDate;
+
+        o.deliveryStartDate = dateStringToISOString(order.deliveryStartDate);
+        o.deliveryEndDate = dateStringToISOString(order.deliveryEndDate);
         o.deliveryConditionCode = order.deliveryConditionCode;
         o.deliveryConditionDetails = order.deliveryConditionDetails;
         o.currencyCoded = order.currencyCoded;
@@ -71,5 +77,15 @@ public class Converter {
         cd.email = contactDetail.email;
         cd.fax = contactDetail.fax;
         return cd;
+    }
+
+    static String dateStringToISOString(String dateString) {
+        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+        try {
+            Date date = df.parse(dateString);
+            return formatDateISO(date);
+        } catch (ParseException e) {
+            return "";
+        }
     }
 }

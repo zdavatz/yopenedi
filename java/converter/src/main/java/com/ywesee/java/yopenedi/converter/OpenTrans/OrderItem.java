@@ -4,6 +4,8 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.math.BigDecimal;
 
+import static com.ywesee.java.yopenedi.converter.Utility.notNullOrEmpty;
+
 public class OrderItem {
     public String ean;
     public String descriptionShort;
@@ -24,12 +26,12 @@ public class OrderItem {
         s.writeAttribute("type", "ean");
         s.writeCharacters(this.ean);
         s.writeEndElement(); // INTERNATIONAL_PID
-        if (this.descriptionShort != null && this.descriptionShort.length() > 0) {
+        if (notNullOrEmpty(this.descriptionShort)) {
             s.writeStartElement("bmecat:DESCRIPTION_SHORT");
             s.writeCharacters(this.descriptionShort);
             s.writeEndElement(); // DESCRIPTION_SHORT
         }
-        if (this.descriptionLong != null && this.descriptionLong.length() > 0) {
+        if (notNullOrEmpty(this.descriptionLong)) {
             s.writeStartElement("bmecat:DESCRIPTION_LONG");
             s.writeCharacters(this.descriptionLong);
             s.writeEndElement(); // DESCRIPTION_LONG

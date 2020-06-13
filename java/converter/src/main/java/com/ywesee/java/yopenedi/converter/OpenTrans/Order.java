@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.ywesee.java.yopenedi.converter.Utility.notNullOrEmpty;
+
 public class Order {
     public String id;
     public String deliveryStartDate;
@@ -70,10 +72,6 @@ public class Order {
         }
         streamWriter.writeEndElement(); // PARTIES
 
-        streamWriter.writeStartElement("CURRENCY");
-        streamWriter.writeCharacters(this.currencyCoded);
-        streamWriter.writeEndElement(); // CURRENCY
-
         streamWriter.writeStartElement("ORDER_PARTIES_REFERENCE");
         streamWriter.writeStartElement("bmecat:BUYER_IDREF");
         streamWriter.writeAttribute("type", "iln");
@@ -85,13 +83,23 @@ public class Order {
         streamWriter.writeEndElement(); // SUPPLIER_IDREF
         streamWriter.writeEndElement(); // ORDER_PARTIES_REFERENCE
 
+        if (notNullOrEmpty(this.currencyCoded)) {
+            streamWriter.writeStartElement("bmecat:CURRENCY");
+            streamWriter.writeCharacters(this.currencyCoded);
+            streamWriter.writeEndElement(); // CURRENCY
+        }
+
         streamWriter.writeStartElement("HEADER_UDX");
-        streamWriter.writeStartElement("UDX.JA.DeliveryConditionCode");
-        streamWriter.writeCharacters(this.deliveryConditionCode);
-        streamWriter.writeEndElement(); // UDX.JA.DeliveryConditionCode
-        streamWriter.writeStartElement("UDX.JA.DeliveryConditionDetails");
-        streamWriter.writeCharacters(this.deliveryConditionDetails);
-        streamWriter.writeEndElement();
+        if (notNullOrEmpty(this.deliveryConditionCode)) {
+            streamWriter.writeStartElement("UDX.JA.DeliveryConditionCode");
+            streamWriter.writeCharacters(this.deliveryConditionCode);
+            streamWriter.writeEndElement(); // UDX.JA.DeliveryConditionCode
+        }
+        if (notNullOrEmpty(this.deliveryConditionDetails)) {
+            streamWriter.writeStartElement("UDX.JA.DeliveryConditionDetails");
+            streamWriter.writeCharacters(this.deliveryConditionDetails);
+            streamWriter.writeEndElement();
+        }
         streamWriter.writeEndElement(); // HEADER_UDX
 
         streamWriter.writeEndElement(); // ORDER_INFO
