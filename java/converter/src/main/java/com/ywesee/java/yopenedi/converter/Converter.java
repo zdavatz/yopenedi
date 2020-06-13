@@ -30,6 +30,17 @@ public class Converter {
         o.orderItems = order.orderItems.stream()
                 .map(Converter::orderItemToOpenTrans).collect(Collectors.toCollection(ArrayList::new));
 
+        for (com.ywesee.java.yopenedi.converter.Party p : order.parties) {
+            switch (p.role) {
+                case Supplier:
+                    o.supplierIdRef = p.id;
+                    break;
+                case Buyer:
+                    o.buyerIdRef = p.id;
+                    break;
+            }
+        }
+
         return o;
     }
 
