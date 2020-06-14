@@ -49,12 +49,13 @@ project.rm = function (path) {
   })
 
 }
+/* -------------------------------------------------------------------------- */
 
 
 project.processEdifactDir = function (dir, func) {
   readFiles(dir, (fileData) => {
 
-    console.log('=========FILE STAT=====',{fileData})
+    console.log('=========Processing File=====',fileData.name)
     var doc = fs.readFileSync(fileData.filepath, 'utf8');
     var xml = Parse.renderEDI(doc)
     console.log('---Writing File', fileData.name)
@@ -74,7 +75,7 @@ project.processEdifactDir = function (dir, func) {
 project.XMLCheck = function(dir,func){
   console.log('===========Reading XML FILES ==============')
   readFiles(dir, (fileData)=>{
-    console.log('=========== XML FILE ==============',{fileData})
+    console.log('=========== XML FILE ==============',fileData.name)
     var fileSize = fileData.size;
     var filePath = fileData.filepath;
     var checkFileCmd  = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: '+fileSize+'" ' +XMLCheckURL+ '  --data-binary @'+filePath+' -v'

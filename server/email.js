@@ -85,7 +85,7 @@ function getFiles() {
       return
     }
     console.log('GetFiles: Getting Message: ', message)
-    
+
     var cmd = 'grab_one_message ' + message
 
 
@@ -108,6 +108,14 @@ function getFiles() {
 
 
   }
+
+  console.log('Converting to XML')
+
+
+  project.processEdifactDir(project.edifact_orders)
+  // },5000)
+  project.XMLCheck(project.opentrans_orders)
+
 
   console.log('======== ALL MESSAGES HAvE BEEN DOWNLOADED ==========')
 }

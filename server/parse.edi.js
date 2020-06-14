@@ -38,9 +38,9 @@ var dataToReplace = [{
 // ediData JSON collection
 // tags arr
 function renderStructuredData(doc) {
-    console.log({
-        doc
-    })
+    // console.log({
+    //     doc
+    // })
     var tags = [];
     var ediData = [];
     var lines = doc.split(/['\n\r]+/);
@@ -543,9 +543,9 @@ function jsonToXML(jsonArr, jsonData) {
 
         //---------------- Handle Close Tags -----------------------//
         if (jsonElem.tag == "ORDER_SUMMARY") {
-            console.log('===============ORDER_SUMMARY==================')
+            // console.log('===============ORDER_SUMMARY:::  Generating==================')
             xml.push(jsonElem.render)
-            console.log('===============SUCCESS:: ORDER_SUMMARY==================')
+            console.log('===============SUCCESS:: ORDER_SUMMARY Generated==================')
             return
         }
         /** 
