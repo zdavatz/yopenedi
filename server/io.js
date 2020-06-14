@@ -58,7 +58,7 @@ project.rm = function (path) {
 // Checking XMLCheck.... 
 project.XMLCheck = Meteor.bindEnvironment(function (dir){
   console.log('===========Reading XML FILES ==============')
-  readFiles(dir, function (fileData){
+  readFiles(dir, Meteor.bindEnvironment(function (fileData){
     console.log('=========== Checking File: ',fileData.name)
     var fileSize = fileData.size;
     var filePath = fileData.filepath;
@@ -68,10 +68,11 @@ project.XMLCheck = Meteor.bindEnvironment(function (dir){
     if(isMsgSuccess(checkXML)){      
       console.log('Success:::https://connect.boni.ch: ', fileData.name)
       Items.update({message:fileData.name}, {$set: {isChecked: true,filename:fileData.name, filePath:filePath,fileSize: fileSize}})
+      console.log('Item',Items.findOne({message: msgId}))
     }else{
       console.error('Error:::https://connect.boni.ch :', fileData.name, " is returning an error")
     }
-  });
+  }));
 });
 
 /* -------------------------------------------------------------------------- */
@@ -92,12 +93,11 @@ project.processEdifactDir = Meteor.bindEnvironment(function (dir) {
     
  
     // console.log('ITEMS',Items.find().fetch())
-    console.log('edifact file is processed and converted: ', fileData.name, msgId)
-    var msgId = fileData.name.substring(0, fileData.name.length - 1);
-    var msgId = fileData.name;
+    console.log('edifact file is processed and converted: ', fileData.name)
+    
+    Items.update({message:fileData.name}, {$set: {isConverted: true,filename:fileData.name, xmlPath:xmlPath ,fileSizeEdi: fileData.size}})
     console.log('Item',Items.findOne({message: msgId}))
-    Items.update({message:msgId}, {$set: {isConverted: true,filename:fileData.name, xmlPath:xmlPath ,fileSizeEdi: fileData.size}})
-    var Item  = Items.find({message: msgId}).fetch()
+    // var Item  = Items.find({message: msgId}).fetch()
     
     // Move the file to another folder
     writeFile(project.edifact_orders_done + fileData.name, doc)
