@@ -128,8 +128,8 @@ function readFiles(dir, processFile) {
 
 
 function runCmd(cmd) {
-  var resp = child_process.execSync(cmd);
-  // var result = resp.toString('UTF8');
+  var result = child_process.execSync(cmd);
+  // var result = result.toString('UTF8');
   return result;
 }
 module.exports = project
