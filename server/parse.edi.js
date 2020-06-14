@@ -545,7 +545,7 @@ function jsonToXML(jsonArr, jsonData) {
         if (jsonElem.tag == "ORDER_SUMMARY") {
             // console.log('===============ORDER_SUMMARY:::  Generating==================')
             xml.push(jsonElem.render)
-            console.log('===============SUCCESS:: ORDER_SUMMARY Generated==================')
+            console.log('===============ORDER_SUMMARY Generated==================')
             return
         }
         /** 

@@ -49,6 +49,21 @@ project.rm = function (path) {
   })
 
 }
+
+/* -------------------------------------------------------------------------- */
+
+project.XMLCheck = function(dir,func){
+  console.log('===========Reading XML FILES ==============')
+  readFiles(dir, (fileData)=>{
+    console.log('=========== XML FILE ==============',fileData.name)
+    var fileSize = fileData.size;
+    var filePath = fileData.filepath;
+    var checkFileCmd  = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: '+fileSize+'" ' +XMLCheckURL+ '  --data-binary @'+filePath+' -v'
+    var checkXML = runCmd(checkFileCmd);
+    console.log('==== XML VALIDATION RESULT FOR '+ fileData.name, {checkXML})
+  });
+}
+
 /* -------------------------------------------------------------------------- */
 
 
@@ -67,22 +82,12 @@ project.processEdifactDir = function (dir, func) {
 
   })
   // project.emptyDir(project.opentrans_orders)
+  project.XMLCheck(project.opentrans_orders)
 }
 
 /* -------------------------------------------------------------------------- */
 
 
-project.XMLCheck = function(dir,func){
-  console.log('===========Reading XML FILES ==============')
-  readFiles(dir, (fileData)=>{
-    console.log('=========== XML FILE ==============',fileData.name)
-    var fileSize = fileData.size;
-    var filePath = fileData.filepath;
-    var checkFileCmd  = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: '+fileSize+'" ' +XMLCheckURL+ '  --data-binary @'+filePath+' -v'
-    var checkXML = runCmd(checkFileCmd);
-    console.log('==== XML VALIDATION RESULT FOR '+ fileData.name, {checkXML})
-  });
-}
 
 
 /* -------------------------------------------------------------------------- */

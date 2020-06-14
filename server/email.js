@@ -113,8 +113,8 @@ function getFiles() {
 
 
   project.processEdifactDir(project.edifact_orders)
-  // },5000)
-  project.XMLCheck(project.opentrans_orders)
+
+
 
 
   console.log('======== ALL MESSAGES HAvE BEEN DOWNLOADED ==========')
