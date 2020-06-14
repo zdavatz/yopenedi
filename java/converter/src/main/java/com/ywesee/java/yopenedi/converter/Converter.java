@@ -78,6 +78,7 @@ public class Converter {
         oi.quantity = orderItem.quantity;
         oi.quantityUnit = orderItem.quantityUnit;
         oi.price = orderItem.price;
+        oi.priceQuantity = orderItem.priceQuantity;
         return oi;
     }
 
