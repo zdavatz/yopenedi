@@ -128,6 +128,7 @@ function readFiles(dir, processFile) {
 
 
 function runCmd(cmd) {
+  console.log('Running Command: ', {cmd})
   var result = child_process.execSync(cmd);
   // var result = result.toString('UTF8');
   return result;
