@@ -232,7 +232,7 @@ function generateStructuredArr(jsonData) {
             }
             if (strucJSON[strucJSON.length - 1] !== tag) {
                 // console.log("New Tag", tag, strucJSON[strucJSON.length - 1])
-                console.log('PARENT: ', strucJSON[strucJSON.length - 1], '> ', tag)
+                // console.log('PARENT: ', strucJSON[strucJSON.length - 1], '> ', tag)
                 strucJSON.push(tag)
             } else if (strucJSON[strucJSON.length - 1] === tag) {
                 // console.log("LOOP: =======================", tag, strucJSON[strucJSON.length - 1])
@@ -507,7 +507,7 @@ function replaceTags(xml) {
 /* -------------------------------------------------------------------------- */
 function jsonToXML(jsonArr, jsonData) {
     var ediData = jsonData.ediData;
-    console.log('------------------')
+    // console.log('------------------')
     var keepOpen = ["UNB", "UNG", "UNH"]
     var start = ["UNB", "UNG", "UNH"]
     var skip = ["UNT", "UNE", "UNZ"]
@@ -545,7 +545,7 @@ function jsonToXML(jsonArr, jsonData) {
         if (jsonElem.tag == "ORDER_SUMMARY") {
             // console.log('===============ORDER_SUMMARY:::  Generating==================')
             xml.push(jsonElem.render)
-            console.log('===============ORDER_SUMMARY Generated==================')
+            // console.log('===============ORDER_SUMMARY Generated==================')
             return
         }
         /** 
