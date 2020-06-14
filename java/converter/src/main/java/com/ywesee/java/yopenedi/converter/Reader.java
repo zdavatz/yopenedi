@@ -185,6 +185,7 @@ public class Reader {
                             C509PriceInformation priceInfo = priceDetails.getC509PriceInformation();
                             if (priceInfo.getE5125PriceQualifier().equals("AAA")) {
                                 orderItem.price = priceInfo.getE5118Price();
+                                orderItem.priceQuantity = priceInfo.getE5284UnitPriceBasis();
                             }
                         } catch (NullPointerException e) {
                         }

@@ -10,9 +10,15 @@ public class OrderItem {
     public String ean;
     public String descriptionShort;
     public String descriptionLong;
-    public BigDecimal quantity;
     public String quantityUnit;
-    public BigDecimal price;
+    public BigDecimal quantity; // How many unit is ordered
+    public BigDecimal priceQuantity; // The quantity that (this.price) can buy.
+    public BigDecimal price; // How much is it per (this.priceQuantity)
+    // e.g. When this.priceQuantity = 3 and this.price = 100, it's possible to buy 3 unit with $100
+
+    public BigDecimal totalPrice() {
+        return this.price.multiply(this.quantity).divide(this.priceQuantity, BigDecimal.ROUND_HALF_UP);
+    }
 
     public void write(XMLStreamWriter s, int index) throws XMLStreamException {
         s.writeStartElement("ORDER_ITEM");
@@ -46,6 +52,19 @@ public class OrderItem {
         s.writeStartElement("bmecat:ORDER_UNIT");
         s.writeCharacters(this.quantityUnit);
         s.writeEndElement(); // ORDER_UNIT
+
+        s.writeStartElement("PRODUCT_PRICE_FIX");
+        s.writeStartElement("bmecat:PRICE_AMOUNT");
+        s.writeCharacters(this.price.toString());
+        s.writeEndElement(); // PRICE_AMOUNT
+        s.writeStartElement("bmecat:PRICE_QUANTITY");
+        s.writeCharacters(this.priceQuantity.toString());
+        s.writeEndElement(); // PRICE_QUANTITY
+        s.writeEndElement(); // PRODUCT_PRICE_FIX
+
+        s.writeStartElement("PRICE_LINE_AMOUNT");
+        s.writeCharacters(this.totalPrice().toString());
+        s.writeEndElement(); // PRICE_LINE_AMOUNT
 
         s.writeEndElement(); // ORDER_ITEM
     }
