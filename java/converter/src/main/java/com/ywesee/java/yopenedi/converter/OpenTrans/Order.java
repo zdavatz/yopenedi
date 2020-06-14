@@ -125,7 +125,9 @@ public class Order {
         streamWriter.writeCharacters("" + this.orderItems.size());
         streamWriter.writeEndElement(); // TOTAL_ITEM_NUM
         streamWriter.writeStartElement("TOTAL_AMOUNT");
-        BigDecimal totalPrice = this.orderItems.stream().map(i -> i.price).reduce(new BigDecimal(0), BigDecimal::add);
+        BigDecimal totalPrice = this.orderItems.stream()
+                .map(OrderItem::totalPrice)
+                .reduce(new BigDecimal(0), BigDecimal::add);
         streamWriter.writeCharacters(totalPrice.toString());
         streamWriter.writeEndElement(); // TOTAL_AMOUNT
         streamWriter.writeEndElement(); // ORDER_SUMMARY
