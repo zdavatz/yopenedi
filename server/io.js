@@ -126,7 +126,10 @@ function readFiles(dir, processFile) {
   });
 }
 
-
+/**
+ * Running Command 
+ * @param {} cmd 
+ */
 function runCmd(cmd) {
   console.log('Running Command: ', {cmd})
   var result = child_process.execSync(cmd);
