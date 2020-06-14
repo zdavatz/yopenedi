@@ -68,7 +68,7 @@ project.XMLCheck = Meteor.bindEnvironment(function (dir){
     if(isMsgSuccess(checkXML)){      
       console.log('Success:::https://connect.boni.ch: ', fileData.name)
       Items.update({message:fileData.name}, {$set: {isChecked: true,filename:fileData.name, filePath:filePath,fileSize: fileSize}})
-      console.log('Item',Items.findOne({message: msgId}))
+      console.log('Item',Items.findOne({message: fileData.name}))
     }else{
       console.error('Error:::https://connect.boni.ch :', fileData.name, " is returning an error")
     }
@@ -96,8 +96,8 @@ project.processEdifactDir = Meteor.bindEnvironment(function (dir) {
     console.log('edifact file is processed and converted: ', fileData.name)
     
     Items.update({message:fileData.name}, {$set: {isConverted: true,filename:fileData.name, xmlPath:xmlPath ,fileSizeEdi: fileData.size}})
-    console.log('Item',Items.findOne({message: msgId}))
-    // var Item  = Items.find({message: msgId}).fetch()
+    console.log('Item',Items.findOne({message: fileData.name}))
+
     
     // Move the file to another folder
     writeFile(project.edifact_orders_done + fileData.name, doc)
