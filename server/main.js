@@ -10,7 +10,10 @@ import './io.js'
 /* -------------------------------------------------------------------------- */
 // FOR TESTING without CRON
 App.checkMessages()
+// Meteor.seTimeout(function(){},1000)
+// project.processEdifactDir(project.edifact_orders)
 
+// project.XMLCheck(project.opentrans_orders)
 /* -------------------------------------------------------------------------- */
 
 /* -------------------------------------------------------------------------- */

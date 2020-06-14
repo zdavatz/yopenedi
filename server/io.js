@@ -82,7 +82,7 @@ project.processEdifactDir = function (dir, func) {
 
   })
   // project.emptyDir(project.opentrans_orders)
-  project.XMLCheck(project.opentrans_orders)
+  // project.XMLCheck(project.opentrans_orders)
 }
 
 /* -------------------------------------------------------------------------- */
@@ -94,7 +94,7 @@ project.processEdifactDir = function (dir, func) {
 
 function writeFile(file, data) {
   console.log('Writing file..........', file)
-  fs.writeFile(file, data, 'utf8', (err, result) => {
+  fs.writeFileSync(file, data, 'utf8', (err, result) => {
     if (err) {
       console.log(err);
     }
