@@ -80,7 +80,7 @@ project.XMLCheck = function(dir,func){
     var checkFileCmd  = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: '+fileSize+'" ' +XMLCheckURL+ '  --data-binary @'+filePath+' -v'
     var checkXML = cmd(checkFileCmd);
     console.log('==== XML VALIDATION RESULT FOR '+ fileData.name, {checkXML})
-  })
+  });
 }
 
 
