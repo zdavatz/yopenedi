@@ -85,6 +85,7 @@ function getFiles() {
       return
     }
     console.log('GetFiles: Getting Message: ', message)
+    
     var cmd = 'grab_one_message ' + message
 
 

@@ -8,8 +8,11 @@ import './io.js'
 
 
 /* -------------------------------------------------------------------------- */
-// FOR TESTING ------
+// FOR TESTING without CRON
 App.checkMessages()
+project.processEdifactDir(project.edifact_orders)
+
+project.XMLCheck(project.opentrans_orders)
 /* -------------------------------------------------------------------------- */
 
 /* -------------------------------------------------------------------------- */

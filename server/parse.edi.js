@@ -350,7 +350,7 @@ function getSegment(line) {
     // MATCH DATA
     if (grammar && grammar.render && grammar.match) {
         // var matchedData = matchData(lineData, grammar.match)
-        console.error('No Matched Data Grammar keys')
+        // console.error('No Matched Data Grammar keys')
         var matchedData = matchDataBlock(elements, grammar.match)
     }
     // dataElements => Contains Elements that seperated by ":"
@@ -404,12 +404,10 @@ function getXMLElement(index, ediData) {
         return
     }//
     if (dataElem.exe) {
-        console.log('======exe======')
+
         var options = {next: ediData[index + 1], prev: ediData[index - 1]};
         var line = dataElem.exe(data,options)
-        if (dataElem.name == "IMD") {
-            console.log('=============',JSON.stringify(data), {line})
-        }
+
     }
     // Looping and replacing $DATA_ELEMENTS
     for (i = 0; i < data.length; i++) {
@@ -605,7 +603,7 @@ function jsonToXML(jsonArr, jsonData) {
                     if (child.tag == "RFF") {
                         
                         rffTag.push(getXMLElement(child.index, ediData))
-                        console.log('++++++++++++++++++ RFF',rffTag)
+                        // console.log('++++++++++++++++++ RFF',rffTag)
                         return
                     }
                     if (!child.index) {
