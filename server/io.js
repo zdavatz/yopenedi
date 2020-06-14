@@ -32,7 +32,7 @@ files = {}
 
 var filePath, fileSize;
 var XMLCheckURL = 'https://connect.boni.ch/OpaccOne/B2B/Channel/XmlOverHttp/YWE'
-checkFileCmd  = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: '+fileSize+'" ' +XMLCheckURL+ '  --data-binary @'+filePath+' -v'
+checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
 
 /* -------------------------------------------------------------------------- */
 
@@ -56,20 +56,42 @@ project.rm = function (path) {
 
 /* -------------------------------------------------------------------------- */
 // Checking XMLCheck.... 
-project.XMLCheck = Meteor.bindEnvironment(function (dir){
+project.XMLCheck = Meteor.bindEnvironment(function (dir) {
   console.log('===========Reading XML FILES ==============')
-  readFiles(dir, Meteor.bindEnvironment(function (fileData){
-    console.log('=========== Checking File: ',fileData.name)
+  readFiles(dir, Meteor.bindEnvironment(function (fileData) {
+    console.log('=========== Checking File: ', fileData.name)
     var fileSize = fileData.size;
     var filePath = fileData.filepath;
-    var checkFileCmd  = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: '+fileSize+'" ' +XMLCheckURL+ '  --data-binary @'+filePath+' -v'
+    var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
     var checkXML = runCmd(checkFileCmd);
-    console.log('==== XML VALIDATION RESULT FOR '+ fileData.name, {checkXML})
-    if(isMsgSuccess(checkXML)){      
+    console.log('==== XML VALIDATION RESULT FOR ' + fileData.name, {
+      checkXML
+    })
+    if (isMsgSuccess(checkXML)) {
       console.log('Success:::https://connect.boni.ch: ', fileData.name)
-      Items.update({message:fileData.name}, {$set: {isChecked: true,filename:fileData.name, filePath:filePath,fileSize: fileSize}})
-      console.log('Item',Items.findOne({message: fileData.name}))
-    }else{
+
+      var item = Items.findOne({
+        message: fileData.name
+      })
+      if (item && item.isChecked) {
+        console.log('XMLCheck: File is already Checked')
+        return
+      } else {
+        Items.update({
+          message: fileData.name
+        }, {
+          $set: {
+            isChecked: true,
+            filename: fileData.name,
+            filePath: filePath,
+            fileSize: fileSize
+          }
+        })
+      }
+      console.log('Item', Items.findOne({
+        message: fileData.name
+      }))
+    } else {
       console.error('Error:::https://connect.boni.ch :', fileData.name, " is returning an error")
     }
   }));
@@ -80,9 +102,9 @@ project.XMLCheck = Meteor.bindEnvironment(function (dir){
 
 
 project.processEdifactDir = Meteor.bindEnvironment(function (dir) {
-  readFiles(dir,  Meteor.bindEnvironment(function (fileData){
+  readFiles(dir, Meteor.bindEnvironment(function (fileData) {
 
-    console.log('=========Processing File=====',fileData.name)
+    console.log('=========Processing File=====', fileData.name)
     var doc = fs.readFileSync(fileData.filepath, 'utf8');
     var xml = Parse.renderEDI(doc)
     console.log('---Writing File', fileData.name)
@@ -90,15 +112,32 @@ project.processEdifactDir = Meteor.bindEnvironment(function (dir) {
     var xmlPath = project.opentrans_orders + fileData.name
     writeFile(xmlPath + '.xml', xml)
     var xmlPath = project.opentrans_orders + fileData.name
-    
- 
+
+
     // console.log('ITEMS',Items.find().fetch())
     console.log('edifact file is processed and converted: ', fileData.name)
-    
-    Items.update({message:fileData.name}, {$set: {isConverted: true,filename:fileData.name, xmlPath:xmlPath ,fileSizeEdi: fileData.size}})
-    console.log('Item',Items.findOne({message: fileData.name}))
+    var item = Items.findOne({
+      message: fileData.name
+    })
+    if (item && item.isConverted) {
+      console.log('edifact File Coversion: File is already converted')
+      return
+    } else {
+      Items.update({
+        message: fileData.name
+      }, {
+        $set: {
+          isConverted: true,
+          filename: fileData.name,
+          xmlPath: xmlPath,
+          fileSizeEdi: fileData.size
+        }
+      })
+    }
 
-    
+
+
+
     // Move the file to another folder
     writeFile(project.edifact_orders_done + fileData.name, doc)
     // project.rm(fileData.filepath)
@@ -144,7 +183,7 @@ function readFiles(dir, processFile) {
         if (error) throw error;
         var isFile = stat.isFile();
         // exclude folders
-       
+
         fileData.size = stat.size
         if (isFile) {
           // callback, do something with the file
@@ -160,7 +199,9 @@ function readFiles(dir, processFile) {
  * @param {} cmd 
  */
 function runCmd(cmd) {
-  console.log('Running Command: ', {cmd})
+  console.log('Running Command: ', {
+    cmd
+  })
   var result = child_process.execSync(cmd);
   var result = result.toString('UTF8');
   return result;
@@ -170,12 +211,12 @@ function runCmd(cmd) {
  * Check XML Message Success
  * @param {*} message 
  */
-function isMsgSuccess(message){
+function isMsgSuccess(message) {
   var re = /(?:<Code>)([\s\S]*)(?:<\/Code>)/
   var result = message.match(re);
-  if(result.length && result.length == 2 && result[1] == '200'){
+  if (result.length && result.length == 2 && result[1] == '200') {
     return true
-  }else{
+  } else {
     return false
   }
 }
