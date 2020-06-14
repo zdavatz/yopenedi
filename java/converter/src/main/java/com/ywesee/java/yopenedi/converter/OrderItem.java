@@ -9,4 +9,5 @@ public class OrderItem {
     public BigDecimal quantity;
     public String quantityUnit;
     public BigDecimal price;
+    public BigDecimal priceQuantity;
 }
