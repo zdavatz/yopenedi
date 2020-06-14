@@ -7,10 +7,11 @@ const path = require('path');
 // import Parse from './parse.draft.final.js'
 
 var child_process = require('child_process');
+import './collections.js'
 import Parse from './parse.edi.js'
 /* -------------------------------------------------------------------------- */
 
-// Items = new Mongo.Collection('Items')
+
 
 /* -------------------------------------------------------------------------- */
 console.log('___init_IO___')
@@ -55,9 +56,9 @@ project.rm = function (path) {
 
 /* -------------------------------------------------------------------------- */
 // Checking XMLCheck.... 
-project.XMLCheck = function(dir,func){
+project.XMLCheck = Meteor.bindEnvironment(function (dir){
   console.log('===========Reading XML FILES ==============')
-  readFiles(dir, (fileData)=>{
+  readFiles(dir, function (fileData){
     console.log('=========== Checking File: ',fileData.name)
     var fileSize = fileData.size;
     var filePath = fileData.filepath;
@@ -71,13 +72,14 @@ project.XMLCheck = function(dir,func){
       console.error('Error:::https://connect.boni.ch :', fileData.name, " is returning an error")
     }
   });
-}
+});
 
 /* -------------------------------------------------------------------------- */
 
 
-project.processEdifactDir = function (dir, func) {
-  readFiles(dir, (fileData) => {
+
+project.processEdifactDir = Meteor.bindEnvironment(function (dir) {
+  readFiles(dir,  Meteor.bindEnvironment(function (fileData){
 
     console.log('=========Processing File=====',fileData.name)
     var doc = fs.readFileSync(fileData.filepath, 'utf8');
@@ -87,16 +89,24 @@ project.processEdifactDir = function (dir, func) {
     var xmlPath = project.opentrans_orders + fileData.name
     writeFile(xmlPath + '.xml', xml)
     var xmlPath = project.opentrans_orders + fileData.name
-    Items.update({message:fileData.name}, {$set: {isConverted: true,filename:fileData.name, xmlPath:xmlPath ,fileSizeEdi: fileData.size}})
-    console.log('edifact file is processed and converted: ', fileData.name )
+    
+ 
+    // console.log('ITEMS',Items.find().fetch())
+    console.log('edifact file is processed and converted: ', fileData.name, msgId)
+    var msgId = fileData.name.substring(0, fileData.name.length - 1);
+    var msgId = fileData.name;
+    console.log('Item',Items.findOne({message: msgId}))
+    Items.update({message:msgId}, {$set: {isConverted: true,filename:fileData.name, xmlPath:xmlPath ,fileSizeEdi: fileData.size}})
+    var Item  = Items.find({message: msgId}).fetch()
+    
     // Move the file to another folder
     writeFile(project.edifact_orders_done + fileData.name, doc)
     // project.rm(fileData.filepath)
 
-  })
+  }));
   // project.emptyDir(project.opentrans_orders)
   // project.XMLCheck(project.opentrans_orders)
-}
+})
 
 /* -------------------------------------------------------------------------- */
 

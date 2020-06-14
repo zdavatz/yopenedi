@@ -6,6 +6,7 @@
 const fs = require('fs')
 const Imap = require("imap")
 inspect = require('util').inspect;
+import './collections.js'
 import './io.js'
 var {
   Base64Decode
@@ -21,7 +22,7 @@ import _ from 'lodash';
     - Register/ Log every  process (email, conversion)
     - Validate read emails
 */
-Items = new Mongo.Collection('Items')
+
 /* -------------------------------------------------------------------------- */
 App = {}
 App.path = process.env['METEOR_SHELL_DIR'] + '/../../../public/';
@@ -57,7 +58,7 @@ function getFiles() {
     console.log('GetFiles: Getting Message: ', message)
     var cmd = 'grab_one_message ' + message
     var isChecked = Items.findOne({
-      message: message
+      message: message + "_"
     })
     //
     if (!isChecked) {
@@ -73,7 +74,7 @@ function getFiles() {
       //
       var createdAt = downloadedAt = new Date()
       Items.insert({
-        message: message,
+        message: message + "_",
         createdAt: createdAt,
         downloadedAt: downloadedAt
       })
@@ -81,6 +82,7 @@ function getFiles() {
       console.log('Message already checked', message)
     }
   }
+  //
   console.log('======== ALL MESSAGES HAvE BEEN DOWNLOADED ==========')
   // Convert the Messages
   console.log('Processing Files: Converting to XML .....')
