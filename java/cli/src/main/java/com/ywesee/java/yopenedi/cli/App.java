@@ -9,17 +9,19 @@ import com.ywesee.java.yopenedi.converter.OpenTrans.Writer;
 import com.ywesee.java.yopenedi.converter.Reader;
 import org.apache.commons.cli.*;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.util.ArrayList;
 
 public class App {
     public static void main(String[] args) throws Exception {
         Options options = new Options();
 
-        Option outputOption = new Option("o", "out", true, "the folder to output");
+        Option outputOption = new Option(
+                "o",
+                "out",
+                true,
+                "The path to output. When in multiple mode, it will be a folder. If the --input flag is used and output is not specified, the default output path is <input filename>.xml. If -m is not present and -i is not used, the output will be standard output."
+        );
         outputOption.setType(String.class);
         options.addOption(outputOption);
 
@@ -27,18 +29,44 @@ public class App {
         outputOption.setType(String.class);
         options.addOption(inputOption);
 
+        Option multipleOption = new Option("m", "multiple", false, "Whether to generate multiple xml files. An Edifact file can contain multiple orders, but in our specific use case we only need one. Please use this option if you prefer generating a folder of multiple XML files.");
+        options.addOption(multipleOption);
+
+        Option helpOption = new Option("h", "help", false, "Display help message");
+        options.addOption(helpOption);
+
         CommandLineParser parser = new DefaultParser();
-        CommandLine cmd = parser.parse( options, args);
-        if (!cmd.hasOption("out")) {
+        CommandLine cmd = parser.parse(options, args);
+        boolean showHelp = false;
+        if (cmd.hasOption("help")) {
+            showHelp = true;
+        }
+
+        boolean isMultiple = cmd.hasOption("m");
+        File outFile = null;
+        if (cmd.hasOption("out")) {
+            outFile = new File(cmd.getOptionValue("out"));
+        } else {
+            if (cmd.hasOption("in")) {
+                if (isMultiple) {
+                    outFile = new File(cmd.getOptionValue("in")+"_out");
+                } else {
+                    outFile = new File(cmd.getOptionValue("in") + ".xml");
+                }
+            } else if (isMultiple) {
+                showHelp = true;
+            }
+        }
+        if (showHelp) {
             HelpFormatter formatter = new HelpFormatter();
-            formatter.printHelp( "openedi-exe", options );
+            formatter.printHelp( "openedi", options );
             return;
         }
 
-        String outPath = cmd.getOptionValue("out");
-        File outDir = new File(outPath);
-        if (!outDir.exists()) {
-            outDir.mkdirs();
+        if (isMultiple) {
+            if (!outFile.exists()) {
+                outFile.mkdirs();
+            }
         }
 
         try {
@@ -50,17 +78,38 @@ public class App {
             }
             Reader reader = new Reader();
             ArrayList<com.ywesee.java.yopenedi.converter.Order> ediOrders = reader.run(s);
-            System.out.println("Detected " + ediOrders.size() + " orders");
+            boolean useStdout = outFile == null;
+            if (!useStdout) {
+                System.out.println("Detected " + ediOrders.size() + " orders");
+            }
+            if (ediOrders.size() > 1 && !isMultiple) {
+                System.out.println("Only the first order is used, if you want to export multiple orders, use the -m flag.");
+            }
             for (com.ywesee.java.yopenedi.converter.Order edi : ediOrders) {
                 Order otOrder = Converter.orderToOpenTrans(edi);
-                File targetFile = new File(outDir, otOrder.id + ".xml");
-                System.out.println("Outputing order(id=" + otOrder.id + ") to " + targetFile.getAbsolutePath());
+                OutputStream out;
+                if (outFile != null) {
+                    File targetFile;
+                    if (isMultiple) {
+                        targetFile = new File(outFile, otOrder.id + ".xml");
+                    } else {
+                        targetFile = outFile;
+                    }
+                    System.out.println("Outputting order(id=" + otOrder.id + ") to " + targetFile.getAbsolutePath());
+                    out = new FileOutputStream(targetFile);
+                } else {
+                    out = System.out;
+                }
                 Writer w = new Writer();
-                FileOutputStream out = new FileOutputStream(targetFile);
                 w.write(otOrder, out);
                 out.close();
+                if (!isMultiple) {
+                    break;
+                }
             }
-            System.out.println("Done");
+            if (!useStdout) {
+                System.out.println("Done");
+            }
         } catch (Exception e) {
             System.out.println("Exception " + e.toString());
         }

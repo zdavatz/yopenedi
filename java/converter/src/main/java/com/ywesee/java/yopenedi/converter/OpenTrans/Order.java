@@ -8,6 +8,8 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.ywesee.java.yopenedi.converter.Utility.notNullOrEmpty;
+
 public class Order {
     public String id;
     public String deliveryStartDate;
@@ -15,6 +17,8 @@ public class Order {
     public String deliveryConditionCode;
     public String deliveryConditionDetails;
     public String currencyCoded;
+    public String buyerIdRef;
+    public String supplierIdRef;
 
     public ArrayList<Party> parties = new ArrayList<>();
     public ArrayList<OrderItem> orderItems = new ArrayList<>();
@@ -39,7 +43,7 @@ public class Order {
 
         streamWriter.writeStartElement("CONTROL_INFO");
         streamWriter.writeStartElement("GENERATION_DATE");
-        streamWriter.writeCharacters(Utility.formatDateISO(new Date())); // TODO: today or info from edi
+        streamWriter.writeCharacters(Utility.formatDateISO(new Date()));
         streamWriter.writeEndElement(); // GENERATION_DATE
         streamWriter.writeEndElement(); // CONTROL_INFO
 
@@ -50,7 +54,7 @@ public class Order {
         streamWriter.writeEndElement(); // ORDER_ID
 
         streamWriter.writeStartElement("ORDER_DATE");
-        streamWriter.writeCharacters("TODO"); // TODO
+        streamWriter.writeCharacters(Utility.formatDateISO(new Date()));
         streamWriter.writeEndElement(); // ORDER_DATE
 
         if (this.deliveryStartDate != null && this.deliveryEndDate != null) {
@@ -70,28 +74,34 @@ public class Order {
         }
         streamWriter.writeEndElement(); // PARTIES
 
-        streamWriter.writeStartElement("CURRENCY");
-        streamWriter.writeCharacters(this.currencyCoded);
-        streamWriter.writeEndElement(); // CURRENCY
-
         streamWriter.writeStartElement("ORDER_PARTIES_REFERENCE");
         streamWriter.writeStartElement("bmecat:BUYER_IDREF");
         streamWriter.writeAttribute("type", "iln");
-        streamWriter.writeCharacters("TODO"); // TODO
+        streamWriter.writeCharacters(this.buyerIdRef);
         streamWriter.writeEndElement(); // BUYER_IDREF
         streamWriter.writeStartElement("bmecat:SUPPLIER_IDREF");
         streamWriter.writeAttribute("type", "iln");
-        streamWriter.writeCharacters("TODO"); // TODO
+        streamWriter.writeCharacters(this.supplierIdRef);
         streamWriter.writeEndElement(); // SUPPLIER_IDREF
         streamWriter.writeEndElement(); // ORDER_PARTIES_REFERENCE
 
+        if (notNullOrEmpty(this.currencyCoded)) {
+            streamWriter.writeStartElement("bmecat:CURRENCY");
+            streamWriter.writeCharacters(this.currencyCoded);
+            streamWriter.writeEndElement(); // CURRENCY
+        }
+
         streamWriter.writeStartElement("HEADER_UDX");
-        streamWriter.writeStartElement("UDX.JA.DeliveryConditionCode");
-        streamWriter.writeCharacters(this.deliveryConditionCode);
-        streamWriter.writeEndElement(); // UDX.JA.DeliveryConditionCode
-        streamWriter.writeStartElement("UDX.JA.DeliveryConditionDetails");
-        streamWriter.writeCharacters(this.deliveryConditionDetails);
-        streamWriter.writeEndElement();
+        if (notNullOrEmpty(this.deliveryConditionCode)) {
+            streamWriter.writeStartElement("UDX.JA.DeliveryConditionCode");
+            streamWriter.writeCharacters(this.deliveryConditionCode);
+            streamWriter.writeEndElement(); // UDX.JA.DeliveryConditionCode
+        }
+        if (notNullOrEmpty(this.deliveryConditionDetails)) {
+            streamWriter.writeStartElement("UDX.JA.DeliveryConditionDetails");
+            streamWriter.writeCharacters(this.deliveryConditionDetails);
+            streamWriter.writeEndElement();
+        }
         streamWriter.writeEndElement(); // HEADER_UDX
 
         streamWriter.writeEndElement(); // ORDER_INFO
