@@ -7,8 +7,10 @@ const path = require('path');
 // import Parse from './parse.draft.final.js'
 
 var child_process = require('child_process');
-
 import Parse from './parse.edi.js'
+/* -------------------------------------------------------------------------- */
+
+// Items = new Mongo.Collection('Items')
 
 /* -------------------------------------------------------------------------- */
 console.log('___init_IO___')
@@ -18,6 +20,7 @@ project.path = process.env['METEOR_SHELL_DIR'] + '/../../../'
 project.public = process.env['METEOR_SHELL_DIR'] + '/../../../public/';
 project.private = project.path + '/private/'
 /* -------------------------------------------------------------------------- */
+
 project.edifact_orders = project.path + 'edifact_orders/'
 project.opentrans_orders = project.path + 'opentrans_orders/'
 project.edifact_orders_done = project.path + 'edifact_orders_done/'
@@ -51,16 +54,22 @@ project.rm = function (path) {
 }
 
 /* -------------------------------------------------------------------------- */
-
+// Checking XMLCheck.... 
 project.XMLCheck = function(dir,func){
   console.log('===========Reading XML FILES ==============')
   readFiles(dir, (fileData)=>{
-    console.log('=========== XML FILE ==============',fileData.name)
+    console.log('=========== Checking File: ',fileData.name)
     var fileSize = fileData.size;
     var filePath = fileData.filepath;
     var checkFileCmd  = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: '+fileSize+'" ' +XMLCheckURL+ '  --data-binary @'+filePath+' -v'
     var checkXML = runCmd(checkFileCmd);
     console.log('==== XML VALIDATION RESULT FOR '+ fileData.name, {checkXML})
+    if(isMsgSuccess(checkXML)){      
+      console.log('Success:::https://connect.boni.ch: ', fileData.name)
+      Items.update({message:fileData.name}, {$set: {isChecked: true,filename:fileData.name, filePath:filePath,fileSize: fileSize}})
+    }else{
+      console.error('Error:::https://connect.boni.ch :', fileData.name, " is returning an error")
+    }
   });
 }
 
@@ -75,7 +84,11 @@ project.processEdifactDir = function (dir, func) {
     var xml = Parse.renderEDI(doc)
     console.log('---Writing File', fileData.name)
     // Write the translated file.
-    writeFile(project.opentrans_orders + fileData.name + '.xml', xml)
+    var xmlPath = project.opentrans_orders + fileData.name
+    writeFile(xmlPath + '.xml', xml)
+    var xmlPath = project.opentrans_orders + fileData.name
+    Items.update({message:fileData.name}, {$set: {isConverted: true,filename:fileData.name, xmlPath:xmlPath ,fileSizeEdi: fileData.size}})
+    console.log('edifact file is processed and converted: ', fileData.name )
     // Move the file to another folder
     writeFile(project.edifact_orders_done + fileData.name, doc)
     // project.rm(fileData.filepath)
@@ -141,6 +154,20 @@ function runCmd(cmd) {
   var result = child_process.execSync(cmd);
   var result = result.toString('UTF8');
   return result;
+}
+
+/**
+ * Check XML Message Success
+ * @param {*} message 
+ */
+function isMsgSuccess(message){
+  var re = /(?:<Code>)([\s\S]*)(?:<\/Code>)/
+  var result = message.match(re);
+  if(result.length && result.length == 2 && result[1] == '200'){
+    return true
+  }else{
+    return false
+  }
 }
 module.exports = project
 module.exports = files

@@ -59,6 +59,7 @@ function getFiles() {
     var isChecked = Items.findOne({
       message: message
     })
+    //
     if (!isChecked) {
       console.log('Getting Message: ', message)
       var result = runCmd(cmd);
@@ -69,6 +70,7 @@ function getFiles() {
           console.log(err);
         }
       });
+      //
       var createdAt = downloadedAt = new Date()
       Items.insert({
         message: message,
@@ -81,11 +83,10 @@ function getFiles() {
   }
   console.log('======== ALL MESSAGES HAvE BEEN DOWNLOADED ==========')
   // Convert the Messages
-  console.log('Converting to XML')
-
+  console.log('Processing Files: Converting to XML .....')
   project.processEdifactDir(project.edifact_orders)
-
   setTimeout(function () {
+    console.log('Processing Files: Checking XML against https://connect.boni.ch .....')
     project.XMLCheck(project.opentrans_orders)
   }, 5000)
 }
