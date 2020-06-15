@@ -48,6 +48,7 @@ project.XMLCheck = Meteor.bindEnvironment(function (dir) {
     var item = Items.findOne({
       message: fileData.name
     })
+    //
     if (item && item.isChecked) {
       console.log('XMLCheck: File is already Checked', fileData.name)
       return
