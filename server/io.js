@@ -49,7 +49,7 @@ project.XMLCheck = Meteor.bindEnvironment(function (dir) {
       message: fileData.name
     })
     if (item && item.isChecked) {
-      console.log('XMLCheck: File is already Checked')
+      console.log('XMLCheck: File is already Checked', fileData.name)
       return
     } else {
       console.log('=========== Checking File: File is not checked: ', fileData.name)
@@ -99,7 +99,7 @@ project.processEdifactDir = Meteor.bindEnvironment(function (dir) {
     })
     // console.log(fileData.name, item)
     if (item && item.isConverted) {
-      console.log('edifact File Coversion: File is already converted')
+      console.log('edifact File Coversion: File is already converted', fileData.name)
       return
     } else {
       console.log('edifact file is processed and converted: ', fileData.name)
