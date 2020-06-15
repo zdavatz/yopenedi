@@ -3,18 +3,19 @@ import {
 } from 'meteor/meteor';
 import _ from 'lodash'
 
-import './email.js'
-import './io.js'
+
 
 import './api.js'
 
 
-
+return
+// import './email.js'
+// import './io.js'
 
 
 /* -------------------------------------------------------------------------- */
 // FOR TESTING without CRON
-App.checkMessages()
+// App.checkMessages()
 // Meteor.seTimeout(function(){},1000)
 // project.processEdifactDir(project.edifact_orders)
 
