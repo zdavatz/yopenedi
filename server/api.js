@@ -5,6 +5,8 @@ import {
   WebApp
 } from 'meteor/webapp'
 import bodyParser from 'body-parser'
+
+import Parse from './parse.edi.js'
 import './edi.js';
 import './io.js'
 /* -------------------------------------------------------------------------- */
@@ -31,15 +33,23 @@ WebApp.connectHandlers.use('/as2', (req, res, next) => {
   console.log('API check: /as2')
   console.log('Header: ', JSON.stringify(req.headers));
   //JSON.stringify(req.body)
-  var file = req.body 
+  var file = req.body
   // var type = req.get('Content-Type');
-  console.log('File length: ', file)
+  console.log('File length: ', JSON.stringify(file).length)
+  var dataLength = JSON.stringify(file).length
   //file.length > 10 &&
 
+  var msg = {}
+  msg.id = req.headers["message-id"]
+  msg.to = req.headers["as2-to"]
+  msg.from = req.headers['as2-from']
 
-  if (req.headers && req.headers["as2-to"] && req.headers['as2-from'] &&  req.headers["message-id"]) {
+  // + "_" + new Date();
+  msg.fileName = msg.id
+
+  if (req.headers && msg.id && msg.to && msg.from && dataLength > 100) {
     console.log('Success: File Passed')
-    ediProcess(file)
+    ediProcess(JSON.stringify(req.body), msg)
     res.setHeader('Content-Type', 'application/json');
     res.writeHead(200);
   } else {
@@ -53,15 +63,30 @@ WebApp.connectHandlers.use('/as2', (req, res, next) => {
 /* -------------------------------------------------------------------------- */
 
 
-Picker.route('/as', function(params, req, res, next) {
+Picker.route('/as', function (params, req, res, next) {
   let body = ''
   req.on('data', Meteor.bindEnvironment((data) => {
     body += data;
-  })).on('end', function() {
-      console.log(params,req)
-      console.log(body)
-      // do something here
-     res.end('api result');
+  })).on('end', function () {
+
+    var msg = {}
+    msg.id = req.headers["message-id"]
+    msg.to = req.headers["as2-to"]
+    msg.from = req.headers['as2-from']
+
+    // + "_" + new Date();
+    msg.fileName = msg.id
+
+    console.log(JSON.stringify(req.headers))
+    console.log(body)
+    var doc = body;
+    // Writing A Message 
+    // project.writeOrder(project.edifact_orders, msg.fileName, doc)
+    var xml = Parse.renderEDI(doc)
+    project.writeOrder(project.opentrans_orders, msg.fileName +".xml", xml)
+    project.writeOrder(project.edifact_orders_done, msg.fileName, doc)
+    // do something here
+    res.end('api result');
   })
 })
 
@@ -75,11 +100,11 @@ Picker.route('/as', function(params, req, res, next) {
  * 3- save 
  */
 
-function ediProcess(doc){
+function ediProcess(doc, msg) {
   // Writing Edifact File
 
   console.log(doc)
-  // project.writeOrder(project.edifact_orders,'Hello',doc)
+  project.writeOrder(project.edifact_orders, msg.fileName, doc)
   // var xml = Parse.renderEDI(doc);
 
 }

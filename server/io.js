@@ -196,7 +196,7 @@ function readFiles(dir, processFile) {
 
 project.writeOrder = function(folder,fileName, data){
   var folder = folder?folder:project.edifact_orders;
-  var fileName = fileName + "_"
+  var fileName = fileName 
   fs.writeFileSync(folder + fileName, data, 'utf8', (err, result) => {
     if (err) {
       console.log(err);
