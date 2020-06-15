@@ -44,10 +44,11 @@ project.XMLCheck = Meteor.bindEnvironment(function (dir) {
   console.log('===========Reading XML FILES ==============')
   readFiles(dir, Meteor.bindEnvironment(function (fileData) {
     console.log('=========== Checking File: ', fileData.name)
+    //
     var item = Items.findOne({
       message: fileData.name
     })
-    if (item && !item.isChecked) {
+    if (item && item.isChecked) {
       console.log('XMLCheck: File is already Checked')
       return
     } else {
@@ -59,6 +60,7 @@ project.XMLCheck = Meteor.bindEnvironment(function (dir) {
       console.log('==== XML VALIDATION RESULT FOR ' + fileData.name, {
         checkXML
       })
+      // Checking Message
       if (isMsgSuccess(checkXML)) {
         console.log('Success:::https://connect.boni.ch: ', fileData.name)
       } else {
@@ -90,11 +92,13 @@ project.processEdifactDir = Meteor.bindEnvironment(function (dir) {
     var xml = Parse.renderEDI(doc)
     // Write the translated file.
     var xmlPath = project.opentrans_orders + fileData.name
+
+    //
     var item = Items.findOne({
       message: fileData.name
     })
     // console.log(fileData.name, item)
-    if (item && !item.isConverted) {
+    if (item && item.isConverted) {
       console.log('edifact File Coversion: File is already converted')
       return
     } else {
