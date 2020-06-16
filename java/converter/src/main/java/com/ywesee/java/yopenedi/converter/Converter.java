@@ -9,13 +9,16 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.stream.Collectors;
 
 import static com.ywesee.java.yopenedi.converter.Utility.formatDateISO;
 
 public class Converter {
-    static public Order orderToOpenTrans(com.ywesee.java.yopenedi.converter.Order order) {
+    public boolean shouldMergeContactDetails;
+
+    public Order orderToOpenTrans(com.ywesee.java.yopenedi.converter.Order order) {
         Order o = new Order();
         o.id = order.id;
 
@@ -26,9 +29,9 @@ public class Converter {
         o.currencyCoded = order.currencyCoded;
 
         o.parties = order.parties.stream()
-                .map(Converter::partyToOpenTrans).collect(Collectors.toCollection(ArrayList::new));
+                .map(this::partyToOpenTrans).collect(Collectors.toCollection(ArrayList::new));
         o.orderItems = order.orderItems.stream()
-                .map(Converter::orderItemToOpenTrans).collect(Collectors.toCollection(ArrayList::new));
+                .map(this::orderItemToOpenTrans).collect(Collectors.toCollection(ArrayList::new));
 
         for (com.ywesee.java.yopenedi.converter.Party p : order.parties) {
             switch (p.role) {
@@ -44,7 +47,7 @@ public class Converter {
         return o;
     }
 
-    static public Party partyToOpenTrans(com.ywesee.java.yopenedi.converter.Party party) {
+    public Party partyToOpenTrans(com.ywesee.java.yopenedi.converter.Party party) {
         Party p = new Party();
         p.id = party.id;
         switch (party.role) {
@@ -64,13 +67,26 @@ public class Converter {
         p.city = party.city;
         p.zip = party.zip;
         p.countryCoded = party.countryCoded;
-        p.contactDetails = party.contactDetails.stream()
-                .map(Converter::contactDetailToOpenTrans)
-                .collect(Collectors.toCollection(ArrayList::new));
+        if (shouldMergeContactDetails) {
+            ContactDetail cd = new ContactDetail();
+            p.contactDetails = new ArrayList<>(Collections.singletonList(cd));
+
+            for (com.ywesee.java.yopenedi.converter.ContactDetail c : party.contactDetails) {
+                cd.name = Converter.mergeStringForContactDetail(c.name, cd.name);
+                cd.phone = Converter.mergeStringForContactDetail(c.phone, cd.phone);
+                cd.email = Converter.mergeStringForContactDetail(c.email, cd.email);
+                cd.fax = Converter.mergeStringForContactDetail(c.fax, cd.fax);
+            }
+        } else {
+            p.contactDetails = party.contactDetails.stream()
+                    .map(this::contactDetailToOpenTrans)
+                    .collect(Collectors.toCollection(ArrayList::new));
+        }
 
         return p;
     }
-    static public OrderItem orderItemToOpenTrans(com.ywesee.java.yopenedi.converter.OrderItem orderItem) {
+
+    public OrderItem orderItemToOpenTrans(com.ywesee.java.yopenedi.converter.OrderItem orderItem) {
         OrderItem oi = new OrderItem();
         oi.ean = orderItem.ean;
         oi.descriptionShort = orderItem.descriptionShort;
@@ -82,7 +98,7 @@ public class Converter {
         return oi;
     }
 
-    static public com.ywesee.java.yopenedi.converter.OpenTrans.ContactDetail contactDetailToOpenTrans(com.ywesee.java.yopenedi.converter.ContactDetail contactDetail) {
+    public com.ywesee.java.yopenedi.converter.OpenTrans.ContactDetail contactDetailToOpenTrans(com.ywesee.java.yopenedi.converter.ContactDetail contactDetail) {
         com.ywesee.java.yopenedi.converter.OpenTrans.ContactDetail cd = new ContactDetail();
         cd.name = contactDetail.name;
         cd.phone = contactDetail.phone;
@@ -99,5 +115,18 @@ public class Converter {
         } catch (ParseException e) {
             return "";
         }
+    }
+
+    static String mergeStringForContactDetail(String a, String b) {
+        if (a == null) {
+            return b;
+        }
+        if (b == null) {
+            return a;
+        }
+        if (a.length() > b.length()) {
+            return a;
+        }
+        return b;
     }
 }
