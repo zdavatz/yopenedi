@@ -84,14 +84,14 @@ Picker.route('/as2', function (params, req, res, next) {
       res.writeHead(200);
       project.writeOrder(project.edifact_orders_encryped, msg.fileName, doc)
 
-      project.writeOrder(project.edifact_orders, msg.fileName, doc)
-      var xml = Parse.renderEDI(doc)
-      console.log('Converted to XML', {
-        xml
-      })
-      project.rm(project.edifact_orders + msg.fileName)
-      project.writeOrder(project.opentrans_orders, msg.fileName + ".xml", xml)
-      project.writeOrder(project.edifact_orders_done, msg.fileName, doc)
+      // project.writeOrder(project.edifact_orders, msg.fileName, doc)
+      // var xml = Parse.renderEDI(doc)
+      // console.log('Converted to XML', {
+      //   xml
+      // })
+      // project.rm(project.edifact_orders + msg.fileName)
+      // project.writeOrder(project.opentrans_orders, msg.fileName + ".xml", xml)
+      // project.writeOrder(project.edifact_orders_done, msg.fileName, doc)
 
       console.log('Success: File is converted')
     } else {
