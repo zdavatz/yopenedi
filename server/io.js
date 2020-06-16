@@ -20,6 +20,9 @@ project.private = project.path + '/private/'
 project.edifact_orders = project.path + 'edifact_orders/'
 project.opentrans_orders = project.path + 'opentrans_orders/'
 project.edifact_orders_done = project.path + 'edifact_orders_done/'
+project.edifact_orders_encryped = project.path + 'edifact_orders_encryped/'
+/* -------------------------------------------------------------------------- */
+
 files = {}
 /* -------------------------------------------------------------------------- */
 var filePath, fileSize;
