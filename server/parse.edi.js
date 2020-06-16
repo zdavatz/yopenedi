@@ -102,7 +102,8 @@ function generatePriceLineAmount(arr, ediData) {
     var totalPrice = 0;
     _.each(arr, (jsonElem, index) => {
         // console.log(jsonElem)
-        var price, qty, priceLinePrice;
+        var price, qty, priceLinePrice, unit;
+
         if (jsonElem.tag == "LIN") {
             totalQTY = totalQTY + 1
             _.each(jsonElem.children, (child) => {
@@ -123,11 +124,19 @@ function generatePriceLineAmount(arr, ediData) {
                         }
                     })
                     price = find['PRICE']
-                    // console.log({price})
+
+                    var geUnit = _.find(data,(o)=>{
+                        if(o["UNIT"]){
+                            return o["UNIT"]
+                        }
+                    })
+
+                    unit = geUnit["UNIT"]
+                    // console.log({data,unit})
                 }
             })
             if (qty && price) {
-                priceLinePrice = (qty * price).toFixed(2);
+                priceLinePrice = ((qty * parseFloat(price)).toFixed(2)) / unit ;
                 // priceLinePrice = priceLinePrice
                 var newTag = {
                     name: "PRICE_LINE_AMOUNT",
@@ -137,7 +146,7 @@ function generatePriceLineAmount(arr, ediData) {
                         []
                     ],
                     value: priceLinePrice,
-                    render: '<PRICE_LINE_AMOUNT>' + priceLinePrice + '</PRICE_LINE_AMOUNT>',
+                    render: '<PRICE_LINE_AMOUNT>' + priceLinePrice.toFixed(2) + '</PRICE_LINE_AMOUNT>',
                     isRendered: true
                 }
                 arr[index].children.push(newTag)
