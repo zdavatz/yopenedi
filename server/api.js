@@ -72,7 +72,8 @@ Picker.route('/as2', function (params, req, res, next) {
       day: '2-digit'
     }).format(d)
     // + "_" + new Date();
-    msg.fileName = msg.id + "_" + `${da}_${mo}_${ye}`
+    // + "_" + `${da}_${mo}_${ye}`
+    msg.fileName = msg.id;
     console.log(JSON.stringify(req.headers))
     console.log(body)
     // var dataLength = JSON.stringify(body).length
@@ -81,7 +82,6 @@ Picker.route('/as2', function (params, req, res, next) {
     if (req.headers && msg.id && msg.to && msg.from && body) {
       console.log('Success: File Passed')
       res.setHeader('Content-Type', 'application/json');
-      res.writeHead(200);
       project.writeOrder(project.edifact_orders_encryped, msg.fileName, doc)
 
       // project.writeOrder(project.edifact_orders, msg.fileName, doc)
@@ -94,6 +94,7 @@ Picker.route('/as2', function (params, req, res, next) {
       // project.writeOrder(project.edifact_orders_done, msg.fileName, doc)
 
       console.log('Success: File is converted')
+      res.writeHead(200);
     } else {
       console.log(JSON.stringify(req.headers));
       console.log('Error: File is not passed')
