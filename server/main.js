@@ -3,8 +3,8 @@ import {
 } from 'meteor/meteor';
 import _ from 'lodash'
 
-// import './email.js'
-// import './io.js'
+import './email.js'
+import './io.js'
 
 
 import './api.js'
@@ -16,7 +16,6 @@ import './api.js'
 
 
 
-return
 /* -------------------------------------------------------------------------- */
 // FOR TESTING without CRON
 App.checkMessages()

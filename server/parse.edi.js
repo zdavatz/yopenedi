@@ -90,6 +90,13 @@ function setEnclosedTags(arr, tag, enclosed) {
     return newArr;
 }
 /* -------------------------------------------------------------------------- */
+
+Number.prototype.format = function(n, x) {
+    var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
+    return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
+};
+
+/* -------------------------------------------------------------------------- */
 function generatePriceLineAmount(arr, ediData) {
     var totalQTY = 0;
     var totalPrice = 0;
@@ -97,6 +104,7 @@ function generatePriceLineAmount(arr, ediData) {
         // console.log(jsonElem)
         var price, qty, priceLinePrice;
         if (jsonElem.tag == "LIN") {
+            totalQTY = totalQTY + 1
             _.each(jsonElem.children, (child) => {
                 if (child.tag == "QTY") {
                     var data = ediData[child.index].matchedData;
@@ -119,8 +127,8 @@ function generatePriceLineAmount(arr, ediData) {
                 }
             })
             if (qty && price) {
-                priceLinePrice = qty * price;
-                priceLinePrice = priceLinePrice.toFixed(2)
+                priceLinePrice = (qty * price).toFixed(2);
+                // priceLinePrice = priceLinePrice
                 var newTag = {
                     name: "PRICE_LINE_AMOUNT",
                     tag: "PRICE_LINE_AMOUNT",
@@ -134,8 +142,10 @@ function generatePriceLineAmount(arr, ediData) {
                 }
                 arr[index].children.push(newTag)
                 //
-                totalQTY = totalQTY + parseFloat(qty);
+                // totalQTY = totalQTY + parseFloat(qty);
                 totalPrice = totalPrice + parseFloat(priceLinePrice);
+                // totalPrice = parseFloat(totalPrice);
+                // totalPrice = totalPrice.toFixed(2)
                 //
                 // console.log('generatePriceLineAmount: ', {
                 //     qty,
@@ -155,7 +165,7 @@ function generatePriceLineAmount(arr, ediData) {
             [totalQTY, totalPrice]
         ],
         // value : priceLinePrice,
-        render: '<ORDER_SUMMARY><TOTAL_ITEM_NUM>' + totalQTY + '</TOTAL_ITEM_NUM><TOTAL_AMOUNT>' + totalPrice + '</TOTAL_AMOUNT></ORDER_SUMMARY>',
+        render: '<ORDER_SUMMARY><TOTAL_ITEM_NUM>' + totalQTY + '</TOTAL_ITEM_NUM><TOTAL_AMOUNT>' + totalPrice.toFixed(2) + '</TOTAL_AMOUNT></ORDER_SUMMARY>',
         isRendered: true
     }
     // console.log('TOTAL++++++++++', total)

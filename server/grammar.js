@@ -285,8 +285,8 @@ Grammar = [{
         // render: '<ITEM_DESCRIPTION>CODE - ID</ITEM_DESCRIPTION>',
         // CLOSE </PRODUCT_ID> if next is QUANTITY QTY
         render: ' ',
-        short: '<bmecat:DESCRIPTION_SHORT>BLISTOM25K</bmecat:DESCRIPTION_SHORT>',
-        long: '<bmecat:DESCRIPTION_LONG>BLISTO K M25 noir, Bouchon de ferm. PA GFK 20pcs</bmecat:DESCRIPTION_LONG>',
+        short: '<bmecat:DESCRIPTION_SHORT>ID</bmecat:DESCRIPTION_SHORT>',
+        long: '<bmecat:DESCRIPTION_LONG>ID</bmecat:DESCRIPTION_LONG>',
         match: [
             ["", "CODE"],
             ["", "", "", "ID"]
@@ -356,7 +356,13 @@ Grammar = [{
         ],
         "parent": "",
         "children": "",
-        "isHeader": ""
+        "isHeader": "",
+        // exe:(data)=>{
+        //     var price = getData('PRICE', data);
+        //     if(price && price["PRICE"]){
+
+        //     }
+        // }
     }, {
         "name": "UNS",
         "tag": "UNS",
