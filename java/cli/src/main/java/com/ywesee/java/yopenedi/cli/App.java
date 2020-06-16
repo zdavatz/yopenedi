@@ -32,6 +32,9 @@ public class App {
         Option multipleOption = new Option("m", "multiple", false, "Whether to generate multiple xml files. An Edifact file can contain multiple orders, but in our specific use case we only need one. Please use this option if you prefer generating a folder of multiple XML files.");
         options.addOption(multipleOption);
 
+        Option mergeCdOption = new Option(null, "no-merge-contact-details", false, "Prevent merging multiple <CONTACT_DETAILS>");
+        options.addOption(mergeCdOption);
+
         Option helpOption = new Option("h", "help", false, "Display help message");
         options.addOption(helpOption);
 
@@ -85,8 +88,10 @@ public class App {
             if (ediOrders.size() > 1 && !isMultiple) {
                 System.out.println("Only the first order is used, if you want to export multiple orders, use the -m flag.");
             }
+            Converter converter = new Converter();
+            converter.shouldMergeContactDetails = !cmd.hasOption("no-merge-contact-details");
             for (com.ywesee.java.yopenedi.converter.Order edi : ediOrders) {
-                Order otOrder = Converter.orderToOpenTrans(edi);
+                Order otOrder = converter.orderToOpenTrans(edi);
                 OutputStream out;
                 if (outFile != null) {
                     File targetFile;
