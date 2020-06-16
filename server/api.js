@@ -96,17 +96,15 @@ Picker.route('/as2', function (params, req, res, next) {
       // project.writeOrder(project.edifact_orders_done, msg.fileName, doc)
 
       console.log('Success: File is converted')
-      // res.writeHead(200);
       res.writeHead(200, {'Content-Type': 'text/html'})
-      res.statusCode = 200
-      res.end("200");
+      // res.statusCode = 200
+      res.end();
     } else {
       console.log(JSON.stringify(req.headers));
       console.log('Error: File is not passed')
-      res.writeHead(400)
       res.writeHead(400, {'Content-Type': 'text/html'})
-      res.statusCode = 400
-      res.end("400");
+      // res.statusCode = 400
+      res.end();
     }
     
   })
