@@ -52,7 +52,7 @@ public class Converter {
         p.id = party.id;
         switch (party.role) {
             case Buyer:
-                p.role = Party.Role.Customer;
+                p.role = Party.Role.Buyer;
                 break;
             case Delivery:
                 p.role = Party.Role.Delivery;

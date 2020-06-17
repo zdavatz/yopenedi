@@ -8,7 +8,7 @@ import static com.ywesee.java.yopenedi.converter.Utility.notNullOrEmpty;
 
 public class Party {
     public enum Role {
-        Customer,
+        Buyer,
         Supplier,
         Delivery,
     }
@@ -38,7 +38,7 @@ public class Party {
 
         s.writeStartElement("PARTY_ROLE");
         switch (this.role) {
-            case Customer: s.writeCharacters("customer"); break;
+            case Buyer: s.writeCharacters("buyer"); break;
             case Supplier: s.writeCharacters("supplier"); break;
             case Delivery: s.writeCharacters("delivery"); break; // TODO: or deliverer?
         }
