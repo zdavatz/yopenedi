@@ -42,6 +42,9 @@ public class Order {
         streamWriter.writeStartElement("ORDER_HEADER");
 
         streamWriter.writeStartElement("CONTROL_INFO");
+        streamWriter.writeStartElement("GENERATOR_INFO");
+        streamWriter.writeCharacters("Yopenedi Java");
+        streamWriter.writeEndElement(); // GENERATOR_INFO
         streamWriter.writeStartElement("GENERATION_DATE");
         streamWriter.writeCharacters(Utility.formatDateISO(new Date()));
         streamWriter.writeEndElement(); // GENERATION_DATE
