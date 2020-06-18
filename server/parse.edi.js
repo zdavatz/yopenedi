@@ -689,6 +689,12 @@ function jsonToXML(jsonArr, jsonData) {
 // renderEDI(doc)
 parse = {}
 parse.renderEDI = function (doc) {
+    //
+    if(doc.substring(0,3) !== "UNA"){
+        console.error("The Document is not valid Edifact file","renderEDI")
+        return
+    }
+    //
     var json = renderStructuredData(doc)
     var processedJSON = generateStructuredArr(json)
     // console.log({processedJSON})
