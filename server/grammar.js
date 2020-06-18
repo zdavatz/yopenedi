@@ -38,7 +38,7 @@ Grammar = [{
         tagClose: '</DELIVERY_DATE>',
         renderxx: `id`,
         render: `
-    <ORDER_ID>code-id</ORDER_ID>`,
+    <ORDER_ID>id</ORDER_ID>`,
         "match": [
             ["", "code", "id"],
             []
