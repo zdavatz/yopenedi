@@ -73,49 +73,25 @@ Picker.route('/as2', function (params, req, res, next) {
     let da = new Intl.DateTimeFormat('en', {
       day: '2-digit'
     }).format(d)
-    // + "_" + new Date();
     // + "_" + `${da}_${mo}_${ye}`
     msg.fileName = msg.id;
     console.log(JSON.stringify(req.headers))
     console.log(body)
-    // var dataLength = JSON.stringify(body).length
     var doc = body;
     // Writing A Message 
     if (req.headers && msg.id && msg.to && msg.from && body) {
       console.log('Success: File Passed')
-
-      // var item = Items.findOne({
-      //   message: msg.fileName,
-      //   isAPIReq: true
-      // })
-
-      // if (!item) {
-      //   console.log('New:: File request: ', msg.fileName)
-
-      // }else{
-      //   console.log('Update:: File already converted: ', msg.fileName)
-      // }
-
       res.setHeader('Content-Type', 'application/json');
       project.writeOrder(project.edifact_orders_encryped, msg.fileName, doc)
-
-
-
       // project.writeOrder(project.edifact_orders, msg.fileName, doc)
       var xml = Parse.renderEDI(doc)
-      // console.log('Converted to XML', {
-      //   xml
-      // })
       // project.rm(project.edifact_orders + msg.fileName)
       project.writeOrder(project.opentrans_orders, msg.fileName + ".xml", xml)
       // project.writeOrder(project.edifact_orders_done, msg.fileName, doc)
-
       console.log('Success: File is converted')
       res.writeHead(200, {'Content-Type': 'text/html'})
       // res.statusCode = 200
       res.end();
-
-
     } else {
       console.log(JSON.stringify(req.headers));
       console.log('Error: File is not passed')
@@ -123,7 +99,6 @@ Picker.route('/as2', function (params, req, res, next) {
       // res.statusCode = 400
       res.end();
     }
-    
   })
 })
 /* -------------------------------------------------------------------------- */

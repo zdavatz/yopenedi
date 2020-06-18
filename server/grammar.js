@@ -160,7 +160,7 @@ Grammar = [{
     <PARTY_ROLE>buyer</PARTY_ROLE>`,
         DP: `<bmecat:PARTY_ID type="iln">ID</bmecat:PARTY_ID>
     <bmecat:PARTY_ID type="supplier_specific">CODE</bmecat:PARTY_ID>
-    <PARTY_ROLE>Depo</PARTY_ROLE>`,
+    <PARTY_ROLE>delivery</PARTY_ROLE>`,
         exc: function (id) {
             var line = this[id]
             return line
