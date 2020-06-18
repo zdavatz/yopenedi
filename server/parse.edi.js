@@ -45,8 +45,11 @@ function renderStructuredData(doc) {
     var ediData = [];
     var lines = doc.split(/['\n\r]+/);
     if (!lines || !lines.length) {
-        throw new Meteor.Error('edifact-error', 'Edifact file problem: Please validate the edifact file')
+        console.error('edifact-error', 'Edifact file problem: Please validate the edifact file')
+        return
+        // throw new Meteor.Error('edifact-error', 'Edifact file problem: Please validate the edifact file')
     }
+
     lines.map(function (line) {
         if (!line) {
             return
@@ -343,6 +346,10 @@ function getSegment(line) {
         [],
         []
     ]
+    if(!segs || !segs.length){
+        console.error('File Parsing Skipped, The File is not Edifact file')
+        return
+    }
     var segs = segs.map((seg) => {
         if (seg !== key) {
             if (seg.indexOf(":") > -1) {

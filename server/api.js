@@ -54,6 +54,8 @@ WebApp.connectHandlers.use('/as', (req, res, next) => {
   res.end();
 });
 /* -------------------------------------------------------------------------- */
+// Active
+/* -------------------------------------------------------------------------- */
 Picker.route('/as2', function (params, req, res, next) {
   let body = ''
   req.on('data', Meteor.bindEnvironment((data) => {
@@ -77,6 +79,11 @@ Picker.route('/as2', function (params, req, res, next) {
     msg.fileName = msg.id;
     console.log(JSON.stringify(req.headers))
     console.log(body)
+    if(body && body.substring(0,3) == "UNA"){
+      console.log('API: Edifact file confirmed')
+    }else{
+      console.error('API: The Data sent is not Edifact file')
+    }
     var doc = body;
     // Writing A Message 
     if (req.headers && msg.id && msg.to && msg.from && body) {
