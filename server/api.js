@@ -5,6 +5,10 @@ import {
   WebApp
 } from 'meteor/webapp'
 import bodyParser from 'body-parser'
+const fs = require('fs');
+const fse = require('fs-extra')
+const path = require('path');
+
 const multer = require('multer');
 
 const upload = multer();
@@ -73,17 +77,36 @@ Picker.route('/as2', function (params, req, res, next) {
 
   if (req.files && req.files.length > 0) {
 
-    console.log(req.files)
+    console.log(req.files[0])
+    var file = req.files[0];
+
+    var outputPath = project.edifact_orders_encryped + file.originalname
+    fs.writeFileSync(outputPath, file.data, "binary", (err, result) => {
+      if (err) {
+        console.log(err);
+      }else{
+        console.log('Success: File is written:', file.name)
+      }
+    });
+
+    res.writeHead(200, {
+      'Content-Type': 'text/html'
+    })
+
+    res.end()
+
+
   }
 
 
+  return
 
 
   let body = ''
   req.on('data', Meteor.bindEnvironment((data) => {
     body += data;
   })).on('end', function () {
-    
+
     //
 
 
