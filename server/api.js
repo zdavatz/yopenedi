@@ -84,85 +84,99 @@ Picker.route('/as2', function (params, req, res, next) {
     fs.writeFileSync(outputPath, file.data, "binary", (err, result) => {
       if (err) {
         console.log(err);
-      }else{
+      } else {
         console.log('Success: File is written:', file.name)
       }
     });
 
     res.writeHead(200, {
-      'Content-Type': 'text/html'
+      'Content-Type': 'application/json'
     })
 
-    res.end()
+
+    var fileData = {
+      status: true,
+      message: 'File is uploaded',
+      data: {
+        name: file.originalname,
+        mimetype: file.mimetype,
+        size: file.size
+      }
+    }
+ 
+  res.end(JSON.stringify(fileData));
 
 
+
+
+
+}
+
+
+return
+
+
+let body = ''
+req.on('data', Meteor.bindEnvironment((data) => {
+  body += data;
+})).on('end', function () {
+
+  //
+
+
+
+  var msg = {}
+  msg.id = req.headers["message-id"]
+  msg.to = req.headers["as2-to"]
+  msg.from = req.headers['as2-from']
+  let d = new Date()
+  // let ye = new Intl.DateTimeFormat('en', {
+  //   year: 'numeric'
+  // }).format(d)
+  // let mo = new Intl.DateTimeFormat('en', {
+  //   month: 'short'
+  // }).format(d)
+  // let da = new Intl.DateTimeFormat('en', {
+  //   day: '2-digit'
+  // }).format(d)
+  // + "_" + `${da}_${mo}_${ye}`
+  msg.fileName = msg.id;
+  console.log(JSON.stringify(req.headers))
+  console.log(
+    body
+  )
+  if (body && body.substring(0, 3) == "UNA") {
+    console.log('API: Edifact file confirmed')
+  } else {
+    console.error('API: The Data sent is not Edifact file')
   }
-
-
-  return
-
-
-  let body = ''
-  req.on('data', Meteor.bindEnvironment((data) => {
-    body += data;
-  })).on('end', function () {
-
-    //
-
-
-
-    var msg = {}
-    msg.id = req.headers["message-id"]
-    msg.to = req.headers["as2-to"]
-    msg.from = req.headers['as2-from']
-    let d = new Date()
-    // let ye = new Intl.DateTimeFormat('en', {
-    //   year: 'numeric'
-    // }).format(d)
-    // let mo = new Intl.DateTimeFormat('en', {
-    //   month: 'short'
-    // }).format(d)
-    // let da = new Intl.DateTimeFormat('en', {
-    //   day: '2-digit'
-    // }).format(d)
-    // + "_" + `${da}_${mo}_${ye}`
-    msg.fileName = msg.id;
-    console.log(JSON.stringify(req.headers))
-    console.log(
-      body
-    )
-    if (body && body.substring(0, 3) == "UNA") {
-      console.log('API: Edifact file confirmed')
-    } else {
-      console.error('API: The Data sent is not Edifact file')
-    }
-    var doc = body;
-    // Writing A Message 
-    if (req.headers && msg.id && msg.to && msg.from && body) {
-      console.log('Success: File Passed')
-      res.setHeader('Content-Type', 'application/json');
-      project.writeOrder(project.edifact_orders_encryped, msg.fileName, doc)
-      // project.writeOrder(project.edifact_orders, msg.fileName, doc)
-      var xml = Parse.renderEDI(doc)
-      // project.rm(project.edifact_orders + msg.fileName)
-      project.writeOrder(project.opentrans_orders, msg.fileName + ".xml", xml)
-      // project.writeOrder(project.edifact_orders_done, msg.fileName, doc)
-      console.log('Success: File is converted')
-      res.writeHead(200, {
-        'Content-Type': 'text/html'
-      })
-      // res.statusCode = 200
-      res.end();
-    } else {
-      console.log(JSON.stringify(req.headers));
-      console.log('Error: File is not passed')
-      res.writeHead(400, {
-        'Content-Type': 'text/html'
-      })
-      // res.statusCode = 400
-      res.end();
-    }
-  })
+  var doc = body;
+  // Writing A Message 
+  if (req.headers && msg.id && msg.to && msg.from && body) {
+    console.log('Success: File Passed')
+    res.setHeader('Content-Type', 'application/json');
+    project.writeOrder(project.edifact_orders_encryped, msg.fileName, doc)
+    // project.writeOrder(project.edifact_orders, msg.fileName, doc)
+    var xml = Parse.renderEDI(doc)
+    // project.rm(project.edifact_orders + msg.fileName)
+    project.writeOrder(project.opentrans_orders, msg.fileName + ".xml", xml)
+    // project.writeOrder(project.edifact_orders_done, msg.fileName, doc)
+    console.log('Success: File is converted')
+    res.writeHead(200, {
+      'Content-Type': 'text/html'
+    })
+    // res.statusCode = 200
+    res.end();
+  } else {
+    console.log(JSON.stringify(req.headers));
+    console.log('Error: File is not passed')
+    res.writeHead(400, {
+      'Content-Type': 'text/html'
+    })
+    // res.statusCode = 400
+    res.end();
+  }
+})
 })
 /* -------------------------------------------------------------------------- */
 /**
