@@ -6,6 +6,10 @@ const fse = require('fs-extra')
 const path = require('path');
 // import Parse from './parse.draft.final.js'
 var child_process = require('child_process');
+const axios = require('axios');
+const FormData = require('form-data');
+/* -------------------------------------------------------------------------- */
+
 import './collections.js'
 import Parse from './parse.edi.js'
 /* -------------------------------------------------------------------------- */
@@ -55,6 +59,10 @@ project.XMLcheckFile = function (fileData) {
     console.log('=========== Checking File: File is not checked: ', fileData.name)
     var fileSize = fileData.size;
     var filePath = fileData.filepath;
+
+
+    xmlCheckAPI(fileData)
+    return 
     var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
     var checkXML = runCmd(checkFileCmd);
     console.log('==== XML VALIDATION RESULT FOR ' + fileData.name, {
@@ -92,7 +100,7 @@ project.XMLCheck = Meteor.bindEnvironment(function (dir) {
   }));
 });
 /* -------------------------------------------------------------------------- */
-project.ediToXML = function(fileData){
+project.ediToXML = function (fileData) {
   console.log('=========Processing File=====', fileData.name)
   var doc = fs.readFileSync(fileData.filepath, 'utf8');
   var xml = Parse.renderEDI(doc)
@@ -107,23 +115,23 @@ project.ediToXML = function(fileData){
   //   console.log('edifact File Coversion: File is already converted', fileData.name)
   //   return
   // } else {
-    console.log('edifact file is processed and converted: ', fileData.name)
-    console.log('---Writing File', fileData.name)
-    writeFile(xmlPath + '.xml', xml)
-    // Move the file to another folder
-    writeFile(project.edifact_orders_done + fileData.name, doc)
-    var xmlPath = project.opentrans_orders + fileData.name
-    Items.update({
-      message: fileData.name
-    }, {
-      $set: {
-        isConverted: true,
-        filename: fileData.name,
-        xmlPath: xmlPath,
-        fileSizeEdi: fileData.size
-      }
-    })
-    // Close else
+  console.log('edifact file is processed and converted: ', fileData.name)
+  console.log('---Writing File', fileData.name)
+  writeFile(xmlPath + '.xml', xml)
+  // Move the file to another folder
+  writeFile(project.edifact_orders_done + fileData.name, doc)
+  var xmlPath = project.opentrans_orders + fileData.name
+  Items.update({
+    message: fileData.name
+  }, {
+    $set: {
+      isConverted: true,
+      filename: fileData.name,
+      xmlPath: xmlPath,
+      fileSizeEdi: fileData.size
+    }
+  })
+  // Close else
   // }
 }
 /* -------------------------------------------------------------------------- */
@@ -133,7 +141,7 @@ project.ediToXML = function(fileData){
 project.processEdifactDir = Meteor.bindEnvironment(function (dir) {
 
   readFiles(dir, Meteor.bindEnvironment(function (fileData) {
-    console.log('filename:',fileData.name)
+    console.log('filename:', fileData.name)
     project.ediToXML(fileData)
     // project.rm(fileData.filepath)
   }));
@@ -162,7 +170,7 @@ project.writeFile = function (file, data) {
   });
 }
 /* -------------------------------------------------------------------------- */
-project.getFileData = function(file){
+project.getFileData = function (file) {
   var fileData = {}
   fileData.name = path.parse(filename).name;
   fileData.ext = path.parse(filename).ext;
@@ -184,9 +192,13 @@ function readFiles(dir, processFile) {
   // read directory
   fs.readdir(dir, (error, fileNames) => {
     if (error) throw error;
-    console.log({fileNames})
+    console.log({
+      fileNames
+    })
     fileNames.forEach(filename => {
-      console.log({filename})
+      console.log({
+        filename
+      })
       var fileData = {}
       fileData.name = path.parse(filename).name;
       fileData.ext = path.parse(filename).ext;
@@ -207,9 +219,9 @@ function readFiles(dir, processFile) {
 }
 /* -------------------------------------------------------------------------- */
 
-project.writeOrder = function(folder,fileName, data){
-  var folder = folder?folder:project.edifact_orders;
-  var fileName = fileName 
+project.writeOrder = function (folder, fileName, data) {
+  var folder = folder ? folder : project.edifact_orders;
+  var fileName = fileName
   fs.writeFileSync(folder + fileName, data, 'utf8', (err, result) => {
     if (err) {
       console.log(err);
@@ -231,6 +243,11 @@ function runCmd(cmd) {
   var result = result.toString('UTF8');
   return result;
 }
+/* -------------------------------------------------------------------------- */
+
+
+/* -------------------------------------------------------------------------- */
+
 /**
  * Check XML Message Success
  * @param {*} message 
@@ -244,5 +261,28 @@ function isMsgSuccess(message) {
     return false
   }
 }
+/* -------------------------------------------------------------------------- */
+
+function xmlCheckAPI(fileData) {
+
+  var path = fileData.path
+  var form = new FormData();
+  var stream = fs.createReadStream(path);
+
+  form.append('file', stream);
+
+  var api = 'http://localhost:3000/send'
+
+  axios.post(api, form, {
+      headers: {
+        ...formHeaders,
+      },
+    })
+    .then(response => response)
+    .catch(error => error)
+}
+
+/* -------------------------------------------------------------------------- */
+
 module.exports = project
 module.exports = files

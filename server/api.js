@@ -18,6 +18,12 @@ Picker.middleware(upload.any());
 import Parse from './parse.edi.js'
 import './edi.js';
 import './io.js'
+
+/* -------------------------------------------------------------------------- */
+
+
+const settings = Meteor.settings;
+
 /* -------------------------------------------------------------------------- */
 const AccessControlAllowOrigin = (req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -77,7 +83,9 @@ Picker.route('/as2', function (params, req, res, next) {
 
   if (req.files && req.files.length > 0) {
 
-    console.log(req.files[0])
+    console.log('Headers: ',JSON.stringify(req.headers))
+    console.log('File: ',req.files[0])
+    
     var file = req.files[0];
 
     var outputPath = project.edifact_orders_encryped + file.originalname
@@ -97,6 +105,7 @@ Picker.route('/as2', function (params, req, res, next) {
     var fileData = {
       status: true,
       message: 'File is uploaded',
+      header: JSON.stringify(req.headers),
       data: {
         name: file.originalname,
         mimetype: file.mimetype,
@@ -178,6 +187,57 @@ req.on('data', Meteor.bindEnvironment((data) => {
   }
 })
 })
+/* -------------------------------------------------------------------------- */
+
+
+
+Picker.route('/send', function (params, req, res, next) {
+
+
+  if (req.files && req.files.length > 0) {
+
+    console.log(req.files[0])
+    var file = req.files[0];
+
+    var outputPath = project.edifact_orders_encryped + file.originalname
+    fs.writeFileSync(outputPath, file.data, "binary", (err, result) => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log('Success: File is written:', file.name)
+      }
+    });
+
+    res.writeHead(200, {
+      'Content-Type': 'application/json'
+    })
+
+
+    var fileData = {
+      status: true,
+      message: 'File is uploaded',
+      data: {
+        name: file.originalname,
+        mimetype: file.mimetype,
+        size: file.size
+      }
+    }
+ 
+  res.end(JSON.stringify(fileData));
+
+
+
+
+
+}
+
+
+
+
+
+})
+
+
 /* -------------------------------------------------------------------------- */
 /**
  * 0- decrypt 
