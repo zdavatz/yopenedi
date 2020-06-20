@@ -5,13 +5,12 @@ import {
   WebApp
 } from 'meteor/webapp'
 import bodyParser from 'body-parser'
-const _multer = require('multer');
-const _multerInstanceConfig = {
-  dest: '/tmp'
-}; // Temp dir for multer
-const _multerInstance = _multer(_multerInstanceConfig);
+const multer = require('multer');
 
-const Busboy = require('busboy');
+const upload = multer();
+
+Picker.middleware(upload.any());
+
 import Parse from './parse.edi.js'
 import './edi.js';
 import './io.js'
@@ -67,9 +66,16 @@ WebApp.connectHandlers.use('/as', (req, res, next) => {
 /* -------------------------------------------------------------------------- */
 
 // WebApp.connectHandlers.use(MultipartParser);
-// Picker.middleware(_multerInstance.single('photo'));
+// Picker.middleware(_multerInstance.single('file'));
 
 Picker.route('/as2', function (params, req, res, next) {
+
+
+  if (req.files && req.files.length > 0) {
+
+    console.log(req.files)
+  }
+
 
 
 
@@ -99,9 +105,9 @@ Picker.route('/as2', function (params, req, res, next) {
     // + "_" + `${da}_${mo}_${ye}`
     msg.fileName = msg.id;
     console.log(JSON.stringify(req.headers))
-    console.log({
+    console.log(
       body
-    })
+    )
     if (body && body.substring(0, 3) == "UNA") {
       console.log('API: Edifact file confirmed')
     } else {
