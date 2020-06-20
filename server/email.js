@@ -25,7 +25,7 @@ import _ from 'lodash';
 
 /* -------------------------------------------------------------------------- */
 App = {}
-App.path = process.env['METEOR_SHELL_DIR'] + '/../../../public/';
+
 /* -------------------------------------------------------------------------- */
 var settings = Meteor.settings
 if (!settings || !settings.private || !settings.private.imap) {
@@ -87,6 +87,7 @@ function getFiles() {
   // Convert the Messages
   console.log('Processing Files: Converting to XML .....')
   project.processEdifactDir(project.edifact_orders)
+  
   setTimeout(function () {
     console.log('Processing Files: Checking XML against https://connect.boni.ch .....')
     project.XMLCheck(project.opentrans_orders)
@@ -255,11 +256,12 @@ imap.once('ready', Meteor.bindEnvironment(function () {
   })); // end bind
 }));
 imap.once('error', function (err) {
-  console.log(err);
+  console.log({err});
 });
 imap.once('end', function () {
   console.log('Connection ended');
 });
+/** Check Messages */
 App.checkMessages = function () {
   console.log('Checking Messages......')
   imap.connect();

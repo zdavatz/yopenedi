@@ -131,10 +131,14 @@ project.ediToXML = function(fileData){
 // #39 
 // Order the files 
 project.processEdifactDir = Meteor.bindEnvironment(function (dir) {
+
   readFiles(dir, Meteor.bindEnvironment(function (fileData) {
+    console.log('filename:',fileData.name)
     project.ediToXML(fileData)
     // project.rm(fileData.filepath)
   }));
+
+
   //
 })
 
@@ -180,7 +184,9 @@ function readFiles(dir, processFile) {
   // read directory
   fs.readdir(dir, (error, fileNames) => {
     if (error) throw error;
+    console.log({fileNames})
     fileNames.forEach(filename => {
+      console.log({filename})
       var fileData = {}
       fileData.name = path.parse(filename).name;
       fileData.ext = path.parse(filename).ext;

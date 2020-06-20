@@ -5,6 +5,13 @@ import {
   WebApp
 } from 'meteor/webapp'
 import bodyParser from 'body-parser'
+const _multer = require('multer');
+const _multerInstanceConfig = {
+  dest: '/tmp'
+}; // Temp dir for multer
+const _multerInstance = _multer(_multerInstanceConfig);
+
+const Busboy = require('busboy');
 import Parse from './parse.edi.js'
 import './edi.js';
 import './io.js'
@@ -27,7 +34,9 @@ WebApp.connectHandlers.use('/as', (req, res, next) => {
   const json = req.method === 'POST' ? req.body || {} : {}
   console.log('API check: /as2')
   console.log('Header: ', JSON.stringify(req.headers));
-  //JSON.stringify(req.body)
+  console.log(req.body)
+  console.log('file: ', req.files)
+  //
   var file = req.body
   // var type = req.get('Content-Type');
   console.log('File length: ', JSON.stringify(file).length)
@@ -56,32 +65,46 @@ WebApp.connectHandlers.use('/as', (req, res, next) => {
 /* -------------------------------------------------------------------------- */
 // Active
 /* -------------------------------------------------------------------------- */
+
+// WebApp.connectHandlers.use(MultipartParser);
+// Picker.middleware(_multerInstance.single('photo'));
+
 Picker.route('/as2', function (params, req, res, next) {
+
+
+
   let body = ''
   req.on('data', Meteor.bindEnvironment((data) => {
     body += data;
   })).on('end', function () {
+    
+    //
+
+
+
     var msg = {}
     msg.id = req.headers["message-id"]
     msg.to = req.headers["as2-to"]
     msg.from = req.headers['as2-from']
     let d = new Date()
-    let ye = new Intl.DateTimeFormat('en', {
-      year: 'numeric'
-    }).format(d)
-    let mo = new Intl.DateTimeFormat('en', {
-      month: 'short'
-    }).format(d)
-    let da = new Intl.DateTimeFormat('en', {
-      day: '2-digit'
-    }).format(d)
+    // let ye = new Intl.DateTimeFormat('en', {
+    //   year: 'numeric'
+    // }).format(d)
+    // let mo = new Intl.DateTimeFormat('en', {
+    //   month: 'short'
+    // }).format(d)
+    // let da = new Intl.DateTimeFormat('en', {
+    //   day: '2-digit'
+    // }).format(d)
     // + "_" + `${da}_${mo}_${ye}`
     msg.fileName = msg.id;
     console.log(JSON.stringify(req.headers))
-    console.log(body)
-    if(body && body.substring(0,3) == "UNA"){
+    console.log({
+      body
+    })
+    if (body && body.substring(0, 3) == "UNA") {
       console.log('API: Edifact file confirmed')
-    }else{
+    } else {
       console.error('API: The Data sent is not Edifact file')
     }
     var doc = body;
@@ -96,13 +119,17 @@ Picker.route('/as2', function (params, req, res, next) {
       project.writeOrder(project.opentrans_orders, msg.fileName + ".xml", xml)
       // project.writeOrder(project.edifact_orders_done, msg.fileName, doc)
       console.log('Success: File is converted')
-      res.writeHead(200, {'Content-Type': 'text/html'})
+      res.writeHead(200, {
+        'Content-Type': 'text/html'
+      })
       // res.statusCode = 200
       res.end();
     } else {
       console.log(JSON.stringify(req.headers));
       console.log('Error: File is not passed')
-      res.writeHead(400, {'Content-Type': 'text/html'})
+      res.writeHead(400, {
+        'Content-Type': 'text/html'
+      })
       // res.statusCode = 400
       res.end();
     }
