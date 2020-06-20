@@ -10,3 +10,5 @@
 rootProject.name = 'openedi'
 include 'cli'
 include 'converter'
+include 'email-fetcher'
+
