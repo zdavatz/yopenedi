@@ -17,6 +17,9 @@ import javax.mail.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.net.*;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -34,6 +37,7 @@ public class App {
     static boolean skipSeenMessage;
     static boolean markMessageAsSeen;
     static boolean showDebugMessages;
+    static String httpPostTo = null;
 
     static boolean setupCliFromArgs(String[] args) {
         Options options = new Options();
@@ -79,6 +83,10 @@ public class App {
 
         Option markAsSeenOption = new Option(null, "mark-as-seen", false, "Mark message as seen after processing?");
         options.addOption(markAsSeenOption);
+
+        Option uploadOption = new Option(null, "http-post-to", true, "Where to upload the file after processing.");
+        uploadOption.setType(String.class);
+        options.addOption(uploadOption);
 
         Option helpOption = new Option("h", "help", false, "Display help message");
         options.addOption(helpOption);
@@ -137,6 +145,9 @@ public class App {
             skipSeenMessage = cmd.hasOption("skip-seen");
             markMessageAsSeen = cmd.hasOption("mark-as-seen");
             showDebugMessages = cmd.hasOption("debug");
+            if (cmd.hasOption("http-post-to")) {
+                httpPostTo = cmd.getOptionValue("http-post-to");
+            }
             return true;
         } catch (ParseException e) {
             return false;
@@ -245,8 +256,30 @@ public class App {
                 System.out.println("Marking message as seen.");
                 message.setFlag(Flags.Flag.SEEN, true);
             }
+            uploadFile(targetFile);
         }
         inbox.close(false);
         System.out.println("Done");
+    }
+
+    static void uploadFile(File file) {
+        if (httpPostTo == null) {
+            return;
+        }
+        System.out.println("Uploading file (" + file.getAbsolutePath() + ") to " + httpPostTo);
+        try {
+            URL url = new URL(httpPostTo);
+            URLConnection con = url.openConnection();
+            HttpURLConnection http = (HttpURLConnection)con;
+            http.setRequestMethod("POST");
+            http.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
+            http.setDoInput(true);
+            http.setDoOutput(true);
+            IOUtils.copy(new FileInputStream(file), con.getOutputStream());
+            String res = IOUtils.toString(con.getInputStream(), Charset.defaultCharset());
+            System.out.println("Response: " + res);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }
