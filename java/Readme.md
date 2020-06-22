@@ -30,3 +30,8 @@ java -jar ./email-fetcher/build/libs/email-fetcher-1.0-all.jar \
 	--skip-seen \
 	--mark-as-seen
 ```
+
+Post XML:
+```
+  --http-post-to="https://connect.boni.ch/OpaccOne/B2B/Channel/XmlOverHttp/YWE"
+```
