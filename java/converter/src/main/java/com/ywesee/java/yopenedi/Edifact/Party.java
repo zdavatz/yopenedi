@@ -1,9 +1,11 @@
-package com.ywesee.java.yopenedi.converter;
+package com.ywesee.java.yopenedi.Edifact;
+
+import com.ywesee.java.yopenedi.Edifact.ContactDetail;
 
 import java.util.ArrayList;
 
 public class Party {
-    enum Role {
+    public enum Role {
         Buyer,
         Supplier,
         Delivery,

@@ -1,9 +1,9 @@
 package com.ywesee.java.yopenedi.converter;
 
-import com.ywesee.java.yopenedi.converter.OpenTrans.ContactDetail;
-import com.ywesee.java.yopenedi.converter.OpenTrans.Order;
-import com.ywesee.java.yopenedi.converter.OpenTrans.OrderItem;
-import com.ywesee.java.yopenedi.converter.OpenTrans.Party;
+import com.ywesee.java.yopenedi.OpenTrans.ContactDetail;
+import com.ywesee.java.yopenedi.OpenTrans.Order;
+import com.ywesee.java.yopenedi.OpenTrans.OrderItem;
+import com.ywesee.java.yopenedi.OpenTrans.Party;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -18,7 +18,7 @@ import static com.ywesee.java.yopenedi.converter.Utility.formatDateISO;
 public class Converter {
     public boolean shouldMergeContactDetails;
 
-    public Order orderToOpenTrans(com.ywesee.java.yopenedi.converter.Order order) {
+    public Order orderToOpenTrans(com.ywesee.java.yopenedi.Edifact.Order order) {
         Order o = new Order();
         o.id = order.id;
 
@@ -33,7 +33,7 @@ public class Converter {
         o.orderItems = order.orderItems.stream()
                 .map(this::orderItemToOpenTrans).collect(Collectors.toCollection(ArrayList::new));
 
-        for (com.ywesee.java.yopenedi.converter.Party p : order.parties) {
+        for (com.ywesee.java.yopenedi.Edifact.Party p : order.parties) {
             switch (p.role) {
                 case Supplier:
                     o.supplierIdRef = p.id;
@@ -47,7 +47,7 @@ public class Converter {
         return o;
     }
 
-    public Party partyToOpenTrans(com.ywesee.java.yopenedi.converter.Party party) {
+    public Party partyToOpenTrans(com.ywesee.java.yopenedi.Edifact.Party party) {
         Party p = new Party();
         p.id = party.id;
         switch (party.role) {
@@ -71,7 +71,7 @@ public class Converter {
             ContactDetail cd = new ContactDetail();
             p.contactDetails = new ArrayList<>(Collections.singletonList(cd));
 
-            for (com.ywesee.java.yopenedi.converter.ContactDetail c : party.contactDetails) {
+            for (com.ywesee.java.yopenedi.Edifact.ContactDetail c : party.contactDetails) {
                 cd.name = Converter.mergeStringForContactDetail(c.name, cd.name);
                 cd.phone = Converter.mergeStringForContactDetail(c.phone, cd.phone);
                 cd.email = Converter.mergeStringForContactDetail(c.email, cd.email);
@@ -86,7 +86,7 @@ public class Converter {
         return p;
     }
 
-    public OrderItem orderItemToOpenTrans(com.ywesee.java.yopenedi.converter.OrderItem orderItem) {
+    public OrderItem orderItemToOpenTrans(com.ywesee.java.yopenedi.Edifact.OrderItem orderItem) {
         OrderItem oi = new OrderItem();
         oi.ean = orderItem.ean;
         oi.descriptionShort = orderItem.descriptionShort;
@@ -98,8 +98,8 @@ public class Converter {
         return oi;
     }
 
-    public com.ywesee.java.yopenedi.converter.OpenTrans.ContactDetail contactDetailToOpenTrans(com.ywesee.java.yopenedi.converter.ContactDetail contactDetail) {
-        com.ywesee.java.yopenedi.converter.OpenTrans.ContactDetail cd = new ContactDetail();
+    public ContactDetail contactDetailToOpenTrans(com.ywesee.java.yopenedi.Edifact.ContactDetail contactDetail) {
+        ContactDetail cd = new ContactDetail();
         cd.name = contactDetail.name;
         cd.phone = contactDetail.phone;
         cd.email = contactDetail.email;

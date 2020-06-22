@@ -4,9 +4,9 @@
 package com.ywesee.java.yopenedi.emailfetcher;
 
 import com.ywesee.java.yopenedi.converter.Converter;
-import com.ywesee.java.yopenedi.converter.OpenTrans.Writer;
-import com.ywesee.java.yopenedi.converter.Order;
-import com.ywesee.java.yopenedi.converter.Reader;
+import com.ywesee.java.yopenedi.OpenTrans.OpenTransWriter;
+import com.ywesee.java.yopenedi.Edifact.Order;
+import com.ywesee.java.yopenedi.Edifact.EdifactReader;
 
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.util.BASE64DecoderStream;
@@ -233,21 +233,21 @@ public class App {
             System.out.println("Saved file to " + f.getAbsolutePath());
 
             FileInputStream ediInputStream = new FileInputStream(f);
-            Reader reader = new Reader();
-            ArrayList<Order> orders = reader.run(ediInputStream);
+            EdifactReader edifactReader = new EdifactReader();
+            ArrayList<Order> orders = edifactReader.run(ediInputStream);
             if (orders.size() > 1) {
                 System.err.println("More than 1 order in edifact, ignore the rest");
             }
 
             Converter converter = new Converter();
             converter.shouldMergeContactDetails = true;
-            com.ywesee.java.yopenedi.converter.OpenTrans.Order otOrder = converter.orderToOpenTrans(orders.get(0));
+            com.ywesee.java.yopenedi.OpenTrans.Order otOrder = converter.orderToOpenTrans(orders.get(0));
 
             File targetFile = new File(openTransFolder, uid + ".xml");
             FileOutputStream otStream = new FileOutputStream(targetFile);
             System.out.println("Outputting order(id=" + otOrder.id + ") to " + targetFile.getAbsolutePath());
 
-            Writer w = new Writer();
+            OpenTransWriter w = new OpenTransWriter();
             w.write(otOrder, otStream);
             otStream.close();
             otStream.close();

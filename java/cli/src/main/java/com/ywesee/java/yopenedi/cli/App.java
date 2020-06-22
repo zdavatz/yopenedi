@@ -3,10 +3,11 @@
  */
 package com.ywesee.java.yopenedi.cli;
 
-import com.ywesee.java.yopenedi.converter.OpenTrans.Order;
+import com.ywesee.java.yopenedi.OpenTrans.OpenTransReader;
+import com.ywesee.java.yopenedi.OpenTrans.Order;
 import com.ywesee.java.yopenedi.converter.Converter;
-import com.ywesee.java.yopenedi.converter.OpenTrans.Writer;
-import com.ywesee.java.yopenedi.converter.Reader;
+import com.ywesee.java.yopenedi.OpenTrans.OpenTransWriter;
+import com.ywesee.java.yopenedi.Edifact.EdifactReader;
 import org.apache.commons.cli.*;
 
 import java.io.*;
@@ -45,8 +46,8 @@ public class App {
             showHelp = true;
         }
 
-        boolean isMultiple = cmd.hasOption("m");
         File outFile = null;
+        boolean isMultiple = cmd.hasOption("m");
         if (cmd.hasOption("out")) {
             outFile = new File(cmd.getOptionValue("out"));
         } else {
@@ -79,44 +80,83 @@ public class App {
             } else {
                 s = System.in;
             }
-            Reader reader = new Reader();
-            ArrayList<com.ywesee.java.yopenedi.converter.Order> ediOrders = reader.run(s);
-            boolean useStdout = outFile == null;
-            if (!useStdout) {
-                System.out.println("Detected " + ediOrders.size() + " orders");
-            }
-            if (ediOrders.size() > 1 && !isMultiple) {
-                System.out.println("Only the first order is used, if you want to export multiple orders, use the -m flag.");
-            }
-            Converter converter = new Converter();
-            converter.shouldMergeContactDetails = !cmd.hasOption("no-merge-contact-details");
-            for (com.ywesee.java.yopenedi.converter.Order edi : ediOrders) {
-                Order otOrder = converter.orderToOpenTrans(edi);
-                OutputStream out;
-                if (outFile != null) {
-                    File targetFile;
-                    if (isMultiple) {
-                        targetFile = new File(outFile, otOrder.id + ".xml");
-                    } else {
-                        targetFile = outFile;
-                    }
-                    System.out.println("Outputting order(id=" + otOrder.id + ") to " + targetFile.getAbsolutePath());
-                    out = new FileOutputStream(targetFile);
-                } else {
-                    out = System.out;
-                }
-                Writer w = new Writer();
-                w.write(otOrder, out);
-                out.close();
-                if (!isMultiple) {
+            PushbackInputStream buffered = new PushbackInputStream(s, 8);
+            switch (detectFileType(buffered)) {
+                case OpenTrans:
+                    openTransToEdifact(buffered, outFile, cmd);
                     break;
-                }
-            }
-            if (!useStdout) {
-                System.out.println("Done");
+                case Edifact:
+                    edifactToOpenTrans(buffered, outFile, cmd);
+                    break;
             }
         } catch (Exception e) {
             System.out.println("Exception " + e.toString());
         }
+    }
+
+    static void edifactToOpenTrans(InputStream in, File outFile, CommandLine cmd) throws Exception {
+        boolean isMultiple = cmd.hasOption("m");
+        EdifactReader edifactReader = new EdifactReader();
+        ArrayList<com.ywesee.java.yopenedi.Edifact.Order> ediOrders = edifactReader.run(in);
+        boolean useStdout = outFile == null;
+        if (!useStdout) {
+            System.out.println("Detected " + ediOrders.size() + " orders");
+        }
+        if (ediOrders.size() > 1 && !isMultiple) {
+            System.out.println("Only the first order is used, if you want to export multiple orders, use the -m flag.");
+        }
+        Converter converter = new Converter();
+        converter.shouldMergeContactDetails = !cmd.hasOption("no-merge-contact-details");
+        for (com.ywesee.java.yopenedi.Edifact.Order edi : ediOrders) {
+            Order otOrder = converter.orderToOpenTrans(edi);
+            OutputStream out;
+            if (outFile != null) {
+                File targetFile;
+                if (isMultiple) {
+                    targetFile = new File(outFile, otOrder.id + ".xml");
+                } else {
+                    targetFile = outFile;
+                }
+                System.out.println("Outputting order(id=" + otOrder.id + ") to " + targetFile.getAbsolutePath());
+                out = new FileOutputStream(targetFile);
+            } else {
+                out = System.out;
+            }
+            OpenTransWriter w = new OpenTransWriter();
+            w.write(otOrder, out);
+            out.close();
+            if (!isMultiple) {
+                break;
+            }
+        }
+    }
+
+    static void openTransToEdifact(InputStream in, File outFile, CommandLine cmd) throws Exception {
+        OpenTransReader reader = new OpenTransReader();
+        reader.run(in);
+    }
+
+    enum FileType {
+        Edifact,
+        OpenTrans,
+    }
+
+    static FileType detectFileType(PushbackInputStream s) throws Exception {
+        final int bufferSize = 8;
+        final byte[] buffer = new byte[bufferSize];
+        s.read(buffer);
+        String firstBitOfFile = new String(buffer).trim();
+        s.unread(buffer);
+
+        if (firstBitOfFile.startsWith("\uFEFF")) { // BOM
+            firstBitOfFile = firstBitOfFile.substring(1);
+        }
+
+        if (firstBitOfFile.startsWith("<")) {
+            return FileType.OpenTrans;
+        } else if (firstBitOfFile.startsWith("U")) {
+            return FileType.Edifact;
+        }
+        throw new Exception("Unrecognised file type");
     }
 }

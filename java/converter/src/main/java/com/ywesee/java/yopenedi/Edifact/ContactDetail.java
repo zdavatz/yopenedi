@@ -1,4 +1,4 @@
-package com.ywesee.java.yopenedi.converter;
+package com.ywesee.java.yopenedi.Edifact;
 
 public class ContactDetail {
     public String name;
