@@ -20,10 +20,10 @@ import Parse from './parse.edi.js'
 import './edi.js';
 import './io.js'
 /* -------------------------------------------------------------------------- */
-const settings = Meteor.settings;
+// const settings = Meteor.settings;
 
 // Setting Private Key.
-const privateKey = fs.readFileSync(settings.private.private_key, 'utf8');
+// const privateKey = fs.readFileSync(settings.private.private_key, 'utf8');
 
 /* -------------------------------------------------------------------------- */
 const AccessControlAllowOrigin = (req, res, next) => {
