@@ -69,7 +69,7 @@ project.XMLcheckFile = function (fileData) {
     // AXIOS function with Async.
     // xmlCheckAPI(fileData)
     // return 
-    var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v -m 7'
+    var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
     var checkXML = runCmd(checkFileCmd);
     // var checkXML =  runAsync(checkFileCmd,null)
     console.log('==== XML VALIDATION RESULT FOR ' + fileData.name, {
