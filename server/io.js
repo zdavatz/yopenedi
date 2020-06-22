@@ -8,6 +8,12 @@ const path = require('path');
 var child_process = require('child_process');
 const axios = require('axios');
 const FormData = require('form-data');
+
+log = console.log
+/* -------------------------------------------------------------------------- */
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
+
 /* -------------------------------------------------------------------------- */
 
 import './collections.js'
@@ -60,32 +66,51 @@ project.XMLcheckFile = function (fileData) {
     var fileSize = fileData.size;
     var filePath = fileData.filepath;
 
-
-    xmlCheckAPI(fileData)
-    return 
-    var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
+    // AXIOS function with Async.
+    // xmlCheckAPI(fileData)
+    // return 
+    var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v -m 7'
     var checkXML = runCmd(checkFileCmd);
+    // var checkXML =  runAsync(checkFileCmd,null)
     console.log('==== XML VALIDATION RESULT FOR ' + fileData.name, {
       checkXML
     })
     // Checking Message
-    if (isMsgSuccess(checkXML)) {
+    if (checkXML && isMsgSuccess(checkXML)) {
       console.log('Success:::https://connect.boni.ch: ', fileData.name)
+
+      Items.update({
+        message: fileData.name
+      }, {
+        $set: {
+          isChecked: true,
+          filename: fileData.name,
+          filePath: filePath,
+          fileSize: fileSize,
+          apiResponse: "success:200",
+          apiStatusCode: 200,
+          isValid: true
+        }
+      })
+
     } else {
       console.error('Error:::https://connect.boni.ch :', fileData.name, " is returning an error")
+      Items.update({
+        message: fileData.name
+      }, {
+        $set: {
+          isChecked: true,
+          filename: fileData.name,
+          filePath: filePath,
+          fileSize: fileSize,
+          apiResponse: "success:200",
+          apiStatusCode: 400,
+          isValid: false
+        }
+      })
+      
     }
-    Items.update({
-      message: fileData.name
-    }, {
-      $set: {
-        isChecked: true,
-        filename: fileData.name,
-        filePath: filePath,
-        fileSize: fileSize,
-        apiResponse: "success:200",
-        apiStatusCode: 200
-      }
-    })
+
   }
 }
 /* -------------------------------------------------------------------------- */
@@ -241,6 +266,7 @@ function runCmd(cmd) {
   })
   var result = child_process.execSync(cmd);
   var result = result.toString('UTF8');
+  console.log('runCmd: ',{result})
   return result;
 }
 /* -------------------------------------------------------------------------- */
@@ -263,11 +289,29 @@ function isMsgSuccess(message) {
 }
 /* -------------------------------------------------------------------------- */
 
+
+
+
+/* -------------------------------------------------------------------------- */
+
+
 function xmlCheckAPI(fileData) {
 
-  var path = fileData.path
+
+
+  // AXIOS function with Async.
+  // xmlCheckAPI(fileData)
+  // return 
+
+
+  var fileSize = fileData.size;
+  var filePath = fileData.filepath;
+  // var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
+
+
+
   var form = new FormData();
-  var stream = fs.createReadStream(path);
+  var stream = fs.createReadStream(filePath);
 
   form.append('file', stream);
 
@@ -280,6 +324,38 @@ function xmlCheckAPI(fileData) {
     })
     .then(response => response)
     .catch(error => error)
+}
+
+
+/* -------------------------------------------------------------------------- */
+/**  */
+
+async function runAsync(command, eventId) {
+  var eventId = eventId?eventId: null;
+  log('running command - runAsync', command, eventId)
+  const {
+    stdout,
+    stderr
+  } = await exec(command);
+
+  o = {}
+  o.log = stdout;
+  if (stderr) {
+    console.error(`error: ${stderr}`);
+    o.log = stderr
+  }
+  o.finishedAt = new Date()
+  o.isDone = true
+  console.log(`Number of files ${stdout}`);
+
+  // Events.update({
+  //   _id: eventId
+  // }, {
+  //   $set: o
+  // })
+
+  return o;
+
 }
 
 /* -------------------------------------------------------------------------- */

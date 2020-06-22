@@ -6,12 +6,12 @@ import _ from 'lodash'
 
 
 import './api.js'
-import './express.api.js'
+// import './express.api.js'
 
 
 const settings = Meteor.settings;
 
-if (settings && settings.private.runEmail) {
+if (settings && !settings.private.isTesting) {
   console.log('Running Cron..')
   import './cron.js'
 }
