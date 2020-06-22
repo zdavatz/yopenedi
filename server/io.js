@@ -62,14 +62,15 @@ project.XMLcheckFile = function (fileData) {
     console.log('XMLCheck: File is already Checked', fileData.name)
     return
   } else {
-    console.log('=========== Checking File: File is not checked: ', fileData.name)
+    console.log('=========== Checking File: File is not checked: ', fileData.name,{fileData})
     var fileSize = fileData.size;
     var filePath = fileData.filepath;
-
     // AXIOS function with Async.
     // xmlCheckAPI(fileData)
     // return 
-    var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
+    // var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
+    var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize +' " https://connect.boni.ch/OpaccOne/B2B/Channel/XmlOverHttp/YWE --data-binary @'+filePath+' -v'
+    console.log({checkFileCmd})
     var checkXML = runCmd(checkFileCmd);
     // var checkXML =  runAsync(checkFileCmd,null)
     console.log('==== XML VALIDATION RESULT FOR ' + fileData.name, {
