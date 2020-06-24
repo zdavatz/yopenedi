@@ -58,15 +58,15 @@ Picker.route('/as2', function (params, req, res, next) {
   msg.to = req.headers["as2-to"] ? req.headers["as2-to"] : null
   msg.from = req.headers['as2-from'] ? req.headers['as2-from'] : null
   // Check the headers.
-  if (!req.headers || !msg.id || !msg.to || !msg.from) {
-    console.log('Missing Header data')
-    res.writeHead(400, {
-      'Content-Type': 'application/json'
-    })
-    fileData.status = 400;
-    fileData.message = 'Error: Check Headers and F field'
-    res.end(JSON.stringify(fileData));
-  }
+  // if (!req.headers || !msg.id || !msg.to || !msg.from) {
+  //   console.log('Missing Header data')
+  //   res.writeHead(400, {
+  //     'Content-Type': 'application/json'
+  //   })
+  //   fileData.status = 400;
+  //   fileData.message = 'Error: Check Headers and F field'
+  //   res.end(JSON.stringify(fileData));
+  // }
 
 
   // --data-binary
