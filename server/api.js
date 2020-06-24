@@ -82,9 +82,15 @@ Picker.route('/as2', function (params, req, res, next) {
       res.writeHead(200, {
         'Content-Type': 'application/json'
       })
+      responseData.status ="SUCCESS";
       responseData.message = 'Data is ready'
       responseData.length = data.length;
-      console.log(responseData)
+      console.log({responseData})
+
+
+      var outputPath = project.edifact_orders_encryped + file.originalname
+      console.log('Success file upload at:', outputPath)
+      writeFile(outputPath, data)
 
     }else{
       res.writeHead(400, {
