@@ -51,88 +51,109 @@ Picker.route('/as2', function (params, req, res, next) {
 
 
 
-  console.log('body: /as2',req.body)
-//   let body = ''
-//   req.on('data', Meteor.bindEnvironment((data) => {
-//     body += data;
-//   })).on('end', function () {
-//     var doc = body;
-//     console.log({doc})
 
-//     console.log('Success: File is converted')
-//     res.writeHead(200, {
-//       'Content-Type': 'text/html'
-//     })
-//     // res.statusCode = 200
-//     res.end();
-
-//   })
+  var fileData = {}
+  var msg = {}
+  msg.id = req.headers["message-id"] ? req.headers["message-id"] : null
+  msg.to = req.headers["as2-to"] ? req.headers["as2-to"] : null
+  msg.from = req.headers['as2-from'] ? req.headers['as2-from'] : null
 
 
 
+  console.log('body: /as2', req.body)
+
+  console.log('body: /as2', msg)
 
 
-var fileData = {}
-var msg = {}
-msg.id = req.headers["message-id"]?req.headers["message-id"]:null
-msg.to = req.headers["as2-to"]?req.headers["as2-to"]:null
-msg.from = req.headers['as2-from']?req.headers['as2-from']:null
+      // -F option 
+
+    // Process the file
+    if (req.files && req.files.length > 0 && req.headers && msg.id && msg.to && msg.from) {
+
+      console.log('File: ', req.files[0])
+      var file = req.files[0];
+      var outputPath = project.edifact_orders_encryped + file.originalname
 
 
+      console.log('Success file upload at:', outputPath)
 
-// Validate Headers
-if (!req.headers || !msg.id || !msg.to || !msg.from) {
-  console.log('Missing Header data')
-  res.writeHead(200, {
-    'Content-Type': 'application/json'
-  })
-  res.writeHead(400, {
-    'Content-Type': 'application/json'
-  })
-  fileData.status = 400;
-  fileData.message = 'Error: Check Headers and F field'
-  res.end(JSON.stringify(fileData));
-}
-// Process the file
-if (req.files && req.files.length > 0 && req.headers && msg.id && msg.to && msg.from) {
+      writeFile(outputPath, file.buffer)
+      // deencrypt 
+      // var ediFileData = new nodersa(privateKey).decrypt(file.data, 'utf8');
+      // console.log('DeencryptedData: ',{ediFileData})
 
-  console.log('File: ', req.files[0])
-  var file = req.files[0];
-  var outputPath = project.edifact_orders_encryped + file.originalname
-  fs.writeFileSync(outputPath, file.buffer, "binary", (err, result) => {
-    if (err) {
-      console.log(err);
+      //
+      res.writeHead(200, {
+        'Content-Type': 'application/json'
+      })
+      fileData.status = 200;
+      fileData.message = 'File is uploaded'
+      fileData.headers = JSON.stringify(req.headers)
+      fileData.data = {
+        name: file.originalname,
+        mimetype: file.mimetype,
+        size: file.size
+      }
+
+
+      res.end(JSON.stringify(fileData));
     } else {
-      console.log('Success: File is written:', file.name)
+      res.writeHead(400, {
+        'Content-Type': 'application/json'
+      })
+      fileData.status = 400;
+      fileData.message = 'Error: Check Headers and F field'
+      res.end(JSON.stringify(fileData));
     }
-  });
 
-  console.log('Success file upload at:', outputPath)
-  // deencrypt 
-  // var ediFileData = new nodersa(privateKey).decrypt(file.data, 'utf8');
-  // console.log('DeencryptedData: ',{ediFileData})
 
-  //
-  res.writeHead(200, {
-    'Content-Type': 'application/json'
+    // -T option
+  let body = ''
+  req.on('data', Meteor.bindEnvironment((data) => {
+    body += data;
+  })).on('end', function () {
+    // Validate Headers
+    if (!req.headers || !msg.id || !msg.to || !msg.from) {
+      console.log('Missing Header data')
+      res.writeHead(400, {
+        'Content-Type': 'application/json'
+      })
+      fileData.status = 400;
+      fileData.message = 'Error: Check Headers and F field'
+      res.end(JSON.stringify(fileData));
+    }
+
+    //
+    var doc = body;
+    console.log({
+      doc
+    })
+
+    // -T option 
+    if (doc) {
+      console.log('headers: -T ',JSON.stringify(req.headers))
+      var outputPath = project.edifact_orders_encryped + "_FILE__"
+      writeFile(outputPath, doc)
+
+      console.log('Success: File is converted')
+      res.writeHead(200, {
+        'Content-Type': 'text/html'
+      })
+      // res.statusCode = 200
+      res.end();
+    } else {
+      console.log('Success: File is NOT converted')
+      res.writeHead(400, {
+        'Content-Type': 'text/html'
+      })
+      // res.statusCode = 200
+      res.end();
+    }
+
   })
-  fileData.status = 200;
-  fileData.message = 'File is uploaded'
-  fileData.headers = JSON.stringify(req.headers)
-  fileData.data = {
-    name: file.originalname,
-    mimetype: file.mimetype,
-    size: file.size
-  }
-  res.end(JSON.stringify(fileData));
-} else {
-  res.writeHead(400, {
-    'Content-Type': 'application/json'
-  })
-  fileData.status = 400;
-  fileData.message = 'Error: Check Headers and F field'
-  res.end(JSON.stringify(fileData));
-}
+
+
+
 })
 /* -------------------------------------------------------------------------- */
 // 
@@ -173,24 +194,26 @@ WebApp.connectHandlers.use('/as', (req, res, next) => {
 // WebApp.connectHandlers.use(MultipartParser);
 // Picker.middleware(_multerInstance.single('file'));
 Picker.route('/send', function (params, req, res, next) {
-  console.log('SEND',req.headers)
+  console.log('SEND', req.headers)
 
 
-    let body = ''
+  let body = ''
   req.on('data', Meteor.bindEnvironment((data) => {
     body += data;
   })).on('end', function () {
     var doc = body;
-    console.log({doc})
+    console.log({
+      doc
+    })
 
-    if(doc){
+    if (doc) {
       console.log('Success: File is converted')
       res.writeHead(200, {
         'Content-Type': 'text/html'
       })
       // res.statusCode = 200
       res.end();
-    }else{
+    } else {
       console.log('Success: File is NOT converted')
       res.writeHead(400, {
         'Content-Type': 'text/html'
@@ -202,36 +225,21 @@ Picker.route('/send', function (params, req, res, next) {
 
   })
 
-
-
-  // if (req.files && req.files.length > 0) {
-  //   console.log(req.files[0])
-  //   var file = req.files[0];
-  //   var outputPath = project.edifact_orders_encryped + file.originalname
-  //   fs.writeFileSync(outputPath, file.data, "binary", (err, result) => {
-  //     if (err) {
-  //       console.log(err);
-  //     } else {
-  //       console.log('Success: File is written:', file.name)
-  //     }
-  //   });
-  //   res.writeHead(200, {
-  //     'Content-Type': 'application/json'
-  //   })
-  //   var fileData = {
-  //     status: true,
-  //     message: 'File is uploaded',
-  //     data: {
-  //       name: file.originalname,
-  //       mimetype: file.mimetype,
-  //       size: file.size
-  //     }
-  //   }
-  //   res.end(JSON.stringify(fileData));
-  // }else{
-  //   console.log('FILE IS NOT DEFINED')
-  // }
 })
+/* -------------------------------------------------------------------------- */
+
+function writeFile(outputPath, data) {
+  fs.writeFileSync(outputPath, data, "binary", (err) => {
+    if (err) {
+      console.log('wWiteFile: (api)', {
+        err
+      });
+    } else {
+      console.log('Success (api): File is written:', file.name)
+      console.log('File location: ', outputPath)
+    }
+  });
+}
 /* -------------------------------------------------------------------------- */
 /**
  * 0- decrypt 
