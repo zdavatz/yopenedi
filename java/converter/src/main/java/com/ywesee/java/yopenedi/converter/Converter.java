@@ -60,6 +60,9 @@ public class Converter {
             case Supplier:
                 p.role = Party.Role.Supplier;
                 break;
+            case Invoicee:
+                // TODO
+                break;
         }
         p.supplierSpecificPartyId = party.supplierSpecificPartyId;
         p.name = party.name;

@@ -53,4 +53,11 @@ public class Utility {
     public static boolean notNullOrEmpty(String s) {
         return s != null && !s.isEmpty();
     }
+
+    public static <T> T getIndexOrNull(List<T> list, int index) {
+        if (list.size() > index) {
+            return list.get(index);
+        }
+        return null;
+    }
 }

@@ -9,6 +9,7 @@ public class Party {
         Buyer,
         Supplier,
         Delivery,
+        Invoicee,
     }
     public String id;
     public Role role;
@@ -18,6 +19,10 @@ public class Party {
     public String city;
     public String zip;
     public String countryCoded;
+
+    public String vatId; // this is VAT registration number, not tax number (Fiscal number)
+    public String fiscalNumber;
+
     public ArrayList<ContactDetail> contactDetails = new ArrayList<>();
 
     public void addContactDetail(ContactDetail contactDetail) {
