@@ -77,12 +77,11 @@ project.XMLcheckFile = function (fileData) {
     }
 
     var content = fs.readFileSync(filePath, 'utf8');
-    // console.log({content})
     var dataString = content;
 
     var options = {
       url: XMLCheckURL,
-      // url : "http://localhost:3000/send",
+      // url: "http://localhost:3000/send",
       method: 'POST',
       headers: headers,
       body: dataString
@@ -90,12 +89,43 @@ project.XMLcheckFile = function (fileData) {
 
     var reqcallback = function (error, response, body) {
       if (!error && response.statusCode == 200) {
-        console.log({body});
-        return body;
+        console.log({
+          body
+        });
+        console.log('Success:::https://connect.boni.ch: ', fileData.name)
+        Items.update({
+          message: fileData.name
+        }, {
+          $set: {
+            isChecked: true,
+            filename: fileData.name,
+            filePath: filePath,
+            fileSize: fileSize,
+            apiResponse: "success:200",
+            apiStatusCode: 200,
+            isValid: true
+          }
+        })
+      } else {
+        console.error('Error:::https://connect.boni.ch :', fileData.name, " is returning an error")
+        Items.update({
+          message: fileData.name
+        }, {
+          $set: {
+            isChecked: true,
+            filename: fileData.name,
+            filePath: filePath,
+            fileSize: fileSize,
+            apiResponse: "success:200",
+            apiStatusCode: 400,
+            isValid: false
+          }
+        })
       }
     }
 
-    var checkXML = request(options, reqcallback);
+    request(options, reqcallback);
+    return
     // console.log(checkXML)
     // try {
     //   // var checkXML = runAsync(checkFileCmd)
@@ -113,44 +143,44 @@ project.XMLcheckFile = function (fileData) {
     // })
     // var checkXML = runCmd(checkFileCmd);
     // var checkXML =  runAsync(checkFileCmd,null)
-    console.log('==== XML VALIDATION RESULT FOR ' + fileData.name, {
-      checkXML
-    })
+    // console.log('==== XML VALIDATION RESULT FOR ' + fileData.name, {
+    //   checkXML
+    // })
 
-    return
-    // Checking Message
-    if (checkXML && isMsgSuccess(checkXML)) {
-      console.log('Success:::https://connect.boni.ch: ', fileData.name)
-      Items.update({
-        message: fileData.name
-      }, {
-        $set: {
-          isChecked: true,
-          filename: fileData.name,
-          filePath: filePath,
-          fileSize: fileSize,
-          apiResponse: "success:200",
-          apiStatusCode: 200,
-          isValid: true
-        }
-      })
-    } else {
-      console.error('Error:::https://connect.boni.ch :', fileData.name, " is returning an error")
-      Items.update({
-        message: fileData.name
-      }, {
-        $set: {
-          isChecked: true,
-          filename: fileData.name,
-          filePath: filePath,
-          fileSize: fileSize,
-          apiResponse: "success:200",
-          apiStatusCode: 400,
-          isValid: false
-        }
-      })
-      return
-    }
+    // return
+    // // Checking Message
+    // if (checkXML && isMsgSuccess(checkXML)) {
+    //   console.log('Success:::https://connect.boni.ch: ', fileData.name)
+    //   Items.update({
+    //     message: fileData.name
+    //   }, {
+    //     $set: {
+    //       isChecked: true,
+    //       filename: fileData.name,
+    //       filePath: filePath,
+    //       fileSize: fileSize,
+    //       apiResponse: "success:200",
+    //       apiStatusCode: 200,
+    //       isValid: true
+    //     }
+    //   })
+    // } else {
+    //   console.error('Error:::https://connect.boni.ch :', fileData.name, " is returning an error")
+    //   Items.update({
+    //     message: fileData.name
+    //   }, {
+    //     $set: {
+    //       isChecked: true,
+    //       filename: fileData.name,
+    //       filePath: filePath,
+    //       fileSize: fileSize,
+    //       apiResponse: "success:200",
+    //       apiStatusCode: 400,
+    //       isValid: false
+    //     }
+    //   })
+    //   return
+    // }
   }
 }
 /* -------------------------------------------------------------------------- */

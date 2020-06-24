@@ -23,7 +23,7 @@ const upload = multer();
 // PICKER MIDDLE WARE
 Picker.middleware(upload.any());
 Picker.middleware( bodyParser.json() );
-Picker.middleware( bodyParser.urlencoded( { extended: false } ) );
+Picker.middleware( bodyParser.urlencoded( { extended: true } ) );
 // Picker.middleware( bodyParser.text({type: '/'}) );
 /* -------------------------------------------------------------------------- */
 
@@ -208,30 +208,9 @@ WebApp.connectHandlers.use('/as', (req, res, next) => {
 // Picker.middleware(_multerInstance.single('file'));
 Picker.route('/send', function (params, req, res, next) {
   console.log('SEND', req.headers)
-  let body = ''
-  req.on('data', Meteor.bindEnvironment((data) => {
-    body += data;
-  })).on('end', function () {
-    var doc = body;
-    console.log({
-      doc
-    })
-    if (doc) {
-      console.log('Success: File is converted')
-      res.writeHead(200, {
-        'Content-Type': 'text/html'
-      })
-      // res.statusCode = 200
-      res.end();
-    } else {
-      console.log('Success: File is NOT converted')
-      res.writeHead(400, {
-        'Content-Type': 'text/html'
-      })
-      // res.statusCode = 200
-      res.end();
-    }
-  })
+
+  console.log(req.files)
+
 })
 /* -------------------------------------------------------------------------- */
 function writeFile(outputPath, data) {
