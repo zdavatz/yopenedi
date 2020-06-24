@@ -19,7 +19,12 @@ const path = require('path');
 /* -------------------------------------------------------------------------- */
 const multer = require('multer');
 const upload = multer();
+/* -------------------------------------------------------------------------- */
+// PICKER MIDDLE WARE
 Picker.middleware(upload.any());
+Picker.middleware( bodyParser.json() );
+Picker.middleware( bodyParser.urlencoded( { extended: false } ) );
+// Picker.middleware( bodyParser.text({type: '/'}) );
 /* -------------------------------------------------------------------------- */
 
 import './edi.js';
@@ -46,6 +51,7 @@ WebApp.connectHandlers.use(bodyParser.json())
 // Active
 /* -------------------------------------------------------------------------- */
 Picker.route('/as2', function (params, req, res, next) {
+  console.log(req.body)
   var fileData = {}
   var msg = {}
   msg.id = req.headers["message-id"] ? req.headers["message-id"] : null
@@ -61,6 +67,35 @@ Picker.route('/as2', function (params, req, res, next) {
     fileData.message = 'Error: Check Headers and F field'
     res.end(JSON.stringify(fileData));
   }
+
+
+  // --data-binary
+
+  if(req && req.body){
+    
+    var keys = Object.keys(req.body);
+    var data = keys[0];
+    console.log('data:body',data)
+
+    var responseData = {}
+    if(data && data.length){
+      res.writeHead(200, {
+        'Content-Type': 'application/json'
+      })
+      responseData.message = 'Data is ready'
+      responseData.length = data.length;
+      console.log(responseData)
+
+    }else{
+      res.writeHead(400, {
+        'Content-Type': 'application/json'
+      })
+      responseData.message = 'There is no binary data'
+      console.log(responseData)
+    }
+    res.end(JSON.stringify(responseData));
+  }
+
 
   // -F option 
   // Process the file
