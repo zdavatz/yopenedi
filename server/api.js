@@ -143,11 +143,14 @@ Picker.route('/as2', function (params, req, res, next) {
         'Content-Type': 'application/json'
       })
       
-      fileData.data = {
+     data = {
+        status: "SUCCESS",
+        code: 200,
+        message: "File is uploaded",
         name:filename,
-        size: req["content-length"]
+        size: req.headers["content-length"]
       }
-      res.end(JSON.stringify(fileData));
+      res.end(JSON.stringify(data));
     } 
 
     // If No DOCUMENT or No File uploaded
