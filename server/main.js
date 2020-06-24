@@ -8,6 +8,7 @@ import _ from 'lodash'
 import './api.js'
 // import './express.api.js'
 
+import './email.js'
 
 const settings = Meteor.settings;
 

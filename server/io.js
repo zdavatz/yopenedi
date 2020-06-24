@@ -8,14 +8,14 @@ const path = require('path');
 var child_process = require('child_process');
 const axios = require('axios');
 const FormData = require('form-data');
-
 log = console.log
 /* -------------------------------------------------------------------------- */
 const util = require('util');
 const exec = util.promisify(require('child_process').exec);
-
+const {
+  execSync
+} = require('child_process');
 /* -------------------------------------------------------------------------- */
-
 import './collections.js'
 import Parse from './parse.edi.js'
 /* -------------------------------------------------------------------------- */
@@ -32,7 +32,6 @@ project.opentrans_orders = project.path + 'opentrans_orders/'
 project.edifact_orders_done = project.path + 'edifact_orders_done/'
 project.edifact_orders_encryped = project.path + 'edifact_orders_encryped/'
 /* -------------------------------------------------------------------------- */
-
 files = {}
 /* -------------------------------------------------------------------------- */
 var filePath, fileSize;
@@ -62,15 +61,26 @@ project.XMLcheckFile = function (fileData) {
     console.log('XMLCheck: File is already Checked', fileData.name)
     return
   } else {
-    console.log('=========== Checking File: File is not checked: ', fileData.name,{fileData})
+    console.log('=========== Checking File: File is not checked: ', fileData.name, {
+      fileData
+    })
     var fileSize = fileData.size;
     var filePath = fileData.filepath;
     // AXIOS function with Async.
+    var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v -m 8'
+    try {
+      var checkXML = runAsync(checkFileCmd)
+    } catch (err) {
+      console.log("ERR", err)
+      return
+    }
+    // console.log(checkXML)
     // xmlCheckAPI(fileData)
-    // return 
-    // var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
-    var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize +' " https://connect.boni.ch/OpaccOne/B2B/Channel/XmlOverHttp/YWE --data-binary @'+filePath+' -v'
-    console.log({checkFileCmd})
+    return
+    var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
+    console.log('Checking File:', {
+      checkFileCmd
+    })
     var checkXML = runCmd(checkFileCmd);
     // var checkXML =  runAsync(checkFileCmd,null)
     console.log('==== XML VALIDATION RESULT FOR ' + fileData.name, {
@@ -79,7 +89,6 @@ project.XMLcheckFile = function (fileData) {
     // Checking Message
     if (checkXML && isMsgSuccess(checkXML)) {
       console.log('Success:::https://connect.boni.ch: ', fileData.name)
-
       Items.update({
         message: fileData.name
       }, {
@@ -93,7 +102,6 @@ project.XMLcheckFile = function (fileData) {
           isValid: true
         }
       })
-
     } else {
       console.error('Error:::https://connect.boni.ch :', fileData.name, " is returning an error")
       Items.update({
@@ -109,9 +117,8 @@ project.XMLcheckFile = function (fileData) {
           isValid: false
         }
       })
-      
+      return
     }
-
   }
 }
 /* -------------------------------------------------------------------------- */
@@ -161,21 +168,16 @@ project.ediToXML = function (fileData) {
   // }
 }
 /* -------------------------------------------------------------------------- */
-
 // #39 
 // Order the files 
 project.processEdifactDir = Meteor.bindEnvironment(function (dir) {
-
   readFiles(dir, Meteor.bindEnvironment(function (fileData) {
     console.log('filename:', fileData.name)
     project.ediToXML(fileData)
     // project.rm(fileData.filepath)
   }));
-
-
   //
 })
-
 /* -------------------------------------------------------------------------- */
 function writeFile(file, data) {
   console.log('Writing file..........', file)
@@ -186,7 +188,6 @@ function writeFile(file, data) {
   });
 }
 /* -------------------------------------------------------------------------- */
-
 project.writeFile = function (file, data) {
   console.log('Writing file..........', file)
   fs.writeFileSync(file, data, 'utf8', (err, result) => {
@@ -244,7 +245,6 @@ function readFiles(dir, processFile) {
   });
 }
 /* -------------------------------------------------------------------------- */
-
 project.writeOrder = function (folder, fileName, data) {
   var folder = folder ? folder : project.edifact_orders;
   var fileName = fileName
@@ -254,9 +254,7 @@ project.writeOrder = function (folder, fileName, data) {
     }
   });
 }
-
 /* -------------------------------------------------------------------------- */
-
 /**
  * Running Command 
  * @param {} cmd 
@@ -267,14 +265,17 @@ function runCmd(cmd) {
   })
   var result = child_process.execSync(cmd);
   var result = result.toString('UTF8');
-  console.log('runCmd: ',{result})
+  console.log('runCmd: ', {
+    result
+  })
   return result;
 }
 /* -------------------------------------------------------------------------- */
-
-
+function run(command) {
+  log('Running: ', command);
+  return execSync(command).toString().trim();
+}
 /* -------------------------------------------------------------------------- */
-
 /**
  * Check XML Message Success
  * @param {*} message 
@@ -289,77 +290,89 @@ function isMsgSuccess(message) {
   }
 }
 /* -------------------------------------------------------------------------- */
-
-
-
-
 /* -------------------------------------------------------------------------- */
-
-
 function xmlCheckAPI(fileData) {
-
-
-
+  console.log('AXIOS API', {
+    fileData
+  })
   // AXIOS function with Async.
   // xmlCheckAPI(fileData)
   // return 
-
-
   var fileSize = fileData.size;
   var filePath = fileData.filepath;
-  // var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
-
-
-
+  // var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H 
+  //"Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  
+  // --data-binary @' + filePath + ' -v'
   var form = new FormData();
-  var stream = fs.createReadStream(filePath);
-
-  form.append('file', stream);
-
+  //
+  // var stream = fs.createReadStream(filePath);
+  // // console.log({stream})
+  // form.append('file', stream,{
+  //   contentType: 'text/xml; charset=UTF-8',
+  //   knownLength: fileSize
+  // });
+  var fileDataStream = fs.readFileSync(filePath)
+  form.append('file', fileDataStream, {
+    // filename: 'unicycle.jpg', // ... or:
+    filepath: filePath,
+    contentType: 'text/xml; charset=UTF-8',
+    knownLength: fileSize
+  });
+  // console.log({form})
   var api = 'http://localhost:3000/send'
-
   axios.post(api, form, {
       headers: {
-        ...formHeaders,
+        to: 'hello',
+        // "Content-Type": "text/xml; charset=UTF-8",
+        // "Content-Length": String(fileSize),
+        ...form.getHeaders(),
       },
     })
-    .then(response => response)
-    .catch(error => error)
+    .then((response) => {
+      console.log('Response; ', response.status)
+    })
+    .catch((error) => {
+      console.log('a', {
+        error
+      })
+    })
 }
-
-
 /* -------------------------------------------------------------------------- */
 /**  */
-
 async function runAsync(command, eventId) {
-  var eventId = eventId?eventId: null;
+  var eventId = eventId ? eventId : null;
   log('running command - runAsync', command, eventId)
+  var x;
+  try{
+    var x = execSync(command).toString().trim();
+  }catch(err){
+    console.log('Bonic.ch Connection Error',err);
+    return
+  }
+  return x;
   const {
     stdout,
     stderr
   } = await exec(command);
-
   o = {}
   o.log = stdout;
   if (stderr) {
-    console.error(`error: ${stderr}`);
+    // console.error(`error: ${stderr}`);
+    console.error('Connection Error to Boni.ch')
     o.log = stderr
+    return
   }
   o.finishedAt = new Date()
   o.isDone = true
   console.log(`Number of files ${stdout}`);
-
+  // console.log({o})
   // Events.update({
   //   _id: eventId
   // }, {
   //   $set: o
   // })
-
   return o;
-
 }
-
 /* -------------------------------------------------------------------------- */
-
 module.exports = project
 module.exports = files
