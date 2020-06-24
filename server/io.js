@@ -116,6 +116,8 @@ project.XMLcheckFile = function (fileData) {
     console.log('==== XML VALIDATION RESULT FOR ' + fileData.name, {
       checkXML
     })
+
+    return
     // Checking Message
     if (checkXML && isMsgSuccess(checkXML)) {
       console.log('Success:::https://connect.boni.ch: ', fileData.name)
