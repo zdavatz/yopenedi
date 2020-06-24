@@ -92,14 +92,7 @@ Picker.route('/as2', function (params, req, res, next) {
       console.log('Success file upload at:', outputPath)
       writeFile(outputPath, data)
 
-    }else{
-      res.writeHead(400, {
-        'Content-Type': 'application/json'
-      })
-      responseData.message = 'There is no binary data'
-      console.log(responseData)
     }
-    res.end(JSON.stringify(responseData));
   }
 
 
