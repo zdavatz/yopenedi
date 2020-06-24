@@ -258,5 +258,5 @@ function ediProcess(doc, msg) {
 function setFileName(){
   // var format = "dd.mm.ss-yyyy"
   // HH:mm:ss_dd:mm:yyyy
-  return moment().format("HH_mm_ss_DD-MM-YYYY");
+  return moment().format("HHmmss_DDMMYYYY");
 }
