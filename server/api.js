@@ -49,6 +49,9 @@ WebApp.connectHandlers.use(bodyParser.json())
 Picker.route('/as2', function (params, req, res, next) {
 
 
+
+
+  console.log('body: /as2',req.body)
 //   let body = ''
 //   req.on('data', Meteor.bindEnvironment((data) => {
 //     body += data;
@@ -172,33 +175,62 @@ WebApp.connectHandlers.use('/as', (req, res, next) => {
 Picker.route('/send', function (params, req, res, next) {
   console.log('SEND',req.headers)
 
-  if (req.files && req.files.length > 0) {
-    console.log(req.files[0])
-    var file = req.files[0];
-    var outputPath = project.edifact_orders_encryped + file.originalname
-    fs.writeFileSync(outputPath, file.data, "binary", (err, result) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log('Success: File is written:', file.name)
-      }
-    });
-    res.writeHead(200, {
-      'Content-Type': 'application/json'
-    })
-    var fileData = {
-      status: true,
-      message: 'File is uploaded',
-      data: {
-        name: file.originalname,
-        mimetype: file.mimetype,
-        size: file.size
-      }
+
+    let body = ''
+  req.on('data', Meteor.bindEnvironment((data) => {
+    body += data;
+  })).on('end', function () {
+    var doc = body;
+    console.log({doc})
+
+    if(doc){
+      console.log('Success: File is converted')
+      res.writeHead(200, {
+        'Content-Type': 'text/html'
+      })
+      // res.statusCode = 200
+      res.end();
+    }else{
+      console.log('Success: File is NOT converted')
+      res.writeHead(400, {
+        'Content-Type': 'text/html'
+      })
+      // res.statusCode = 200
+      res.end();
     }
-    res.end(JSON.stringify(fileData));
-  }else{
-    console.log('FILE IS NOT DEFINED')
-  }
+
+
+  })
+
+
+
+  // if (req.files && req.files.length > 0) {
+  //   console.log(req.files[0])
+  //   var file = req.files[0];
+  //   var outputPath = project.edifact_orders_encryped + file.originalname
+  //   fs.writeFileSync(outputPath, file.data, "binary", (err, result) => {
+  //     if (err) {
+  //       console.log(err);
+  //     } else {
+  //       console.log('Success: File is written:', file.name)
+  //     }
+  //   });
+  //   res.writeHead(200, {
+  //     'Content-Type': 'application/json'
+  //   })
+  //   var fileData = {
+  //     status: true,
+  //     message: 'File is uploaded',
+  //     data: {
+  //       name: file.originalname,
+  //       mimetype: file.mimetype,
+  //       size: file.size
+  //     }
+  //   }
+  //   res.end(JSON.stringify(fileData));
+  // }else{
+  //   console.log('FILE IS NOT DEFINED')
+  // }
 })
 /* -------------------------------------------------------------------------- */
 /**

@@ -2,10 +2,12 @@
  * 
  */
 const fs = require('fs');
-const fse = require('fs-extra')
+
+const request = require('request');
+
 const path = require('path');
 // import Parse from './parse.draft.final.js'
-var child_process = require('child_process');
+const child_process = require('child_process');
 const axios = require('axios');
 const FormData = require('form-data');
 log = console.log
@@ -68,20 +70,48 @@ project.XMLcheckFile = function (fileData) {
     var filePath = fileData.filepath;
     // AXIOS function with Async.
     var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v -m 8'
-    try {
-      var checkXML = runAsync(checkFileCmd)
-    } catch (err) {
-      console.log("ERR", err)
-      return
+
+    var headers = {
+      'content-type': "text/xml; charset=UTF-8",
+      'Content-Length': fileSize
     }
+
+    var content = fs.readFileSync(filePath, 'utf8');
+    // console.log({content})
+    var dataString = content;
+
+    var options = {
+      url: XMLCheckURL,
+      // url : "http://localhost:3000/send",
+      method: 'POST',
+      headers: headers,
+      body: dataString
+    };
+
+    var reqcallback = function (error, response, body) {
+      if (!error && response.statusCode == 200) {
+        console.log(body);
+        return body;
+      }
+    }
+
+    var checkXML = request(options, reqcallback);
+    // console.log(checkXML)
+    // try {
+    //   // var checkXML = runAsync(checkFileCmd)
+    //   var checkXML = runCmd(checkFileCmd)
+    // } catch (err) {
+    //   console.log("ERR", err)
+    //   return
+    // }
     // console.log(checkXML)
     // xmlCheckAPI(fileData)
-    return
-    var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
-    console.log('Checking File:', {
-      checkFileCmd
-    })
-    var checkXML = runCmd(checkFileCmd);
+    // return
+    // var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
+    // console.log('Checking File:', {
+    //   checkFileCmd
+    // })
+    // var checkXML = runCmd(checkFileCmd);
     // var checkXML =  runAsync(checkFileCmd,null)
     console.log('==== XML VALIDATION RESULT FOR ' + fileData.name, {
       checkXML
@@ -260,15 +290,18 @@ project.writeOrder = function (folder, fileName, data) {
  * @param {} cmd 
  */
 function runCmd(cmd) {
-  console.log('Running Command: ', {
+  console.log('runCmd', {
     cmd
   })
-  var result = child_process.execSync(cmd);
-  var result = result.toString('UTF8');
-  console.log('runCmd: ', {
-    result
-  })
-  return result;
+  try {
+    var resp = child_process.execSync(cmd);
+    var result = resp.toString('UTF8');
+    return result;
+    //
+  } catch (err) {
+    console.log('Err: Grabbing Message', cmd)
+    return
+  }
 }
 /* -------------------------------------------------------------------------- */
 function run(command) {
@@ -343,10 +376,10 @@ async function runAsync(command, eventId) {
   var eventId = eventId ? eventId : null;
   log('running command - runAsync', command, eventId)
   var x;
-  try{
+  try {
     var x = execSync(command).toString().trim();
-  }catch(err){
-    console.log('Bonic.ch Connection Error',err);
+  } catch (err) {
+    console.log('Bonic.ch Connection Error', err);
     return
   }
   return x;
