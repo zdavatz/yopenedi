@@ -87,8 +87,8 @@ Picker.route('/as2', function (params, req, res, next) {
       responseData.length = data.length;
       console.log({responseData})
 
-
-      var outputPath = project.edifact_orders_encryped + file.originalname
+      var filename = setFileName();
+      var outputPath = project.edifact_orders_encryped + filename
       console.log('Success file upload at:', outputPath)
       writeFile(outputPath, data)
 
