@@ -77,11 +77,12 @@ project.XMLcheckFile = function (fileData) {
     }
 
     var content = fs.readFileSync(filePath, 'utf8');
+    // console.log({content})
     var dataString = content;
 
     var options = {
-      url: XMLCheckURL,
-      // url: "http://localhost:3000/send",
+      // url: XMLCheckURL,
+      url: "http://localhost:3000/send",
       method: 'POST',
       headers: headers,
       body: dataString
@@ -124,8 +125,8 @@ project.XMLcheckFile = function (fileData) {
       }
     }
 
-    request(options, reqcallback);
-    return
+   //request(options, reqcallback);
+
     // console.log(checkXML)
     // try {
     //   // var checkXML = runAsync(checkFileCmd)
@@ -135,52 +136,52 @@ project.XMLcheckFile = function (fileData) {
     //   return
     // }
     // console.log(checkXML)
-    // xmlCheckAPI(fileData)
-    // return
-    // var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
+    // // xmlCheckAPI(fileData)
+
+    var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
     // console.log('Checking File:', {
     //   checkFileCmd
     // })
     // var checkXML = runCmd(checkFileCmd);
-    // var checkXML =  runAsync(checkFileCmd,null)
-    // console.log('==== XML VALIDATION RESULT FOR ' + fileData.name, {
-    //   checkXML
-    // })
+    var checkXML = runAsync(checkFileCmd, null)
+    console.log('==== XML VALIDATION RESULT FOR ' + fileData.name, {
+      checkFileCmd,checkXML
+    })
 
-    // return
-    // // Checking Message
-    // if (checkXML && isMsgSuccess(checkXML)) {
-    //   console.log('Success:::https://connect.boni.ch: ', fileData.name)
-    //   Items.update({
-    //     message: fileData.name
-    //   }, {
-    //     $set: {
-    //       isChecked: true,
-    //       filename: fileData.name,
-    //       filePath: filePath,
-    //       fileSize: fileSize,
-    //       apiResponse: "success:200",
-    //       apiStatusCode: 200,
-    //       isValid: true
-    //     }
-    //   })
-    // } else {
-    //   console.error('Error:::https://connect.boni.ch :', fileData.name, " is returning an error")
-    //   Items.update({
-    //     message: fileData.name
-    //   }, {
-    //     $set: {
-    //       isChecked: true,
-    //       filename: fileData.name,
-    //       filePath: filePath,
-    //       fileSize: fileSize,
-    //       apiResponse: "success:200",
-    //       apiStatusCode: 400,
-    //       isValid: false
-    //     }
-    //   })
-    //   return
-    // }
+
+    // Checking Message
+    if (checkXML && isMsgSuccess(checkXML)) {
+      console.log('Success:::https://connect.boni.ch: ', fileData.name)
+      Items.update({
+        message: fileData.name
+      }, {
+        $set: {
+          isChecked: true,
+          filename: fileData.name,
+          filePath: filePath,
+          fileSize: fileSize,
+          apiResponse: "success:200",
+          apiStatusCode: 200,
+          isValid: true
+        }
+      })
+    } else {
+      console.error('Error:::https://connect.boni.ch :', fileData.name, " is returning an error")
+      Items.update({
+        message: fileData.name
+      }, {
+        $set: {
+          isChecked: true,
+          filename: fileData.name,
+          filePath: filePath,
+          fileSize: fileSize,
+          apiResponse: "success:200",
+          apiStatusCode: 400,
+          isValid: false
+        }
+      })
+      return
+    }
   }
 }
 /* -------------------------------------------------------------------------- */
