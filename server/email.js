@@ -118,6 +118,8 @@ var getMail = Meteor.bindEnvironment(function () {
   }));
   imap.connect();
 });
+/* -------------------------------------------------------------------------- */
+
 function getFile(msg) {
   console.log('Grabbing Message file {getFile}: ', msg)
 
@@ -179,10 +181,6 @@ function getFiles() {
   // Convert the Messages
   console.log('Processing Files: Converting to XML .....')
   project.processEdifactDir(project.edifact_orders)
-  setTimeout(function () {
-    console.log('Processing Files: Checking XML against https://connect.boni.ch .....')
-    project.XMLCheck(project.opentrans_orders)
-  }, 5000)
 }
 /* -------------------------------------------------------------------------- */
 
@@ -200,19 +198,9 @@ function runCmd(cmd) {
     return
   }
 }
-// TESTING MESSAGES....
-// _.each([64,42,55,34,433],(i)=>{
-//   var result = runCmd('grab_one_message '+i)
-//   if(result && result.length < 200){
-//     console.error('There is an error while reading the file for: ', cmd)
-//     return
-//   }else if(!result){      
-//     console.log('There is no Message')
-//     return
-//   }else{
-//     console.log('Reading Message Success:',{result})
-//   }
-//   console.log({result})
-// })
+/* -------------------------------------------------------------------------- */
+
+getMail()
+
 module.exports = getMail;
 // return

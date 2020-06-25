@@ -55,6 +55,7 @@ project.rm = function (path) {
 }
 /* -------------------------------------------------------------------------- */
 project.XMLcheckFile = function (fileData) {
+  console.error('Init XML validation:', fileData)
   var item = Items.findOne({
     message: fileData.name
   })
@@ -68,64 +69,68 @@ project.XMLcheckFile = function (fileData) {
     })
     var fileSize = fileData.size;
     var filePath = fileData.filepath;
+
+    /**
+     * REQUEST INSTEAD OF CURL... 
+     */
     // AXIOS function with Async.
-    var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v -m 8'
+    // var checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v -m 8'
 
-    var headers = {
-      'content-type': "text/xml; charset=UTF-8",
-      'Content-Length': fileSize
-    }
+    // var headers = {
+    //   'content-type': "text/xml; charset=UTF-8",
+    //   'Content-Length': fileSize
+    // }
 
-    var content = fs.readFileSync(filePath, 'utf8');
-    // console.log({content})
-    var dataString = content;
+    // var content = fs.readFileSync(filePath, 'utf8');
+    // // console.log({content})
+    // var dataString = content;
 
-    var options = {
-      // url: XMLCheckURL,
-      url: "http://localhost:3000/send",
-      method: 'POST',
-      headers: headers,
-      body: dataString
-    };
+    // var options = {
+    //   // url: XMLCheckURL,
+    //   url: "http://localhost:3000/send",
+    //   method: 'POST',
+    //   headers: headers,
+    //   body: dataString
+    // };
 
-    var reqcallback = function (error, response, body) {
-      if (!error && response.statusCode == 200) {
-        console.log({
-          body
-        });
-        console.log('Success:::https://connect.boni.ch: ', fileData.name)
-        Items.update({
-          message: fileData.name
-        }, {
-          $set: {
-            isChecked: true,
-            filename: fileData.name,
-            filePath: filePath,
-            fileSize: fileSize,
-            apiResponse: "success:200",
-            apiStatusCode: 200,
-            isValid: true
-          }
-        })
-      } else {
-        console.error('Error:::https://connect.boni.ch :', fileData.name, " is returning an error")
-        Items.update({
-          message: fileData.name
-        }, {
-          $set: {
-            isChecked: true,
-            filename: fileData.name,
-            filePath: filePath,
-            fileSize: fileSize,
-            apiResponse: "success:200",
-            apiStatusCode: 400,
-            isValid: false
-          }
-        })
-      }
-    }
+    // var reqcallback = function (error, response, body) {
+    //   if (!error && response.statusCode == 200) {
+    //     console.log({
+    //       body
+    //     });
+    //     console.log('Success:::https://connect.boni.ch: ', fileData.name)
+    //     Items.update({
+    //       message: fileData.name
+    //     }, {
+    //       $set: {
+    //         isChecked: true,
+    //         filename: fileData.name,
+    //         filePath: filePath,
+    //         fileSize: fileSize,
+    //         apiResponse: "success:200",
+    //         apiStatusCode: 200,
+    //         isValid: true
+    //       }
+    //     })
+    //   } else {
+    //     console.error('Error:::https://connect.boni.ch :', fileData.name, " is returning an error")
+    //     Items.update({
+    //       message: fileData.name
+    //     }, {
+    //       $set: {
+    //         isChecked: true,
+    //         filename: fileData.name,
+    //         filePath: filePath,
+    //         fileSize: fileSize,
+    //         apiResponse: "success:200",
+    //         apiStatusCode: 400,
+    //         isValid: false
+    //       }
+    //     })
+    //   }
+    // }
 
-   //request(options, reqcallback);
+    //request(options, reqcallback);
 
     // console.log(checkXML)
     // try {
@@ -142,10 +147,11 @@ project.XMLcheckFile = function (fileData) {
     // console.log('Checking File:', {
     //   checkFileCmd
     // })
-    // var checkXML = runCmd(checkFileCmd);
-    var checkXML = runAsync(checkFileCmd, null)
+    var checkXML = runCmd(checkFileCmd);
+    // var checkXML = runAsync(checkFileCmd, null)
     console.log('==== XML VALIDATION RESULT FOR ' + fileData.name, {
-      checkFileCmd,checkXML
+      checkFileCmd,
+      checkXML
     })
 
 
@@ -185,7 +191,7 @@ project.XMLcheckFile = function (fileData) {
   }
 }
 /* -------------------------------------------------------------------------- */
-// Checking XMLCheck.... 
+// Checking XMLCheck Directory
 project.XMLCheck = Meteor.bindEnvironment(function (dir) {
   console.log('===========Reading XML FILES ==============')
   readFiles(dir, Meteor.bindEnvironment(function (fileData) {
@@ -198,6 +204,7 @@ project.XMLCheck = Meteor.bindEnvironment(function (dir) {
 /* -------------------------------------------------------------------------- */
 project.ediToXML = function (fileData) {
   console.log('=========Processing File=====', fileData.name)
+  var filename = fileData.name;
   var doc = fs.readFileSync(fileData.filepath, 'utf8');
   var xml = Parse.renderEDI(doc)
   // Write the translated file.
@@ -207,28 +214,40 @@ project.ediToXML = function (fileData) {
     message: fileData.name
   })
   // console.log(fileData.name, item)
-  // if (item && item.isConverted) {
-  //   console.log('edifact File Coversion: File is already converted', fileData.name)
-  //   return
-  // } else {
-  console.log('edifact file is processed and converted: ', fileData.name)
-  console.log('---Writing File', fileData.name)
-  writeFile(xmlPath + '.xml', xml)
-  // Move the file to another folder
-  writeFile(project.edifact_orders_done + fileData.name, doc)
-  var xmlPath = project.opentrans_orders + fileData.name
-  Items.update({
-    message: fileData.name
-  }, {
-    $set: {
-      isConverted: true,
-      filename: fileData.name,
-      xmlPath: xmlPath,
-      fileSizeEdi: fileData.size
-    }
-  })
-  // Close else
-  // }
+  if (item && item.isConverted) {
+    console.log('edifact File Coversion: File is already converted', fileData.name)
+    return
+  } else {
+    console.log('edifact file is processed and converted: ', fileData.name)
+    console.log('---Writing File', fileData.name)
+    writeFile(xmlPath + '.xml', xml)
+    // Move the file to another folder
+    writeFile(project.edifact_orders_done + fileData.name, doc)
+    var xmlPath = project.opentrans_orders + fileData.name
+    Items.update({
+      message: fileData.name
+    }, {
+      $set: {
+        isConverted: true,
+        filename: fileData.name,
+        xmlPath: xmlPath,
+        fileSizeEdi: fileData.size
+      }
+    })
+
+    // CHECK XML FILE: 
+    // XML File Data 
+    var xmlFilePath = xmlPath + '.xml'
+    fileData = {}
+    var stats = fs.statSync(xmlFilePath)
+    console.log("stats", stats.size)
+    fileData.size = stats.size;
+    fileData.filepath = xmlFilePath;
+    fileData.name = filename + '.xml'
+    // CHECK XML FILE..
+    project.XMLcheckFile(fileData)
+    // Close else
+  }
 }
 /* -------------------------------------------------------------------------- */
 // #39 
@@ -239,6 +258,12 @@ project.processEdifactDir = Meteor.bindEnvironment(function (dir) {
     project.ediToXML(fileData)
     // project.rm(fileData.filepath)
   }));
+
+  // console.log('Processing Files: Checking XML against https://connect.boni.ch .....')
+  // setTimeout(function () {
+  //   project.XMLCheck(project.opentrans_orders)
+  // }, 4000)
+
   //
 })
 /* -------------------------------------------------------------------------- */
@@ -276,6 +301,13 @@ project.getFileData = function (file) {
       processFile(fileData);
     }
   });
+}
+/* -------------------------------------------------------------------------- */
+function getFileDataPath(path) {
+  fs.stat(path, function (error, stat) {
+    if (error) throw error;
+
+  })
 }
 /* -------------------------------------------------------------------------- */
 function readFiles(dir, processFile) {
