@@ -61,7 +61,7 @@ public class Converter {
                 p.role = Party.Role.Supplier;
                 break;
             case Invoicee:
-                // TODO
+                p.role = Party.Role.InvoiceRecipient;
                 break;
         }
         p.supplierSpecificPartyId = party.supplierSpecificPartyId;

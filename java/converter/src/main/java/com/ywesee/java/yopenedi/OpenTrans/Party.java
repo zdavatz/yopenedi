@@ -11,6 +11,7 @@ public class Party {
         Buyer,
         Supplier,
         Delivery,
+        InvoiceRecipient,
     }
 
     public String id;
@@ -22,6 +23,8 @@ public class Party {
     public String zip;
     public String countryCoded;
     public ArrayList<ContactDetail> contactDetails = new ArrayList<>();
+
+    public String vatId;
 
     public void write(XMLStreamWriter s) throws XMLStreamException {
         s.writeStartElement("PARTY");
