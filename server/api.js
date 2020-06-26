@@ -27,7 +27,6 @@ Picker.middleware( bodyParser.json() );
 Picker.middleware( bodyParser.urlencoded( { extended: true } ) );
 // Picker.middleware( bodyParser.text({type: '/'}) );
 /* -------------------------------------------------------------------------- */
-
 import './edi.js';
 import './io.js'
 /* -------------------------------------------------------------------------- */
@@ -54,9 +53,7 @@ WebApp.connectHandlers.use(bodyParser.json())
 // Active
 /* -------------------------------------------------------------------------- */
 Picker.route('/as2', function (params, req, res, next) {
-  
   var fileData = {}
-
   var msg = {}
   msg.id = req.headers["message-id"] ? req.headers["message-id"] : null
   msg.to = req.headers["as2-to"] ? req.headers["as2-to"] : null
@@ -71,17 +68,12 @@ Picker.route('/as2', function (params, req, res, next) {
   //   fileData.message = 'Error: Check Headers and F field'
   //   res.end(JSON.stringify(fileData));
   // }
-
-
   // --data-binary
-
   if(req && req.body){
-    
     console.log('REQUEST BODY',req.body)
     var keys = Object.keys(req.body);
     var data = keys[0];
     console.log('data:body',data)
-
     var responseData = {}
     if(data && data.length){
       res.writeHead(200, {
@@ -99,10 +91,7 @@ Picker.route('/as2', function (params, req, res, next) {
       writeFile(outputPath, data)
       res.end(JSON.stringify(responseData));
     }
-    
   }
-
-
   // -F option 
   // Process the file
   if (req.files && req.files.length > 0 && req.headers && msg.id && msg.to && msg.from) {
@@ -135,12 +124,13 @@ Picker.route('/as2', function (params, req, res, next) {
   let body = ''
   req.on('data', Meteor.bindEnvironment((data) => {
     body += data;
-  })).on('end', function () {
+  })).on('end', Meteor.bindEnvironment(function () {
     //
     var doc = body;
     console.log({
       doc
     })
+    ////
     // -T option 
     if (doc) {
       console.log('headers: -T ', JSON.stringify(req.headers))
@@ -154,7 +144,6 @@ Picker.route('/as2', function (params, req, res, next) {
       res.writeHead(200, {
         'Content-Type': 'application/json'
       })
-      
      data = {
         status: "SUCCESS",
         code: 200,
@@ -162,11 +151,9 @@ Picker.route('/as2', function (params, req, res, next) {
         name:filename,
         size: req.headers["content-length"]
       }
-      convertFile(fileData)
       res.end(JSON.stringify(data));
-      
+      convertFile(fileData)
     } 
-
     // If No DOCUMENT or No File uploaded
     if(!body && (req.files && req.files.length == 0) || (!req.files && !body)){
       console.log('Error: There is no file or document detected')
@@ -180,28 +167,33 @@ Picker.route('/as2', function (params, req, res, next) {
       }
       res.end(JSON.stringify(message));
     }
-  })
+  }))
   // Convert the File and Run XML Validation Check.
-
-
   if((req.files && req.files.length > 0 ) || (req && req.body && JSON.stringify(req.body).length > 200) ){
     convertFile(fileData)
   }
- 
-
 })
 /* -------------------------------------------------------------------------- */
-
 function convertFile(fileData){
   console.log('Converting the file: (convertFile)',JSON.stringify(fileData))
   var doc = fs.readFileSync(fileData.filepath, 'utf8');
   var xml = Parse.renderEDI(doc)
-  console.log({doc,xml})
-  // project.ediToXML(fileData) 
+  var xmlPath = project.opentrans_orders + fileData.name
+  console.log('SUCCESS: File is Converted at: ',xmlPath)
+  writeFile(xmlPath + ".xml" ,xml)
+  // Write Backup file at edifact_orders_done
+  writeFile(project.edifact_orders_done + fileData.name, doc)
+  // File Validation
+  // Re-set FileData
+  var xmlFilePath = xmlPath + '.xml'
+  // Get the file size
+  var stats = fs.statSync(xmlFilePath)
+  console.log("stats", stats.size)
+  fileData.size = stats.size;
+  fileData.filepath = xmlFilePath;
+  fileData.name = fileData.name + '.xml'
+  project.XMLcheckFile(fileData)
 }
-
-
-
 /* -------------------------------------------------------------------------- */
 // Check if it's an Edifact file
 function isEdiFile(fileContent){
@@ -212,7 +204,6 @@ function isEdiFile(fileContent){
     return true
   }
 }
-
 /* -------------------------------------------------------------------------- */
 function writeFile(outputPath, data) {
   fs.writeFileSync(outputPath, data, "binary", (err) => {
@@ -227,7 +218,6 @@ function writeFile(outputPath, data) {
   });
 }
 /* -------------------------------------------------------------------------- */
-
 function ediProcess(doc, msg) {
   // Writing Edifact File
   console.log(doc)
@@ -235,15 +225,12 @@ function ediProcess(doc, msg) {
   // var xml = Parse.renderEDI(doc);
 }
 /* -------------------------------------------------------------------------- */
-
 // set file name 
-
 function setFileName(){
   // var format = "dd.mm.ss-yyyy"
   // HH:mm:ss_dd:mm:yyyy
   return moment().format("HHmmss_DDMMYYYY");
 }
-
 /* -------------------------------------------------------------------------- */
 // 
 /* -------------------------------------------------------------------------- */

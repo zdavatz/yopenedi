@@ -55,7 +55,7 @@ project.rm = function (path) {
 }
 /* -------------------------------------------------------------------------- */
 project.XMLcheckFile = function (fileData) {
-  console.error('Init XML validation:', fileData)
+  console.log('Init XML validation:', fileData)
   var item = Items.findOne({
     message: fileData.name
   })
