@@ -46,13 +46,16 @@ WebApp.connectHandlers.use(bodyParser.urlencoded({
 }))
 // parse application/json
 WebApp.connectHandlers.use(bodyParser.json())
+//
+// WebApp.connectHandlers.use(MultipartParser);
 // Listen to incoming HTTP requests (can only be used on the server).
 /* -------------------------------------------------------------------------- */
 // Active
 /* -------------------------------------------------------------------------- */
 Picker.route('/as2', function (params, req, res, next) {
-  console.log(req.body)
+  
   var fileData = {}
+
   var msg = {}
   msg.id = req.headers["message-id"] ? req.headers["message-id"] : null
   msg.to = req.headers["as2-to"] ? req.headers["as2-to"] : null
@@ -89,6 +92,8 @@ Picker.route('/as2', function (params, req, res, next) {
 
       var filename = setFileName();
       var outputPath = project.edifact_orders_encryped + filename
+      fileData.filepath = outputPath;
+      fileData.name = filename
       console.log('Success file upload at:', outputPath)
       writeFile(outputPath, data)
       res.end(JSON.stringify(responseData));
@@ -103,6 +108,8 @@ Picker.route('/as2', function (params, req, res, next) {
     console.log('File: is valid (-F) ', req.files[0])
     var file = req.files[0];
     var outputPath = project.edifact_orders_encryped + file.originalname
+    fileData.filepath = outputPath;
+    fileData.name = file.originalname
     console.log('Success file upload at:', outputPath)
     writeFile(outputPath, file.buffer)
     // deencrypt 
@@ -138,6 +145,8 @@ Picker.route('/as2', function (params, req, res, next) {
       var filename = setFileName();
       var outputPath = project.edifact_orders_encryped + filename
       writeFile(outputPath, doc)
+      fileData.filepath = outputPath;
+      fileData.name = filename
       console.log('Success (-T): File is converted')
       res.writeHead(200, {
         'Content-Type': 'application/json'
@@ -167,7 +176,60 @@ Picker.route('/as2', function (params, req, res, next) {
       res.end(JSON.stringify(message));
     }
   })
+  // Convert the File and Run XML Validation Check.
+  convertFile(fileData)
 })
+/* -------------------------------------------------------------------------- */
+
+function convertFile(fileData){
+  console.log('Converting the file: (convertFile)',JSON.stringify(fileData))
+  project.ediToXML(fileData) 
+}
+
+
+
+/* -------------------------------------------------------------------------- */
+// Check if it's an Edifact file
+function isEdiFile(fileContent){
+  if (fileContent.substring(0, 3) !== "UNA") {
+    console.error("The Document is not valid Edifact file", "getFile")
+    return;
+  }else{
+    return true
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+function writeFile(outputPath, data) {
+  fs.writeFileSync(outputPath, data, "binary", (err) => {
+    if (err) {
+      console.log('wWiteFile: (api)', {
+        err
+      });
+    } else {
+      console.log('Success (api): File is written:', file.name)
+      console.log('File location: ', outputPath)
+    }
+  });
+}
+/* -------------------------------------------------------------------------- */
+
+function ediProcess(doc, msg) {
+  // Writing Edifact File
+  console.log(doc)
+  project.writeOrder(project.edifact_orders, msg.fileName, doc)
+  // var xml = Parse.renderEDI(doc);
+}
+/* -------------------------------------------------------------------------- */
+
+// set file name 
+
+function setFileName(){
+  // var format = "dd.mm.ss-yyyy"
+  // HH:mm:ss_dd:mm:yyyy
+  return moment().format("HHmmss_DDMMYYYY");
+}
+
 /* -------------------------------------------------------------------------- */
 // 
 /* -------------------------------------------------------------------------- */
@@ -204,41 +266,3 @@ WebApp.connectHandlers.use('/as', (req, res, next) => {
   res.end();
 });
 /* -------------------------------------------------------------------------- */
-// WebApp.connectHandlers.use(MultipartParser);
-// Picker.middleware(_multerInstance.single('file'));
-Picker.route('/send', function (params, req, res, next) {
-  console.log('SEND', req.headers)
-
-  console.log(req.files)
-
-})
-/* -------------------------------------------------------------------------- */
-function writeFile(outputPath, data) {
-  fs.writeFileSync(outputPath, data, "binary", (err) => {
-    if (err) {
-      console.log('wWiteFile: (api)', {
-        err
-      });
-    } else {
-      console.log('Success (api): File is written:', file.name)
-      console.log('File location: ', outputPath)
-    }
-  });
-}
-/* -------------------------------------------------------------------------- */
-
-function ediProcess(doc, msg) {
-  // Writing Edifact File
-  console.log(doc)
-  project.writeOrder(project.edifact_orders, msg.fileName, doc)
-  // var xml = Parse.renderEDI(doc);
-}
-/* -------------------------------------------------------------------------- */
-
-// set file name 
-
-function setFileName(){
-  // var format = "dd.mm.ss-yyyy"
-  // HH:mm:ss_dd:mm:yyyy
-  return moment().format("HHmmss_DDMMYYYY");
-}
