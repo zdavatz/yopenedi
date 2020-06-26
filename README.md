@@ -59,3 +59,21 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
   SSLCertificateChainFile /etc/letsencrypt/live/test.yopenedi.ch/chain.pem
 </VirtualHost>
 ```
+## settings.json
+```
+{
+    "public":{
+    },
+    "private":{
+        "resetDB":false,
+        "imap":{
+            "username":"user@domain.com",
+            "password":"password",
+            "host": "imap.gmail.com",
+            "post": "993",
+            "secure": true
+        }
+    }
+```
+1. `meteor reset` removes all sqlite files and recreates an empty DB, which is not friendly at all if u have files bigger then 100mb on a slow testing machine.
+2. `resetDB` in `settings.json` is removing the DB entries as `Items.remove({})`. It will remove all DB records related to the choosn collection.
