@@ -99,30 +99,32 @@ public class EdifactWriter {
         bgm.setE1004DocumentMessageNumber(invoice.documentNumber);
         invoic.setBGMBeginningOfMessage(bgm);
 
-        ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
+        {
+            ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
 
-        if (invoice.orderDate != null) {
-            DateFormat df = new SimpleDateFormat("yyyyMMdd");
-            DTMDateTimePeriod orderDate = new DTMDateTimePeriod();
-            C507DateTimePeriod orderC507 = new C507DateTimePeriod();
-            orderC507.setE2005DateTimePeriodQualifier("137"); // order date Belegdatum
-            orderC507.setE2380DateTimePeriod(df.format(invoice.orderDate));
-            orderC507.setE2379DateTimePeriodFormatQualifier("102");
-            orderDate.setC507DateTimePeriod(orderC507);
-            dtms.add(orderDate);
-        }
-        if (invoice.deliveryDate != null) {
-            DateFormat df = new SimpleDateFormat("yyyyMMdd");
-            DTMDateTimePeriod orderDate = new DTMDateTimePeriod();
-            C507DateTimePeriod orderC507 = new C507DateTimePeriod();
-            orderC507.setE2005DateTimePeriodQualifier("35"); // delivery date tatsächliches Lieferdatum
-            orderC507.setE2380DateTimePeriod(df.format(invoice.deliveryDate));
-            orderC507.setE2379DateTimePeriodFormatQualifier("102");
-            orderDate.setC507DateTimePeriod(orderC507);
-            dtms.add(orderDate);
-        }
+            if (invoice.orderDate != null) {
+                DateFormat df = new SimpleDateFormat("yyyyMMdd");
+                DTMDateTimePeriod orderDate = new DTMDateTimePeriod();
+                C507DateTimePeriod orderC507 = new C507DateTimePeriod();
+                orderC507.setE2005DateTimePeriodQualifier("137"); // order date Belegdatum
+                orderC507.setE2380DateTimePeriod(df.format(invoice.orderDate));
+                orderC507.setE2379DateTimePeriodFormatQualifier("102");
+                orderDate.setC507DateTimePeriod(orderC507);
+                dtms.add(orderDate);
+            }
+            if (invoice.deliveryDate != null) {
+                DateFormat df = new SimpleDateFormat("yyyyMMdd");
+                DTMDateTimePeriod orderDate = new DTMDateTimePeriod();
+                C507DateTimePeriod orderC507 = new C507DateTimePeriod();
+                orderC507.setE2005DateTimePeriodQualifier("35"); // delivery date tatsächliches Lieferdatum
+                orderC507.setE2380DateTimePeriod(df.format(invoice.deliveryDate));
+                orderC507.setE2379DateTimePeriodFormatQualifier("102");
+                orderDate.setC507DateTimePeriod(orderC507);
+                dtms.add(orderDate);
+            }
 
-        invoic.setDTMDateTimePeriod(dtms);
+            invoic.setDTMDateTimePeriod(dtms);
+        }
 
 //        invoic.setFTXFreeText() // TODO: what to put in free text?
         ArrayList<SegmentGroup1> sg1s = new ArrayList<>();
@@ -232,6 +234,45 @@ public class EdifactWriter {
                 sg3s.add(sg3);
             }
             sg2.setSegmentGroup3(sg3s);
+
+            ArrayList<SegmentGroup5> sg5s = new ArrayList<>();
+            for (ContactDetail cd : p.contactDetails) {
+                SegmentGroup5 sg5 = new SegmentGroup5();
+                CTAContactInformation contactInfo = new CTAContactInformation();
+                C056DepartmentOrEmployeeDetails c056 = new C056DepartmentOrEmployeeDetails();
+                c056.setE3412DepartmentOrEmployee(cd.name);
+                contactInfo.setC056DepartmentOrEmployeeDetails(c056);
+                sg5.setCTAContactInformation(contactInfo);
+                ArrayList<COMCommunicationContact> contacts = new ArrayList<>();
+                if (notNullOrEmpty(cd.phone)) {
+                    COMCommunicationContact contact = new COMCommunicationContact();
+                    C076CommunicationContact c076 = new C076CommunicationContact();
+                    c076.setE3155CommunicationChannelQualifier("TE");
+                    c076.setE3148CommunicationNumber(cd.phone);
+                    contact.setC076CommunicationContact(c076);
+                    contacts.add(contact);
+                }
+                if (notNullOrEmpty(cd.email)) {
+                    COMCommunicationContact contact = new COMCommunicationContact();
+                    C076CommunicationContact c076 = new C076CommunicationContact();
+                    c076.setE3155CommunicationChannelQualifier("EM");
+                    c076.setE3148CommunicationNumber(cd.email);
+                    contact.setC076CommunicationContact(c076);
+                    contacts.add(contact);
+                }
+                if (notNullOrEmpty(cd.fax)) {
+                    COMCommunicationContact contact = new COMCommunicationContact();
+                    C076CommunicationContact c076 = new C076CommunicationContact();
+                    c076.setE3155CommunicationChannelQualifier("FX");
+                    c076.setE3148CommunicationNumber(cd.fax);
+                    contact.setC076CommunicationContact(c076);
+                    contacts.add(contact);
+                }
+                sg5.setCOMCommunicationContact(contacts);
+                sg5s.add(sg5);
+            }
+            sg2.setSegmentGroup5(sg5s);
+
             sg2s.add(sg2);
         }
 
@@ -264,6 +305,58 @@ public class EdifactWriter {
         sg7.setCUXCurrencies(cux);
         sg7s.add(sg7);
         invoic.setSegmentGroup7(sg7s);
+
+        ArrayList<SegmentGroup8> sg8s = new ArrayList<>();
+        SegmentGroup8 sg8 = new SegmentGroup8();
+        PATPaymentTermsBasis patPaymentTermsBasis = new PATPaymentTermsBasis();
+
+        // TODO: need to confirm! Which one to use?
+        // 1 = Basic, Payment conditions normally applied.
+        // 3 = Fixed date
+        patPaymentTermsBasis.setE4279PaymentTermsTypeQualifier("3");
+        sg8.setPATPaymentTermsBasis(patPaymentTermsBasis);
+
+        {
+            DateFormat df = new SimpleDateFormat("yyyyMMdd");
+            ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
+            if (invoice.dateWithDiscount != null) {
+                DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                C507DateTimePeriod c507 = new C507DateTimePeriod();
+                c507.setE2005DateTimePeriodQualifier("12"); // With discount
+                c507.setE2379DateTimePeriodFormatQualifier("102");
+                c507.setE2380DateTimePeriod(df.format(invoice.dateWithDiscount));
+                dtm.setC507DateTimePeriod(c507);
+                dtms.add(dtm);
+            }
+            if (invoice.dateWithoutDiscount != null) {
+                DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                C507DateTimePeriod c507 = new C507DateTimePeriod();
+                c507.setE2005DateTimePeriodQualifier("13"); // Without discount
+                c507.setE2379DateTimePeriodFormatQualifier("102");
+                c507.setE2380DateTimePeriod(df.format(invoice.dateWithoutDiscount));
+                dtm.setC507DateTimePeriod(c507);
+                dtms.add(dtm);
+            }
+            sg8.setDTMDateTimePeriod(dtms);
+        }
+
+        if (invoice.discountPercentage != null) {
+            PCDPercentageDetails pcdPercentageDetails = new PCDPercentageDetails();
+            C501PercentageDetails c501 = new C501PercentageDetails();
+            c501.setE5245PercentageQualifier("12"); // Discount
+            c501.setE5482Percentage(invoice.discountPercentage);
+            pcdPercentageDetails.setC501PercentageDetails(c501);
+            sg8.setPCDPercentageDetails(pcdPercentageDetails);
+        }
+
+        sg8s.add(sg8);
+        invoic.setSegmentGroup8(sg8s);
+
+        {
+            // TODO: What is this, delivery condition?
+            ArrayList<SegmentGroup12> sg12s = new ArrayList<>();
+            invoic.setSegmentGroup12(sg12s);
+        }
 
         factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream));
     }

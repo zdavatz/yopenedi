@@ -1,5 +1,6 @@
 package com.ywesee.java.yopenedi.Edifact;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -16,6 +17,10 @@ public class Invoice {
     public String taxType; // e.g. "VAT"
     public String taxRate; // "19" means 19%;
     public String currencyCode;
+
+    public Date dateWithDiscount;
+    public Date dateWithoutDiscount;
+    public BigDecimal discountPercentage;
 
     public ArrayList<Party> parties = new ArrayList<>();
 
