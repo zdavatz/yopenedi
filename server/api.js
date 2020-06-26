@@ -12,6 +12,7 @@ import {
   WebApp
 } from 'meteor/webapp'
 import bodyParser from 'body-parser'
+import Parse from './parse.edi.js'
 const nodersa = require('node-rsa');
 const fs = require('fs');
 const moment = require('moment');
@@ -76,6 +77,7 @@ Picker.route('/as2', function (params, req, res, next) {
 
   if(req && req.body){
     
+    console.log('REQUEST BODY',req.body)
     var keys = Object.keys(req.body);
     var data = keys[0];
     console.log('data:body',data)
@@ -89,12 +91,11 @@ Picker.route('/as2', function (params, req, res, next) {
       responseData.message = 'Data is ready'
       responseData.length = data.length;
       console.log({responseData})
-
       var filename = setFileName();
       var outputPath = project.edifact_orders_encryped + filename
       fileData.filepath = outputPath;
       fileData.name = filename
-      console.log('Success file upload at:', outputPath)
+      console.log('Success file upload at:', outputPath,data)
       writeFile(outputPath, data)
       res.end(JSON.stringify(responseData));
     }
@@ -129,6 +130,7 @@ Picker.route('/as2', function (params, req, res, next) {
     }
     res.end(JSON.stringify(fileData));
   }
+  //===============================================================
   // -T option
   let body = ''
   req.on('data', Meteor.bindEnvironment((data) => {
@@ -146,7 +148,8 @@ Picker.route('/as2', function (params, req, res, next) {
       var outputPath = project.edifact_orders_encryped + filename
       writeFile(outputPath, doc)
       fileData.filepath = outputPath;
-      fileData.name = filename
+      fileData.name = filename;
+      console.log('-T',{fileData})
       console.log('Success (-T): File is converted')
       res.writeHead(200, {
         'Content-Type': 'application/json'
@@ -159,7 +162,9 @@ Picker.route('/as2', function (params, req, res, next) {
         name:filename,
         size: req.headers["content-length"]
       }
+      convertFile(fileData)
       res.end(JSON.stringify(data));
+      
     } 
 
     // If No DOCUMENT or No File uploaded
@@ -177,13 +182,22 @@ Picker.route('/as2', function (params, req, res, next) {
     }
   })
   // Convert the File and Run XML Validation Check.
-  convertFile(fileData)
+
+
+  if((req.files && req.files.length > 0 ) || (req && req.body && JSON.stringify(req.body).length > 200) ){
+    convertFile(fileData)
+  }
+ 
+
 })
 /* -------------------------------------------------------------------------- */
 
 function convertFile(fileData){
   console.log('Converting the file: (convertFile)',JSON.stringify(fileData))
-  project.ediToXML(fileData) 
+  var doc = fs.readFileSync(fileData.filepath, 'utf8');
+  var xml = Parse.renderEDI(doc)
+  console.log({doc,xml})
+  // project.ediToXML(fileData) 
 }
 
 

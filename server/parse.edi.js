@@ -690,6 +690,7 @@ function jsonToXML(jsonArr, jsonData) {
 parse = {}
 parse.renderEDI = function (doc) {
     //
+    // console.log({doc})
     if(doc.substring(0,3) !== "UNA"){
         console.error("The Document is not valid Edifact file","renderEDI")
         return
