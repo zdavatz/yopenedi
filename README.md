@@ -101,5 +101,5 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
 ```
 1. `meteor reset` removes all sqlite files and recreates an empty DB, which is not friendly at all if you have files bigger then 100MB on a slow testing machine.
 2. `resetDB` in `settings.json` is removing the DB entries as `Items.remove({})`. It will remove all DB records related to the choosen collection.
-3. `checkEmail` disable/ enable IMAP polling, checkEmail cronjob is running every 5 mins.
-4. `isDev` handy in development process
+3. `checkEmail` disable/enable IMAP polling, every 5 minutes.
+4. `isDev` is for developers.
