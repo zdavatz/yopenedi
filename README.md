@@ -75,5 +75,5 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
         }
     }
 ```
-1. `meteor reset` removes all sqlite files and recreates an empty DB, which is not friendly at all if u have files bigger then 100mb on a slow testing machine.
+1. `meteor reset` removes all sqlite files and recreates an empty DB, which is not friendly at all if you have files bigger then 100MB on a slow testing machine.
 2. `resetDB` in `settings.json` is removing the DB entries as `Items.remove({})`. It will remove all DB records related to the choosn collection.
