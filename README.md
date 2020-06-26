@@ -87,6 +87,8 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
     "public":{
     },
     "private":{
+        "isDev":false,
+        "checkEmail":false,
         "resetDB":false,
         "imap":{
             "username":"user@domain.com",
@@ -100,3 +102,4 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
 1. `meteor reset` removes all sqlite files and recreates an empty DB, which is not friendly at all if you have files bigger then 100MB on a slow testing machine.
 2. `resetDB` in `settings.json` is removing the DB entries as `Items.remove({})`. It will remove all DB records related to the choosen collection.
 3. `checkEmail` disable/ enable IMAP polling
+4. `isDev` handy in development process
