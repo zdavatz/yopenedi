@@ -8,6 +8,10 @@ const Imap = require("imap")
 inspect = require('util').inspect;
 import './collections.js'
 import './io.js'
+
+const settings = Meteor.settings;
+
+
 var {
   Base64Decode
 } = require('base64-stream');
@@ -27,7 +31,7 @@ const {
 /* -------------------------------------------------------------------------- */
 App = {}
 /* -------------------------------------------------------------------------- */
-var settings = Meteor.settings
+
 if (!settings || !settings.private || !settings.private.imap) {
   throw new Meteor.Error('setting-err', 'Setting file is not loaded')
 } else {
@@ -199,8 +203,12 @@ function runCmd(cmd) {
   }
 }
 /* -------------------------------------------------------------------------- */
+/* -------------------------------------------------------------------------- */
 
-getMail()
+if (settings && settings.private.isDev) {
+  getMail()
+}
+
 
 module.exports = getMail;
 // return

@@ -40,6 +40,28 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
 * `curl https://install.meteor.com/ | sh`
 * `meteor npm i`
 * `meteor --settings settings.json`
+
+### settings
+
+1. "resetDB": true, remove all records from the database. It requires to change the value after the first reset run into, "resetDB": false.
+2. "imap": imap connection configuration.
+
+```json
+{
+    "public":{
+    },
+    "private":{
+        "resetDB":false,
+        "imap":{
+            "username":"email",
+            "password":"pass",
+            "host": "imap locatio.....",
+            "post": "port",
+            "secure": true
+        }
+    }
+}
+```
 ### Apache setup
 ```
 <VirtualHost *:80>
