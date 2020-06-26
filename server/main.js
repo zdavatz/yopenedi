@@ -4,8 +4,9 @@ import {
 import _ from 'lodash'
 import './collections.js'
 import './api.js'
-import './email.js'
 import './cron.js'
+
+import './parse.edi.js'
 const settings = Meteor.settings;
 
 /* -------------------------------------------------------------------------- */

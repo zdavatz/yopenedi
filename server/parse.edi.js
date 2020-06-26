@@ -7,7 +7,12 @@ const fs = require('fs');
 const path = require('path');
 const _ = require('lodash');
 import moment from 'moment';
-import './grammar.js'
+import './io.js';
+import './grammar.js';
+/* -------------------------------------------------------------------------- */
+
+console.log('Converter {init}')
+
 /* -------------------------------------------------------------------------- */
 parseEDI = {}
 parseEDI.regex = {
@@ -31,8 +36,8 @@ var dataToReplace = [{
     }
 ]
 /* -------------------------------------------------------------------------- */
-// var fileName = 'noname_order_sample_from_REXEL_03062020'
-// var doc = Assets.getText(fileName)
+var fileName = 'edi_unsportedTags'
+var testDoc = Assets.getText(fileName)
 /* -------------------------------------------------------------------------- */
 // Render JSON structured Data */
 // ediData JSON collection
@@ -94,7 +99,7 @@ function setEnclosedTags(arr, tag, enclosed) {
 }
 /* -------------------------------------------------------------------------- */
 
-Number.prototype.format = function(n, x) {
+Number.prototype.format = function (n, x) {
     var re = '\\d(?=(\\d{' + (x || 3) + '})+' + (n > 0 ? '\\.' : '$') + ')';
     return this.toFixed(Math.max(0, ~~n)).replace(new RegExp(re, 'g'), '$&,');
 };
@@ -128,8 +133,8 @@ function generatePriceLineAmount(arr, ediData) {
                     })
                     price = find['PRICE']
 
-                    var geUnit = _.find(data,(o)=>{
-                        if(o["UNIT"]){
+                    var geUnit = _.find(data, (o) => {
+                        if (o["UNIT"]) {
                             return o["UNIT"]
                         }
                     })
@@ -139,7 +144,7 @@ function generatePriceLineAmount(arr, ediData) {
                 }
             })
             if (qty && price) {
-                priceLinePrice = ((qty * parseFloat(price)).toFixed(2)) / unit ;
+                priceLinePrice = ((qty * parseFloat(price)).toFixed(2)) / unit;
                 // priceLinePrice = priceLinePrice
                 var newTag = {
                     name: "PRICE_LINE_AMOUNT",
@@ -230,6 +235,13 @@ function generateStructuredArr(jsonData) {
     var looped = ["LIN", "NAD"] //
     // var skipRendering = ["RFF", ""]
     _.each(tags, (tag, index) => {
+
+        // Skip upsported tags
+        if (!_.includes(supportedTags(), tag)) {
+            console.error(`The tag ${tag} is not supported`)
+            return
+        }
+        //
         var prev = tag;
         var line = ediData[index]["line"].substring(4, 100)
         var i = index;
@@ -346,7 +358,7 @@ function getSegment(line) {
         [],
         []
     ]
-    if(!segs || !segs.length){
+    if (!segs || !segs.length) {
         console.error('File Parsing Skipped, The File is not Edifact file')
         return
     }
@@ -428,11 +440,14 @@ function getXMLElement(index, ediData) {
     var data = dataElem.matchedData
     if (!data) {
         return
-    }//
+    } //
     if (dataElem.exe) {
 
-        var options = {next: ediData[index + 1], prev: ediData[index - 1]};
-        var line = dataElem.exe(data,options)
+        var options = {
+            next: ediData[index + 1],
+            prev: ediData[index - 1]
+        };
+        var line = dataElem.exe(data, options)
 
     }
     // Looping and replacing $DATA_ELEMENTS
@@ -552,7 +567,7 @@ function jsonToXML(jsonArr, jsonData) {
     xml.push('<ORDER_INFO>')
 
     // RFF TAG
-   var rffTag = [];
+    var rffTag = [];
     _.each(jsonArr, (jsonElem) => {
         var tag = jsonElem.tag;
         // console.log('Processing:', tag)
@@ -611,7 +626,7 @@ function jsonToXML(jsonArr, jsonData) {
                 xml.push("<" + getGrammar(tag, 'tag') + ">")
             }
             return
-        }//
+        } //
         /* -------------------------------------------------------------------------- */
         // IF HAS CHILDREN
         if (jsonElem.children) {
@@ -627,7 +642,7 @@ function jsonToXML(jsonArr, jsonData) {
                     // SETTING CACULATED DATA: (PRICE_LINE_AMOUNT)
                     // RFF TAG
                     if (child.tag == "RFF") {
-                        
+
                         rffTag.push(getXMLElement(child.index, ediData))
                         // console.log('++++++++++++++++++ RFF',rffTag)
                         return
@@ -675,6 +690,17 @@ function jsonToXML(jsonArr, jsonData) {
     return xml;
 }
 /* -------------------------------------------------------------------------- */
+
+function supportedTags() {
+    var supportedTags = _.map(Grammar, (o) => {
+        return o.name
+    })
+    return supportedTags
+}
+
+
+
+/* -------------------------------------------------------------------------- */
 // Render edi to a file**
 // Input File Data 
 // Output XML 
@@ -689,19 +715,23 @@ function jsonToXML(jsonArr, jsonData) {
 // renderEDI(doc)
 parse = {}
 parse.renderEDI = function (doc) {
- 
     console.log("Reandering the EDIFact File into OpenTrans XML")
-    if(doc.substring(0,3) !== "UNA"){
-        console.error("The Document is not valid Edifact file","renderEDI")
+    if (doc.substring(0, 3) !== "UNA") {
+        console.error("The Document is not valid Edifact file", "renderEDI")
         return
     }
-    //
     var json = renderStructuredData(doc)
     var processedJSON = generateStructuredArr(json)
-    // console.log({processedJSON})
     var xml = jsonToXML(processedJSON, json)
     var xml = replaceTags(xml)
-    // console.log(xml)
+    // console.log({xml})
     return xml;
 }
+/* -------------------------------------------------------------------------- */
+// Edifact TEST
+// var testXML = parse.renderEDI(testDoc)
+// project.writeFile(project.opentrans_orders + 'upsported_xml.xml', testXML)
+
+/* -------------------------------------------------------------------------- */
+
 module.exports = parse
