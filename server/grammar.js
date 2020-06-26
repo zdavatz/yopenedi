@@ -208,15 +208,19 @@ Grammar = [{
         cases: ["type"],
         "EM": `<bmecat:EMAILS>CONTACT</bmecat:EMAILS>`,
         "TE": `<bmecat:PHONE>CONTACT</bmecat:PHONE>`, //
+        "FX": `<bmecat:FAX>CONTACT</bmecat:FAX>`,
         exe: function (data, options) {
             var line;
             var start = "";
             var close = "";
             var next = options.next.key
             var prev = options.prev.key
-            if (_.includes(['CTA'], prev) && _.includes(['CTA'], next)) {
+
+            if(_.includes(['CTA'], prev)){
                 var start = '<ADDRESS> '
             }
+
+            
             if (_.includes(['NAD'], next)) {
                 var close = '</ADDRESS>'
             }
