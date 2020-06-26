@@ -8,7 +8,7 @@ const settings = Meteor.settings;
 /* -------------------------------------------------------------------------- */
 
 if (settings.private.checkEmail) {
-  console.log('Email Check is disabled....')
+  console.log('Email Check is enabled....')
   console.log('Check Messages every 5 mins...')
   SyncedCron.add({
     name: 'Checking Messages Cron......',
