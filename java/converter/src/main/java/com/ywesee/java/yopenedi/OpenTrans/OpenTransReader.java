@@ -161,8 +161,36 @@ public class OpenTransReader {
         }
     }
 
-    void processContactDetail(Party party, XMLEventReader er, StartElement se) throws XMLStreamException {
+    void processContactDetail(Party party, XMLEventReader er, StartElement _se) throws XMLStreamException {
+        ContactDetail cd = new ContactDetail();
+        party.contactDetails.add(cd);
 
+        while(er.hasNext()) {
+            XMLEvent event = er.nextEvent();
+
+            if (event.isStartElement()) {
+                StartElement se = event.asStartElement();
+                String name = se.getName().getLocalPart();
+                if (name.equals("CONTACT_NAME")) {
+                    cd.name = nextStringOrNull(er);
+                } else if (name.equals("FIRST_NAME")) {
+                    cd.firstName = nextStringOrNull(er);
+                } else if (name.equals("PHONE")) {
+                    cd.phone = nextStringOrNull(er);
+                } else if (name.equals("FAX")) {
+                    cd.fax = nextStringOrNull(er);
+                } else if (name.equals("EMAILS")) {
+                    cd.email = nextStringOrNull(er);
+                }
+            }
+            if (event.isEndElement()) {
+                EndElement ee = event.asEndElement();
+                String name = ee.getName().getLocalPart();
+                if (name.equals("CONTACT_DETAILS")) {
+                    break;
+                }
+            }
+        }
     }
     void processInvoiceItemList(Invoice invoice, XMLEventReader er, StartElement se) throws XMLStreamException {
 
