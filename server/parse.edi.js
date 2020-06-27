@@ -36,8 +36,7 @@ var dataToReplace = [{
     }
 ]
 /* -------------------------------------------------------------------------- */
-var fileName = 'edi_unsportedTags'
-var testDoc = Assets.getText(fileName)
+
 /* -------------------------------------------------------------------------- */
 // Render JSON structured Data */
 // ediData JSON collection
@@ -323,7 +322,9 @@ function generateStructuredArr(jsonData) {
         }
     })
     // Inject enclose tags looped
-    var arr = setEnclosedTags(structuredArr, "NAD", "PARTIES");
+    //
+    var arr = structuredArr;
+    var arr = setEnclosedTags(arr, "NAD", "PARTIES");
     var arr = setEnclosedTags(arr, "LIN", "PRODUCTS");
     var arr = generatePriceLineAmount(arr, ediData);
     // ORDER >>>>>>>>
@@ -402,6 +403,7 @@ function getSegment(line) {
         matchedData
     }
     var out = _.assign(out, grammar)
+    console.log({out})
     return out;
 }
 /* -------------------------------------------------------------------------- */
@@ -687,6 +689,7 @@ function jsonToXML(jsonArr, jsonData) {
     xml.push('</ORDER>')
     xml.push('')
     var xml = xml.join("")
+    var xml = xmlCleanNullTags(xml)
     return xml;
 }
 /* -------------------------------------------------------------------------- */
@@ -696,6 +699,13 @@ function supportedTags() {
         return o.name
     })
     return supportedTags
+}
+
+/* -------------------------------------------------------------------------- */
+
+function xmlCleanNullTags(xml){
+    var xml = xml.replace(/<[^/>][^>]*><\/[^>]+>/gim, "");
+    return xml;
 }
 
 
@@ -729,6 +739,10 @@ parse.renderEDI = function (doc) {
 }
 /* -------------------------------------------------------------------------- */
 // Edifact TEST
+// var fileName = 'edi_unsportedTags'
+// // var fileName = "43_"
+// //
+// var testDoc = Assets.getText(fileName)
 // var testXML = parse.renderEDI(testDoc)
 // project.writeFile(project.opentrans_orders + 'upsported_xml.xml', testXML)
 

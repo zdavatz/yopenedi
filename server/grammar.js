@@ -145,10 +145,9 @@ Grammar = [{
     <PARTY_ROLE>ROLE</PARTY_ROLE>
     <bmecat:PARTY_ID type="supplier_specific">CODE</bmecat:PARTY_ID>`,
         render: `
-    <PARTY>
     <PARTY_ID type="iln">ID</PARTY_ID>
     <PARTY_ROLE>ROLE</PARTY_ROLE>
-    </PARTY>`,
+    `,
         match: [
             ["", "ROLE"],
             ["ID", "", "CODE"]
@@ -169,7 +168,10 @@ Grammar = [{
             var code = getData('ROLE', data);
             if (code && code['ROLE']) {
                 var line = this[code['ROLE']]
-                return line
+                if(line){
+                    return line
+                }
+                
             }
         },
         "parent": "",
@@ -185,7 +187,7 @@ Grammar = [{
     <DEPCODE_NAME>CODENAME</DEPCODE_NAME>
     <PERSON>PERSONDEP</PERSON>
     </COMMUNICATION_INFORMATION>`,
-        render: ``,
+        render: `<ADDRESS>`,
         match: [
             ["", "FUNCTIONCODE", "DEP"],
             ["CODENAME", "PERSONDEP", "type"]
@@ -216,9 +218,9 @@ Grammar = [{
             var next = options.next.key
             var prev = options.prev.key
 
-            if(_.includes(['CTA'], prev)){
-                var start = '<ADDRESS> '
-            }
+            // if(_.includes(['CTA'], prev)){
+            //     var start = '<ADDRESS> '
+            // }
 
             
             if (_.includes(['NAD'], next)) {

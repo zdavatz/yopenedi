@@ -31,8 +31,6 @@ import './edi.js';
 import './io.js'
 /* -------------------------------------------------------------------------- */
 const settings = Meteor.settings;
-// Setting Private Key.
-// const privateKey = fs.readFileSync(settings.private.private_key, 'utf8');
 /* -------------------------------------------------------------------------- */
 const AccessControlAllowOrigin = (req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*')
@@ -119,7 +117,7 @@ Picker.route('/as2', function (params, req, res, next) {
     }
     res.end(JSON.stringify(fileData));
   }
-  //===============================================================
+  //===============================================================//
   // -T option
   let body = ''
   req.on('data', Meteor.bindEnvironment((data) => {

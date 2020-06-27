@@ -11,3 +11,4 @@ opentrans_orders/*
 edifact_orders/*
 edifact_orders_done/*
 edifact_orders_encryped/*
+private/*
