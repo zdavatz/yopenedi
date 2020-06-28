@@ -403,7 +403,7 @@ function getSegment(line) {
         matchedData
     }
     var out = _.assign(out, grammar)
-    console.log({out})
+    // console.log({out})
     return out;
 }
 /* -------------------------------------------------------------------------- */
@@ -556,7 +556,7 @@ function jsonToXML(jsonArr, jsonData) {
     var skip = ["UNT", "UNE", "UNZ"]
     var xml = []
     var struc = []
-    xml.push('<?xml version="1.0" encoding="utf-8" standalone="yes"?>')
+    // xml.push('<?xml version="1.0" encoding="utf-8" standalone="yes"?>')
     xml.push('<ORDER type="standard" xmlns="http://www.opentrans.org/XMLSchema/2.1" xmlns:bmecat="http://www.bmecat.org/bmecat/2005" version="2.1">')
     // ORDER_HEADER
     xml.push('<ORDER_HEADER>')
@@ -690,6 +690,8 @@ function jsonToXML(jsonArr, jsonData) {
     xml.push('')
     var xml = xml.join("")
     var xml = xmlCleanNullTags(xml)
+    var xml = xmlCleanSpecialChar(xml);
+    var xml = xmlSetHeader(xml)
     return xml;
 }
 /* -------------------------------------------------------------------------- */
@@ -708,7 +710,19 @@ function xmlCleanNullTags(xml){
     return xml;
 }
 
+/* -------------------------------------------------------------------------- */
 
+function xmlCleanSpecialChar(xml){
+    var xml = xml.replace(/\?/g, '');
+    return xml;
+}
+
+/* -------------------------------------------------------------------------- */
+
+function xmlSetHeader(xml){
+    var xml = '<?xml version="1.0" encoding="utf-8" standalone="yes"?>' + xml;
+    return xml;
+}
 
 /* -------------------------------------------------------------------------- */
 // Render edi to a file**
@@ -744,7 +758,7 @@ parse.renderEDI = function (doc) {
 // //
 // var testDoc = Assets.getText(fileName)
 // var testXML = parse.renderEDI(testDoc)
-// project.writeFile(project.opentrans_orders + 'upsported_xml.xml', testXML)
+// project.writeFile(project.opentrans_orders + 'skippedtags_edi.xml', testXML)
 
 /* -------------------------------------------------------------------------- */
 
