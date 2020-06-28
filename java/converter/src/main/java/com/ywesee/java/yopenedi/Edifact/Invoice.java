@@ -23,6 +23,7 @@ public class Invoice {
     public BigDecimal discountPercentage;
 
     public ArrayList<Party> parties = new ArrayList<>();
+    public ArrayList<InvoiceItem> invoiceItems = new ArrayList<>();
 
     public Party getSender() {
         for (Party p : this.parties) {

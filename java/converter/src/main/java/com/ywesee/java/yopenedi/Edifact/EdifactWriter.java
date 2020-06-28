@@ -277,22 +277,23 @@ public class EdifactWriter {
         }
 
         invoic.setSegmentGroup2(sg2s);
-
-        ArrayList<SegmentGroup6> sg6s = new ArrayList<>();
-        SegmentGroup6 sg6 = new SegmentGroup6();
-        TAXDutyTaxFeeDetails taxDetails = new TAXDutyTaxFeeDetails();
-        taxDetails.setE5283DutyTaxFeeFunctionQualifier("7"); // tax
-        C241DutyTaxFeeType c241 = new C241DutyTaxFeeType();
-        // TODO: need an enum for the list of codes?
-        // http://www.stylusstudio.com/edifact/D96A/5153.htm
-        c241.setE5153DutyTaxFeeTypeCoded(invoice.taxType);
-        taxDetails.setC241DutyTaxFeeType(c241);
-        C243DutyTaxFeeDetail c243 = new C243DutyTaxFeeDetail();
-        c243.setE5278DutyTaxFeeRate(invoice.taxRate);
-        taxDetails.setC243DutyTaxFeeDetail(c243);
-        sg6.setTAXDutyTaxFeeDetails(taxDetails);
-        sg6s.add(sg6);
-        invoic.setSegmentGroup6(sg6s);
+        {
+            ArrayList<SegmentGroup6> sg6s = new ArrayList<>();
+            SegmentGroup6 sg6 = new SegmentGroup6();
+            TAXDutyTaxFeeDetails taxDetails = new TAXDutyTaxFeeDetails();
+            taxDetails.setE5283DutyTaxFeeFunctionQualifier("7"); // tax
+            C241DutyTaxFeeType c241 = new C241DutyTaxFeeType();
+            // TODO: need an enum for the list of codes?
+            // http://www.stylusstudio.com/edifact/D96A/5153.htm
+            c241.setE5153DutyTaxFeeTypeCoded(invoice.taxType);
+            taxDetails.setC241DutyTaxFeeType(c241);
+            C243DutyTaxFeeDetail c243 = new C243DutyTaxFeeDetail();
+            c243.setE5278DutyTaxFeeRate(invoice.taxRate);
+            taxDetails.setC243DutyTaxFeeDetail(c243);
+            sg6.setTAXDutyTaxFeeDetails(taxDetails);
+            sg6s.add(sg6);
+            invoic.setSegmentGroup6(sg6s);
+        }
 
         ArrayList<SegmentGroup7> sg7s = new ArrayList<>();
         SegmentGroup7 sg7 = new SegmentGroup7();
@@ -357,6 +358,245 @@ public class EdifactWriter {
             ArrayList<SegmentGroup12> sg12s = new ArrayList<>();
             invoic.setSegmentGroup12(sg12s);
         }
+
+        ArrayList<SegmentGroup25> sg25s = new ArrayList<>();
+        for (InvoiceItem ii : invoice.invoiceItems) {
+            SegmentGroup25 sg25 = new SegmentGroup25();
+            sg25s.add(sg25);
+            {
+                LINLineItem lineItem = new LINLineItem();
+                lineItem.setE1082LineItemNumber(ii.lineItemId);
+                C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
+                c212.setE7140ItemNumber(ii.ean);
+                c212.setE7143ItemNumberTypeCoded("EN");
+                lineItem.setC212ItemNumberIdentification(c212);
+                sg25.setLINLineItem(lineItem);
+            }
+
+            ArrayList<PIAAdditionalProductId> pias = new ArrayList<>();
+            if (notNullOrEmpty(ii.supplierSpecificProductId)) {
+                PIAAdditionalProductId pia = new PIAAdditionalProductId();
+                pia.setE4347ProductIdFunctionQualifier("1");
+                C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
+                c212.setE7140ItemNumber(ii.supplierSpecificProductId);
+                c212.setE7143ItemNumberTypeCoded("SA");
+                pia.setC2121ItemNumberIdentification(c212);
+                pias.add(pia);
+            }
+            if (notNullOrEmpty(ii.buyerSpecificProductId)) {
+                PIAAdditionalProductId pia = new PIAAdditionalProductId();
+                pia.setE4347ProductIdFunctionQualifier("1");
+                C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
+                c212.setE7140ItemNumber(ii.buyerSpecificProductId);
+                c212.setE7143ItemNumberTypeCoded("BP");
+                pia.setC2121ItemNumberIdentification(c212);
+                pias.add(pia);
+            }
+            sg25.setPIAAdditionalProductId(pias);
+
+            ArrayList<IMDItemDescription> imds = new ArrayList<>();
+            if (notNullOrEmpty(ii.shortDescription)) {
+                IMDItemDescription imd = new IMDItemDescription();
+                imd.setE7077ItemDescriptionTypeCoded("F");
+                C273ItemDescription c273 = new C273ItemDescription();
+                ArrayList<String> parts = splitStringIntoParts(ii.shortDescription, 35, 2);
+                c273.setE70081ItemDescription(getIndexOrNull(parts, 0));
+                c273.setE70082ItemDescription(getIndexOrNull(parts, 1));
+                imd.setC273ItemDescription(c273);
+            }
+            if (notNullOrEmpty(ii.longDescription)) {
+                IMDItemDescription imd = new IMDItemDescription();
+                imd.setE7077ItemDescriptionTypeCoded("F");
+                C273ItemDescription c273 = new C273ItemDescription();
+                ArrayList<String> parts = splitStringIntoParts(ii.longDescription, 35, 2);
+                c273.setE70081ItemDescription(getIndexOrNull(parts, 0));
+                c273.setE70082ItemDescription(getIndexOrNull(parts, 1));
+                imd.setC273ItemDescription(c273);
+            }
+            sg25.setIMDItemDescription(imds);
+
+            ArrayList<MEAMeasurements> meas = new ArrayList<>();
+            if (ii.volume != null) {
+                MEAMeasurements mea = new MEAMeasurements();
+                mea.setE6311MeasurementApplicationQualifier("PD");
+                C502MeasurementDetails c502 = new C502MeasurementDetails();
+                c502.setE6313MeasurementDimensionCoded("ABJ");
+                mea.setC502MeasurementDetails(c502);
+                C174ValueRange c174 = new C174ValueRange();
+                // https://www.unece.org/fileadmin/DAM/cefact/recommendations/rec20/rec20_rev3_Annex3e.pdf
+                c174.setE6411MeasureUnitQualifier("MTQ"); // cubic metre
+                c174.setE6314MeasurementValue(ii.volume);
+                mea.setC174ValueRange(c174);
+                meas.add(mea);
+            }
+            if (ii.weight != null) {
+                MEAMeasurements mea = new MEAMeasurements();
+                mea.setE6311MeasurementApplicationQualifier("PD");
+                C502MeasurementDetails c502 = new C502MeasurementDetails();
+                c502.setE6313MeasurementDimensionCoded("WT");
+                mea.setC502MeasurementDetails(c502);
+                C174ValueRange c174 = new C174ValueRange();
+                // https://www.unece.org/fileadmin/DAM/cefact/recommendations/rec20/rec20_rev3_Annex3e.pdf
+                c174.setE6411MeasureUnitQualifier("KGM"); // KG
+                c174.setE6314MeasurementValue(ii.weight);
+                mea.setC174ValueRange(c174);
+                meas.add(mea);
+            }
+            if (ii.length != null) {
+                MEAMeasurements mea = new MEAMeasurements();
+                mea.setE6311MeasurementApplicationQualifier("PD");
+                C502MeasurementDetails c502 = new C502MeasurementDetails();
+                c502.setE6313MeasurementDimensionCoded("LN");
+                mea.setC502MeasurementDetails(c502);
+                C174ValueRange c174 = new C174ValueRange();
+                // https://www.unece.org/fileadmin/DAM/cefact/recommendations/rec20/rec20_rev3_Annex3e.pdf
+                c174.setE6411MeasureUnitQualifier("MTR"); // Metre
+                c174.setE6314MeasurementValue(ii.length);
+                mea.setC174ValueRange(c174);
+                meas.add(mea);
+            }
+            if (ii.width != null) {
+                MEAMeasurements mea = new MEAMeasurements();
+                mea.setE6311MeasurementApplicationQualifier("PD");
+                C502MeasurementDetails c502 = new C502MeasurementDetails();
+                c502.setE6313MeasurementDimensionCoded("WD");
+                mea.setC502MeasurementDetails(c502);
+                C174ValueRange c174 = new C174ValueRange();
+                // https://www.unece.org/fileadmin/DAM/cefact/recommendations/rec20/rec20_rev3_Annex3e.pdf
+                c174.setE6411MeasureUnitQualifier("MTR"); // Metre
+                c174.setE6314MeasurementValue(ii.width);
+                mea.setC174ValueRange(c174);
+                meas.add(mea);
+            }
+            if (ii.depth != null) {
+                MEAMeasurements mea = new MEAMeasurements();
+                mea.setE6311MeasurementApplicationQualifier("PD");
+                C502MeasurementDetails c502 = new C502MeasurementDetails();
+                c502.setE6313MeasurementDimensionCoded("DP");
+                mea.setC502MeasurementDetails(c502);
+                C174ValueRange c174 = new C174ValueRange();
+                // https://www.unece.org/fileadmin/DAM/cefact/recommendations/rec20/rec20_rev3_Annex3e.pdf
+                c174.setE6411MeasureUnitQualifier("MTR"); // Metre
+                c174.setE6314MeasurementValue(ii.depth);
+                mea.setC174ValueRange(c174);
+                meas.add(mea);
+            }
+            sg25.setMEAMeasurements(meas);
+
+            {
+                ArrayList<QTYQuantity> qtys = new ArrayList<>();
+                QTYQuantity qty = new QTYQuantity();
+                qtys.add(qty);
+                C186QuantityDetails c186 = new C186QuantityDetails();
+                c186.setE6063QuantityQualifier("47");
+                c186.setE6060Quantity(ii.quantity);
+                qty.setC186QuantityDetails(c186);
+                sg25.setQTYQuantity(qtys);
+            }
+
+            if (notNullOrEmpty(ii.countryOfOriginCoded)) {
+                ArrayList<ALIAdditionalInformation> alis = new ArrayList<>();
+                ALIAdditionalInformation ali = new ALIAdditionalInformation();
+                ali.setE3239CountryOfOriginCoded(ii.countryOfOriginCoded);
+                alis.add(ali);
+                sg25.setALIAdditionalInformation(alis);
+            }
+            {
+                DateFormat df = new SimpleDateFormat("yyyyMMdd");
+                ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
+                DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                C507DateTimePeriod c507 = new C507DateTimePeriod();
+                c507.setE2005DateTimePeriodQualifier("37");
+                c507.setE2379DateTimePeriodFormatQualifier("102");
+                c507.setE2380DateTimePeriod(df.format(ii.deliveryDate));
+                dtm.setC507DateTimePeriod(c507);
+                dtms.add(dtm);
+                sg25.setDTMDateTimePeriod(dtms);
+            }
+
+            {
+                ArrayList<SegmentGroup28> sg28s = new ArrayList<>();
+                SegmentGroup28 sg28 = new SegmentGroup28();
+                PRIPriceDetails pri = new PRIPriceDetails();
+                C509PriceInformation c509 = new C509PriceInformation();
+                c509.setE5125PriceQualifier("AAB");
+                c509.setE5118Price(ii.price);
+                c509.setE5284UnitPriceBasis(ii.priceQuantity);
+                pri.setC509PriceInformation(c509);
+                sg28.setPRIPriceDetails(pri);
+                sg28s.add(sg28);
+                sg25.setSegmentGroup28(sg28s);
+            }
+
+            {
+                ArrayList<SegmentGroup29> sg29s = new ArrayList<>();
+                if (notNullOrEmpty(ii.supplierOrderId)) {
+                    SegmentGroup29 sg29 = new SegmentGroup29();
+                    RFFReference rff = new RFFReference();
+                    C506Reference c506 = new C506Reference();
+                    c506.setE1153ReferenceQualifier("VN");
+                    c506.setE1154ReferenceNumber(ii.supplierOrderId);
+                    if (notNullOrEmpty(ii.supplierOrderItemId)) {
+                        c506.setE1156LineNumber(ii.supplierOrderItemId);
+                    }
+                    rff.setC506Reference(c506);
+                    sg29.setRFFReference(rff);
+                    sg29s.add(sg29);
+                }
+                if (notNullOrEmpty(ii.buyerOrderId)) {
+                    SegmentGroup29 sg29 = new SegmentGroup29();
+                    RFFReference rff = new RFFReference();
+                    C506Reference c506 = new C506Reference();
+                    c506.setE1153ReferenceQualifier("ON");
+                    c506.setE1154ReferenceNumber(ii.buyerOrderId);
+                    if (notNullOrEmpty(ii.buyerOrderItemId)) {
+                        c506.setE1156LineNumber(ii.buyerOrderItemId);
+                    }
+                    rff.setC506Reference(c506);
+                    sg29.setRFFReference(rff);
+                    sg29s.add(sg29);
+                }
+                if (notNullOrEmpty(ii.deliveryOrderId)) {
+                    SegmentGroup29 sg29 = new SegmentGroup29();
+                    RFFReference rff = new RFFReference();
+                    C506Reference c506 = new C506Reference();
+                    c506.setE1153ReferenceQualifier("DQ");
+                    c506.setE1154ReferenceNumber(ii.deliveryOrderId);
+                    if (notNullOrEmpty(ii.deliveryOrderItemId)) {
+                        c506.setE1156LineNumber(ii.deliveryOrderItemId);
+                    }
+                    rff.setC506Reference(c506);
+                    sg29.setRFFReference(rff);
+                    sg29s.add(sg29);
+                }
+                sg25.setSegmentGroup29(sg29s);
+            }
+
+            {
+                ArrayList<SegmentGroup33> sg33s = new ArrayList<>();
+                SegmentGroup33 sg33 = new SegmentGroup33();
+                TAXDutyTaxFeeDetails tax = new TAXDutyTaxFeeDetails();
+                tax.setE5283DutyTaxFeeFunctionQualifier("7");
+                C241DutyTaxFeeType c241 = new C241DutyTaxFeeType();
+                c241.setE5153DutyTaxFeeTypeCoded(ii.taxType);
+                tax.setC241DutyTaxFeeType(c241);
+                C243DutyTaxFeeDetail c243 = new C243DutyTaxFeeDetail();
+                c243.setE5278DutyTaxFeeRate(ii.taxRate);
+                tax.setC243DutyTaxFeeDetail(c243);
+                sg33.setTAXDutyTaxFeeDetails(tax);
+                MOAMonetaryAmount moa = new MOAMonetaryAmount();
+                C516MonetaryAmount c516 = new C516MonetaryAmount();
+                c516.setE5025MonetaryAmountTypeQualifier("124");
+                if (ii.taxAmount != null) {
+                    c516.setE5004MonetaryAmount(ii.taxAmount);
+                }
+                moa.setC516MonetaryAmount(c516);
+                sg33.setMOAMonetaryAmount(moa);
+                sg33s.add(sg33);
+                sg25.setSegmentGroup33(sg33s);
+            }
+        }
+        invoic.setSegmentGroup25(sg25s);
 
         factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream));
     }
