@@ -595,8 +595,94 @@ public class EdifactWriter {
                 sg33s.add(sg33);
                 sg25.setSegmentGroup33(sg33s);
             }
+
+            {
+                ArrayList<SegmentGroup38> sg38s = new ArrayList<>();
+                for (AllowanceOrCharge aoc : ii.allowanceOrCharges) {
+                    SegmentGroup38 sg38 = new SegmentGroup38();
+                    sg38s.add(sg38);
+                    ALCAllowanceOrCharge alc = new ALCAllowanceOrCharge();
+                    switch (aoc.type) {
+                        case Charge:
+                            alc.setE5463AllowanceOrChargeQualifier("C");
+                        case Allowance:
+                            alc.setE5463AllowanceOrChargeQualifier("A");
+                    }
+                    if (notNullOrEmpty(aoc.name)) {
+                        C552AllowanceChargeInformation c552 = new C552AllowanceChargeInformation();
+                        c552.setE5189ChargeAllowanceDescriptionCoded(aoc.name);
+                        alc.setC552AllowanceChargeInformation(c552);
+                    }
+                    if (notNullOrEmpty(aoc.sequence)) {
+                        alc.setE1227CalculationSequenceIndicatorCoded(aoc.sequence);
+                    }
+                    C214SpecialServicesIdentification c214 = new C214SpecialServicesIdentification();
+                    // TODO: What should we put here?
+                    //c214.setE7161SpecialServicesCoded()
+                    alc.setC214SpecialServicesIdentification(c214);
+
+                    if (aoc.percentage != null) {
+                        SegmentGroup40 sg40 = new SegmentGroup40();
+                        PCDPercentageDetails pcd = new PCDPercentageDetails();
+                        C501PercentageDetails c501 = new C501PercentageDetails();
+                        c501.setE5245PercentageQualifier("3");
+                        c501.setE5482Percentage(aoc.percentage);
+                        pcd.setC501PercentageDetails(c501);
+                        sg40.setPCDPercentageDetails(pcd);
+                        sg38.setSegmentGroup40(sg40);
+                    }
+
+                    ArrayList<SegmentGroup41> sg41s = new ArrayList<>();
+                    SegmentGroup41 sg41 = new SegmentGroup41();
+                    MOAMonetaryAmount moa = new MOAMonetaryAmount();
+                    C516MonetaryAmount c516 = new C516MonetaryAmount();
+                    c516.setE5025MonetaryAmountTypeQualifier("8");
+                    c516.setE5004MonetaryAmount(aoc.amount);
+                    moa.setC516MonetaryAmount(c516);
+                    sg41.setMOAMonetaryAmount(moa);
+                    sg41s.add(sg41);
+                    sg38.setSegmentGroup41(sg41s);
+                    sg38.setALCAllowanceOrCharge(alc);
+
+                }
+                sg25.setSegmentGroup38(sg38s);
+            }
         }
         invoic.setSegmentGroup25(sg25s);
+        invoic.setUNSSectionControl(new Uns());
+
+        ArrayList<SegmentGroup48> sg48s = new ArrayList<>();
+        if (invoice.totalAmount != null) {
+            SegmentGroup48 sg48 = new SegmentGroup48();
+            MOAMonetaryAmount moa = new MOAMonetaryAmount();
+            C516MonetaryAmount c516 = new C516MonetaryAmount();
+            c516.setE5025MonetaryAmountTypeQualifier("9");
+            c516.setE5004MonetaryAmount(invoice.totalAmount);
+            moa.setC516MonetaryAmount(c516);
+            sg48.setMOAMonetaryAmount(moa);
+            sg48s.add(sg48);
+        }
+        if (invoice.netAmountOfItems != null) {
+            SegmentGroup48 sg48 = new SegmentGroup48();
+            MOAMonetaryAmount moa = new MOAMonetaryAmount();
+            C516MonetaryAmount c516 = new C516MonetaryAmount();
+            c516.setE5025MonetaryAmountTypeQualifier("79");
+            c516.setE5004MonetaryAmount(invoice.netAmountOfItems);
+            moa.setC516MonetaryAmount(c516);
+            sg48.setMOAMonetaryAmount(moa);
+            sg48s.add(sg48);
+        }
+        if (invoice.taxAmount != null) {
+            SegmentGroup48 sg48 = new SegmentGroup48();
+            MOAMonetaryAmount moa = new MOAMonetaryAmount();
+            C516MonetaryAmount c516 = new C516MonetaryAmount();
+            c516.setE5025MonetaryAmountTypeQualifier("124");
+            c516.setE5004MonetaryAmount(invoice.taxAmount);
+            moa.setC516MonetaryAmount(c516);
+            sg48.setMOAMonetaryAmount(moa);
+            sg48s.add(sg48);
+        }
+        invoic.setSegmentGroup48(sg48s);
 
         factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream));
     }

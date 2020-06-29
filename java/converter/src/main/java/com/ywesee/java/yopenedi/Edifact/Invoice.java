@@ -25,6 +25,10 @@ public class Invoice {
     public ArrayList<Party> parties = new ArrayList<>();
     public ArrayList<InvoiceItem> invoiceItems = new ArrayList<>();
 
+    public BigDecimal totalAmount;
+    public BigDecimal netAmountOfItems;
+    public BigDecimal taxAmount;
+
     public Party getSender() {
         for (Party p : this.parties) {
             if (p.role == Party.Role.Supplier) {
