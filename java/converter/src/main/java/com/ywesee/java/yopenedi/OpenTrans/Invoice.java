@@ -1,10 +1,11 @@
 package com.ywesee.java.yopenedi.OpenTrans;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 
 public class Invoice {
-    public String referenceNumber;
+    // public String referenceNumber;
     public String documentNumber;
     public Date invoiceDate;
     public Date deliveryStartDate;
@@ -23,4 +24,12 @@ public class Invoice {
     public String currencyCode;
 
     public ArrayList<Party> parties = new ArrayList<>();
+    public ArrayList<InvoiceItem> invoiceItems = new ArrayList<>();
+
+    public Date paymentValueDate;
+    public ArrayList<PaymentTerm> paymentTerms = new ArrayList<>();
+
+    public String totalAmount;
+    public String netAmountOfItems;
+    public String taxAmount;
 }

@@ -10,6 +10,8 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.InputStream;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 
 public class OpenTransReader {
     public Invoice run(InputStream stream) throws XMLStreamException {
@@ -67,8 +69,9 @@ public class OpenTransReader {
                     processParty(invoice, er, se);
                 } else if (name.equals("INVOICE_ID")) {
                     XMLEvent next = er.nextEvent();
-                    String invoiceId = next.asCharacters().getData();
-                    invoice.documentNumber = invoiceId;
+                    invoice.documentNumber = next.asCharacters().getData();
+                } else if (name.equals("PAYMENT_TERMS")) {
+                    processPaymentTerms(invoice, er, se);
                 } else if (name.equals("INVOICE_DATE")) {
                     invoice.invoiceDate = Utility.dateFromISOString(nextStringOrNull(er));
                 } else if (name.equals("DELIVERY_START_DATE")) {
@@ -192,8 +195,264 @@ public class OpenTransReader {
             }
         }
     }
-    void processInvoiceItemList(Invoice invoice, XMLEventReader er, StartElement se) throws XMLStreamException {
 
+    void processPaymentTerms(Invoice invoice, XMLEventReader er, StartElement _se) throws XMLStreamException {
+        while (er.hasNext()) {
+            XMLEvent event = er.nextEvent();
+            if (event.isStartElement()) {
+                StartElement se = event.asStartElement();
+                String name = se.getName().getLocalPart();
+                if (name.equals("TIME_FOR_PAYMENT")) {
+                    processTimeForPayment(invoice, er, se);
+                } else if (name.equals("VALUE_DATE")) {
+                    try {
+                        String dateStr = nextStringOrNull(er);
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                        invoice.paymentValueDate = df.parse(dateStr);
+                    } catch (Exception e){}
+                }
+            }
+            if (event.isEndElement()) {
+                EndElement ee = event.asEndElement();
+                String name = ee.getName().getLocalPart();
+                if (name.equals("PAYMENT_TERMS")) {
+                    break;
+                }
+            }
+        }
+    }
+
+    void processTimeForPayment(Invoice invoice, XMLEventReader er, StartElement _se) throws XMLStreamException {
+        PaymentTerm pt = new PaymentTerm();
+        invoice.paymentTerms.add(pt);
+        while (er.hasNext()) {
+            XMLEvent event = er.nextEvent();
+            if (event.isStartElement()) {
+                StartElement se = event.asStartElement();
+                String name = se.getName().getLocalPart();
+                if (name.equals("PAYMENT_DATE")) {
+                    try {
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                        pt.date = df.parse(nextStringOrNull(er));
+                    } catch (Exception e) {}
+                } else if (name.equals("DAYS")) {
+                    pt.days = Integer.parseInt(nextStringOrNull(er));
+                } else if (name.equals("DISCOUNT_FACTOR")) {
+                    pt.discountFactor = Float.parseFloat(nextStringOrNull(er));
+                }
+            }
+            if (event.isEndElement()) {
+                EndElement ee = event.asEndElement();
+                String name = ee.getName().getLocalPart();
+                if (name.equals("TIME_FOR_PAYMENT")) {
+                    break;
+                }
+            }
+        }
+    }
+
+    void processInvoiceItemList(Invoice invoice, XMLEventReader er, StartElement _se) throws XMLStreamException {
+        while (er.hasNext()) {
+            XMLEvent event = er.nextEvent();
+            if (event.isStartElement()) {
+                StartElement se = event.asStartElement();
+                String name = se.getName().getLocalPart();
+                if (name.equals("INVOICE_ITEM")) {
+                    processInvoiceItem(invoice, er, se);
+                }
+            }
+            if (event.isEndElement()) {
+                EndElement ee = event.asEndElement();
+                String name = ee.getName().getLocalPart();
+                if (name.equals("INVOICE_ITEM_LIST")) {
+                    break;
+                }
+            }
+        }
+    }
+
+    void processInvoiceItem(Invoice invoice, XMLEventReader er, StartElement _se) throws XMLStreamException {
+        InvoiceItem ii = new InvoiceItem();
+        invoice.invoiceItems.add(ii);
+
+        while (er.hasNext()) {
+            XMLEvent event = er.nextEvent();
+            if (event.isStartElement()) {
+                StartElement se = event.asStartElement();
+                String prefix = se.getName().getPrefix();
+                String name = se.getName().getLocalPart();
+                if (name.equals("LINE_ITEM_ID")) {
+                    ii.lineItemId = nextStringOrNull(er);
+                } else if (prefix.equals("bmecat") &&
+                        name.equals("INTERNATIONAL_PID") &&
+                        se.getAttributeByName(new QName("type")).getValue().equals("ean")) {
+                    ii.ean = nextStringOrNull(er);
+                } else if (name.equals("SUPPLIER_PID")) {
+                    ii.supplierSpecificProductId = nextStringOrNull(er);
+                } else if (name.equals("BUYER_PID")) {
+                    ii.buyerSpecificProductId = nextStringOrNull(er);
+                } else if (name.equals("DESCRIPTION_SHORT")) {
+                    ii.shortDescription = nextStringOrNull(er);
+                } else if (name.equals("DESCRIPTION_LONG")) {
+                    ii.longDescription = nextStringOrNull(er);
+                } else if (name.equals("VOLUME")) {
+                    try {
+                        ii.volume = Float.parseFloat(nextStringOrNull(er));
+                    } catch (Exception e) {}
+                } else if (name.equals("WEIGHT")) {
+                    try {
+                        ii.weight = Float.parseFloat(nextStringOrNull(er));
+                    } catch (Exception e) {}
+                } else if (name.equals("LENGTH")) {
+                    try {
+                        ii.length = Float.parseFloat(nextStringOrNull(er));
+                    } catch (Exception e) {}
+                } else if (name.equals("WIDTH")) {
+                    try {
+                        ii.width = Float.parseFloat(nextStringOrNull(er));
+                    } catch (Exception e) {}
+                } else if (name.equals("DEPTH")) {
+                    try {
+                        ii.depth = Float.parseFloat(nextStringOrNull(er));
+                    } catch (Exception e) {}
+                } else if (name.equals("QUANTITY")) {
+                    try {
+                        ii.quantity = Integer.parseInt(nextStringOrNull(er));
+                    } catch (Exception e) {}
+                } else if (name.equals("COUNTRY_OF_ORIGIN")) {
+                    ii.countryOfOriginCoded = nextStringOrNull(er);
+                } else if (name.equals("DELIVERY_START_DATE")) {
+                    try {
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                        ii.deliveryStartDate = df.parse(nextStringOrNull(er));
+                    } catch (Exception e){}
+                } else if (name.equals("DELIVERY_END_DATE")) {
+                    try {
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                        ii.deliveryEndDate = df.parse(nextStringOrNull(er));
+                    } catch (Exception e){}
+                } else if (prefix.equals("bmecat") && name.equals("PRICE_AMOUNT")) {
+                    try {
+                        ii.price = Float.parseFloat(nextStringOrNull(er));
+                    } catch (Exception e){}
+                } else if (prefix.equals("bmecat") && name.equals("PRICE_QUANTITY")) {
+                    try {
+                        ii.priceQuantity = Integer.parseInt(nextStringOrNull(er));
+                    } catch (Exception e){}
+                } else if (name.equals("SUPPLIER_ORDER_ID")) {
+                    ii.supplierOrderId = nextStringOrNull(er);
+                } else if (name.equals("SUPPLIER_ORDER_ITEM_ID")) {
+                    ii.supplierOrderItemId = nextStringOrNull(er);
+                } else if (name.equals("CUSTOMER_ORDER_REFERENCE")) {
+                    processCustomerOrderReference(ii, er, se);
+                } else if (name.equals("DELIVERY_REFERENCE")) {
+                    processDeliveryReference(ii, er, se);
+                } else if (name.equals("TAX_TYPE")) {
+                    ii.taxType = nextStringOrNull(er);
+                } else if (name.equals("TAX")) {
+                    try {
+                        ii.taxRate = Float.parseFloat(nextStringOrNull(er));
+                    } catch (Exception e) {}
+                } else if (name.equals("TAX_AMOUNT")) {
+                    try {
+                        ii.taxAmount = Float.parseFloat(nextStringOrNull(er));
+                    } catch (Exception e) {}
+                } else if (name.equals("ALLOW_OR_CHARGE")) {
+                    processAllowOrCharge(ii, er, se);
+                }
+            }
+            if (event.isEndElement()) {
+                EndElement ee = event.asEndElement();
+                String name = ee.getName().getLocalPart();
+                if (name.equals("INVOICE_ITEM")) {
+                    break;
+                }
+            }
+        }
+    }
+
+    void processAllowOrCharge(InvoiceItem ii, XMLEventReader er, StartElement _se) throws XMLStreamException {
+        AllowanceOrCharge aoc = new AllowanceOrCharge();
+        ii.allowanceOrCharges.add(aoc);
+
+        String typeStr = _se.getAttributeByName(new QName("type")).getValue();
+        if (typeStr.equals("allowance")) {
+            aoc.type = AllowanceOrCharge.Type.Allowance;
+        } else if (typeStr.equals("surcharge")) {
+            aoc.type = AllowanceOrCharge.Type.Charge;
+        }
+
+        while(er.hasNext()) {
+            XMLEvent event = er.nextEvent();
+            if (event.isStartElement()) {
+                StartElement se = event.asStartElement();
+                String name = se.getName().getLocalPart();
+                if (name.equals("ALLOW_OR_CHARGE_NAME")) {
+                    aoc.name = nextStringOrNull(er);
+                } else if (name.equals("ALLOW_OR_CHARGE_SEQUENCE")) {
+                    aoc.sequence = nextStringOrNull(er);
+                } else if (name.equals("AOC_PERCENTAGE_FACTOR")) {
+                    try {
+                        aoc.percentage = Float.parseFloat(nextStringOrNull(er));
+                    } catch (Exception e) {}
+                } else if (name.equals("AOC_MONETARY_AMOUNT")) {
+                    try {
+                        aoc.amount = Float.parseFloat(nextStringOrNull(er));
+                    } catch (Exception e) {}
+                }
+            }
+            if (event.isEndElement()) {
+                EndElement ee = event.asEndElement();
+                String name = ee.getName().getLocalPart();
+                if (name.equals("ALLOW_OR_CHARGE")) {
+                    break;
+                }
+            }
+        }
+    }
+
+    void processCustomerOrderReference(InvoiceItem ii, XMLEventReader er, StartElement _se) throws XMLStreamException {
+        while(er.hasNext()) {
+            XMLEvent event = er.nextEvent();
+            if (event.isStartElement()) {
+                StartElement se = event.asStartElement();
+                String name = se.getName().getLocalPart();
+                if (name.equals("ORDER_ID")) {
+                    ii.buyerOrderId = nextStringOrNull(er);
+                } else if (name.equals("LINE_ITEM_ID")) {
+                    ii.buyerOrderItemId = nextStringOrNull(er);
+                }
+            }
+            if (event.isEndElement()) {
+                EndElement ee = event.asEndElement();
+                String name = ee.getName().getLocalPart();
+                if (name.equals("CUSTOMER_ORDER_REFERENCE")) {
+                    break;
+                }
+            }
+        }
+    }
+
+    void processDeliveryReference(InvoiceItem ii, XMLEventReader er, StartElement _se) throws XMLStreamException {
+        while(er.hasNext()) {
+            XMLEvent event = er.nextEvent();
+            if (event.isStartElement()) {
+                StartElement se = event.asStartElement();
+                String name = se.getName().getLocalPart();
+                if (name.equals("DELIVERY_IDREF")) {
+                    ii.deliveryOrderId = nextStringOrNull(er);
+                } else if (name.equals("LINE_ITEM_ID")) {
+                    ii.deliveryOrderItemId = nextStringOrNull(er);
+                }
+            }
+            if (event.isEndElement()) {
+                EndElement ee = event.asEndElement();
+                String name = ee.getName().getLocalPart();
+                if (name.equals("DELIVERY_REFERENCE")) {
+                    break;
+                }
+            }
+        }
     }
 
     void processInvoiceInvoiceSummary(Invoice invoice, XMLEventReader er, StartElement _se) throws XMLStreamException {
@@ -208,6 +467,12 @@ public class OpenTransReader {
                     invoice.taxType = nextStringOrNull(er);
                 } else if (prefix.equals("bmecat") && name.equals("TAX")) {
                     invoice.taxRate = nextStringOrNull(er);
+                } else if (name.equals("TOTAL_AMOUNT")) {
+                    invoice.totalAmount = nextStringOrNull(er);
+                } else if (name.equals("NET_VALUE_GOODS")) {
+                    invoice.netAmountOfItems = nextStringOrNull(er);
+                } else if (name.equals("TAX_AMOUNT")) {
+                    invoice.taxAmount = nextStringOrNull(er);
                 }
             }
 
