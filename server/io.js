@@ -215,7 +215,6 @@ project.ediToXML = function (fileData) {
   })
   // console.log(fileData.name, item)
   if (item && item.isConverted) {
-    console.log('edifact File Coversion: File is already converted', fileData.name)
     return
   } else {
     console.log('edifact file is processed and converted: ', fileData.name)
