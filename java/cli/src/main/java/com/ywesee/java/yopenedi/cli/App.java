@@ -3,6 +3,8 @@
  */
 package com.ywesee.java.yopenedi.cli;
 
+import com.ywesee.java.yopenedi.Edifact.EdifactWriter;
+import com.ywesee.java.yopenedi.Edifact.Invoice;
 import com.ywesee.java.yopenedi.OpenTrans.OpenTransReader;
 import com.ywesee.java.yopenedi.OpenTrans.Order;
 import com.ywesee.java.yopenedi.converter.Converter;
@@ -46,8 +48,18 @@ public class App {
             showHelp = true;
         }
 
-        File outFile = null;
         boolean isMultiple = cmd.hasOption("m");
+
+        InputStream s;
+        if (cmd.hasOption("in")) {
+            s = new FileInputStream(cmd.getOptionValue("in"));
+        } else {
+            s = System.in;
+        }
+        PushbackInputStream buffered = new PushbackInputStream(s, 8);
+        FileType ft = detectFileType(buffered);
+
+        File outFile = null;
         if (cmd.hasOption("out")) {
             outFile = new File(cmd.getOptionValue("out"));
         } else {
@@ -55,7 +67,15 @@ public class App {
                 if (isMultiple) {
                     outFile = new File(cmd.getOptionValue("in")+"_out");
                 } else {
-                    outFile = new File(cmd.getOptionValue("in") + ".xml");
+                    switch (ft) {
+                        case Edifact:
+                            outFile = new File(cmd.getOptionValue("in") + ".xml");
+                            break;
+                        case OpenTrans:
+                            outFile = new File(cmd.getOptionValue("in") + ".edi");
+                            break;
+                    }
+
                 }
             } else if (isMultiple) {
                 showHelp = true;
@@ -73,24 +93,13 @@ public class App {
             }
         }
 
-        try {
-            InputStream s;
-            if (cmd.hasOption("in")) {
-                s = new FileInputStream(cmd.getOptionValue("in"));
-            } else {
-                s = System.in;
-            }
-            PushbackInputStream buffered = new PushbackInputStream(s, 8);
-            switch (detectFileType(buffered)) {
-                case OpenTrans:
-                    openTransToEdifact(buffered, outFile, cmd);
-                    break;
-                case Edifact:
-                    edifactToOpenTrans(buffered, outFile, cmd);
-                    break;
-            }
-        } catch (Exception e) {
-            System.out.println("Exception " + e.toString());
+        switch (ft) {
+            case OpenTrans:
+                openTransToEdifact(buffered, outFile, cmd);
+                break;
+            case Edifact:
+                edifactToOpenTrans(buffered, outFile, cmd);
+                break;
         }
     }
 
@@ -133,7 +142,18 @@ public class App {
 
     static void openTransToEdifact(InputStream in, File outFile, CommandLine cmd) throws Exception {
         OpenTransReader reader = new OpenTransReader();
-        reader.run(in);
+        com.ywesee.java.yopenedi.OpenTrans.Invoice otInvoice = reader.run(in);
+        Converter converter = new Converter();
+        Invoice invoice = converter.invoiceToEdifact(otInvoice);
+        EdifactWriter writer = new EdifactWriter();
+        OutputStream out;
+        if (outFile != null) {
+            out = new FileOutputStream(outFile);
+            System.out.println("Outputting to " + outFile.getAbsolutePath());
+        } else {
+            out = System.out;
+        }
+        writer.write(invoice, out);
     }
 
     enum FileType {
