@@ -1,5 +1,6 @@
 package com.ywesee.java.yopenedi.converter;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -50,7 +51,31 @@ public class Utility {
         return df.format(date);
     }
 
+    public static Date dateFromISOString(String str) {
+        TimeZone tz = TimeZone.getTimeZone("UTC");
+        try {
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'");
+            df.setTimeZone(tz);
+            return df.parse(str);
+        } catch (ParseException e) {
+        }
+        try {
+            SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+            df.setTimeZone(tz);
+            return df.parse(str);
+        } catch (ParseException e) {
+        }
+        return null;
+    }
+
     public static boolean notNullOrEmpty(String s) {
         return s != null && !s.isEmpty();
+    }
+
+    public static <T> T getIndexOrNull(List<T> list, int index) {
+        if (list.size() > index) {
+            return list.get(index);
+        }
+        return null;
     }
 }

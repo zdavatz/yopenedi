@@ -13,7 +13,11 @@ make jar
 To run converter:
 
 ```
+# Edifact -> OpenTrans
 java -jar ./cli/build/libs/cli-1.0-all.jar -o testout -i ./edifile
+
+# OpenTrans -> Edifact
+java -jar ./cli/build/libs/cli-1.0-all.jar -i ./opentrans -o ./edifact
 ```
 
 To run email-fetcher:

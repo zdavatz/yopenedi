@@ -1,4 +1,4 @@
-package com.ywesee.java.yopenedi.converter;
+package com.ywesee.java.yopenedi.Edifact;
 
 import java.util.ArrayList;
 
