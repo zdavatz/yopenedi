@@ -20,7 +20,7 @@ public class Invoice {
 
     public Date dateWithDiscount;
     public Date dateWithoutDiscount;
-    public BigDecimal discountPercentage;
+    public BigDecimal discountPercentage; // "3" means 3%
 
     public ArrayList<Party> parties = new ArrayList<>();
     public ArrayList<InvoiceItem> invoiceItems = new ArrayList<>();

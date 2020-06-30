@@ -149,6 +149,8 @@ public class OpenTransReader {
                     p.countryCoded = nextStringOrNull(er);
                 } else if (name.equals("VAT_ID")) {
                     p.vatId = nextStringOrNull(er);
+                } else if (name.equals("TAX_NUMBER")) {
+                    p.taxNumber = nextStringOrNull(er);
                 }
                 // TODO, more info e.g. PHONE / FAX / EMAIL in <PARTY><ADDRESS>
                 // or put into contact details?

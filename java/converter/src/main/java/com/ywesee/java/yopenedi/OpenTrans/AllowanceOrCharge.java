@@ -1,9 +1,7 @@
 package com.ywesee.java.yopenedi.OpenTrans;
 
-import java.math.BigDecimal;
-
 public class AllowanceOrCharge {
-    enum Type {
+    public enum Type {
         Allowance,
         Charge,
     }

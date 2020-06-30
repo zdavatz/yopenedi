@@ -1,6 +1,7 @@
 package com.ywesee.java.yopenedi.OpenTrans;
 
 import java.math.BigDecimal;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -32,4 +33,14 @@ public class Invoice {
     public String totalAmount;
     public String netAmountOfItems;
     public String taxAmount;
+
+    public Date dateForPaymentTerm(PaymentTerm pt) {
+        if (pt.date != null) {
+            return pt.date;
+        }
+        if (invoiceDate != null && pt.days != null) {
+            return Date.from(invoiceDate.toInstant().plus(pt.days, ChronoUnit.DAYS));
+        }
+        return null;
+    }
 }

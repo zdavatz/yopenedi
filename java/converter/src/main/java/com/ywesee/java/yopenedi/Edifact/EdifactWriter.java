@@ -88,7 +88,7 @@ public class EdifactWriter {
 
         UNT41 unt41 = new UNT41();
         unt41.setMessageRefNum("1");
-        unt41.setSegmentCount(50); // TODO: default is 0, sample is 50, do we need to count / generate?
+        unt41.setSegmentCount(50);
         message41.setMessageTrailer(unt41);
         interchange.setMessages(Arrays.asList(message41));
 
@@ -114,13 +114,13 @@ public class EdifactWriter {
             }
             if (invoice.deliveryDate != null) {
                 DateFormat df = new SimpleDateFormat("yyyyMMdd");
-                DTMDateTimePeriod orderDate = new DTMDateTimePeriod();
+                DTMDateTimePeriod deliveryDate = new DTMDateTimePeriod();
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
                 orderC507.setE2005DateTimePeriodQualifier("35"); // delivery date tatsächliches Lieferdatum
                 orderC507.setE2380DateTimePeriod(df.format(invoice.deliveryDate));
                 orderC507.setE2379DateTimePeriodFormatQualifier("102");
-                orderDate.setC507DateTimePeriod(orderC507);
-                dtms.add(orderDate);
+                deliveryDate.setC507DateTimePeriod(orderC507);
+                dtms.add(deliveryDate);
             }
 
             invoic.setDTMDateTimePeriod(dtms);
@@ -136,8 +136,6 @@ public class EdifactWriter {
             // DQ = Lieferscheinnummer  delivery note number
             r506.setE1153ReferenceQualifier("DQ");
             r506.setE1154ReferenceNumber(invoice.deliveryNoteNumber);
-            // TODO: do we need reference date here?
-            // sg1.setDTMDateTimePeriod()
             r.setC506Reference(r506);
             sg1.setRFFReference(r);
             sg1s.add(sg1);
@@ -311,10 +309,9 @@ public class EdifactWriter {
         SegmentGroup8 sg8 = new SegmentGroup8();
         PATPaymentTermsBasis patPaymentTermsBasis = new PATPaymentTermsBasis();
 
-        // TODO: need to confirm! Which one to use?
         // 1 = Basic, Payment conditions normally applied.
         // 3 = Fixed date
-        patPaymentTermsBasis.setE4279PaymentTermsTypeQualifier("3");
+        patPaymentTermsBasis.setE4279PaymentTermsTypeQualifier("1");
         sg8.setPATPaymentTermsBasis(patPaymentTermsBasis);
 
         {
@@ -352,12 +349,6 @@ public class EdifactWriter {
 
         sg8s.add(sg8);
         invoic.setSegmentGroup8(sg8s);
-
-        {
-            // TODO: What is this, delivery condition?
-            ArrayList<SegmentGroup12> sg12s = new ArrayList<>();
-            invoic.setSegmentGroup12(sg12s);
-        }
 
         ArrayList<SegmentGroup25> sg25s = new ArrayList<>();
         for (InvoiceItem ii : invoice.invoiceItems) {
@@ -501,7 +492,8 @@ public class EdifactWriter {
                 alis.add(ali);
                 sg25.setALIAdditionalInformation(alis);
             }
-            {
+
+            if (ii.deliveryDate != null) {
                 DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
                 DTMDateTimePeriod dtm = new DTMDateTimePeriod();
@@ -617,8 +609,7 @@ public class EdifactWriter {
                         alc.setE1227CalculationSequenceIndicatorCoded(aoc.sequence);
                     }
                     C214SpecialServicesIdentification c214 = new C214SpecialServicesIdentification();
-                    // TODO: What should we put here?
-                    //c214.setE7161SpecialServicesCoded()
+                    c214.setE7161SpecialServicesCoded("FC");
                     alc.setC214SpecialServicesIdentification(c214);
 
                     if (aoc.percentage != null) {

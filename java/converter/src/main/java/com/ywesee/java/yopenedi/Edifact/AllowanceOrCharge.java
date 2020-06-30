@@ -3,7 +3,7 @@ package com.ywesee.java.yopenedi.Edifact;
 import java.math.BigDecimal;
 
 public class AllowanceOrCharge {
-    enum Type {
+    public enum Type {
         Allowance,
         Charge,
     }

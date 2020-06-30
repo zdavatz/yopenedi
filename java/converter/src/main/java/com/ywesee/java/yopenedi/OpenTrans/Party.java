@@ -25,6 +25,7 @@ public class Party {
     public ArrayList<ContactDetail> contactDetails = new ArrayList<>();
 
     public String vatId;
+    public String taxNumber;
 
     public void write(XMLStreamWriter s) throws XMLStreamException {
         s.writeStartElement("PARTY");
