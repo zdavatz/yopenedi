@@ -38,7 +38,7 @@ files = {}
 /* -------------------------------------------------------------------------- */
 var filePath, fileSize;
 var XMLCheckURL = 'https://connect.boni.ch/OpaccOne/B2B/Channel/XmlOverHttp/YWE'
-checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v'
+checkFileCmd = 'curl -H "Content-Type: text/xml; charset=UTF-8" -H "Content-Length: ' + fileSize + '" ' + XMLCheckURL + '  --data-binary @' + filePath + ' -v -m 4'
 /* -------------------------------------------------------------------------- */
 project.emptyDir = function (dir) {
   console.log('==== Cleaning ' + dir + ' ======')

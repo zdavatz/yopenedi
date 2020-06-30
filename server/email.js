@@ -209,6 +209,7 @@ if (settings && settings.private.isDev) {
   getMail()
 }
 
+getMail()
 
 module.exports = getMail;
 // return

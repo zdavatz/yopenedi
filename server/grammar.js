@@ -148,6 +148,7 @@ Grammar = [{
     <PARTY_ID type="iln">ID</PARTY_ID>
     <PARTY_ROLE>ROLE</PARTY_ROLE>
     `,
+    //
         match: [
             ["", "ROLE"],
             ["ID", "", "CODE"]
@@ -164,12 +165,21 @@ Grammar = [{
             var line = this[id]
             return line
         },
-        exe: function (data) {
+        exe: function (data,options) {
+
+            var start = "";
+            var close = "";
+            var next = options.next.key
+            var prev = options.prev.key
+
+            if(next !== "NAD" && _.includes(["CTA","COM"],next)){
+                close = "<ADDRESS>"
+            }
             var code = getData('ROLE', data);
             if (code && code['ROLE']) {
                 var line = this[code['ROLE']]
                 if(line){
-                    return line
+                    return line + close;
                 }
                 
             }
@@ -187,14 +197,26 @@ Grammar = [{
     <DEPCODE_NAME>CODENAME</DEPCODE_NAME>
     <PERSON>PERSONDEP</PERSON>
     </COMMUNICATION_INFORMATION>`,
-        render: `<ADDRESS>`,
+        render: ``,
         match: [
             ["", "FUNCTIONCODE", "DEP"],
             ["CODENAME", "PERSONDEP", "type"]
         ],
         "parent": "",
         "children": "",
-        "isHeader": ""
+        "isHeader": "",
+        cases: ["type"],
+        exe:function(data,options){
+
+            var next = options.next.key
+            var prev = options.prev.key
+
+            // console.log(prev)
+            // if(!_.includes(["COM"], prev)){
+            //    return '<ADDRESS>'
+            // }
+            
+        }
     }, {
         "name": "COM",
         "tag": "COMMUNICATION",
@@ -207,6 +229,7 @@ Grammar = [{
             [],
             ["CONTACT", "type"]
         ],
+        //
         cases: ["type"],
         "EM": `<bmecat:EMAILS>CONTACT</bmecat:EMAILS>`,
         "TE": `<bmecat:PHONE>CONTACT</bmecat:PHONE>`, //
@@ -217,10 +240,7 @@ Grammar = [{
             var close = "";
             var next = options.next.key
             var prev = options.prev.key
-
-            // if(_.includes(['CTA'], prev)){
-            //     var start = '<ADDRESS> '
-            // }
+            //
 
             
             if (_.includes(['NAD'], next)) {

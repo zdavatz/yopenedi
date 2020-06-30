@@ -739,7 +739,7 @@ function xmlSetHeader(xml){
 // renderEDI(doc)
 parse = {}
 parse.renderEDI = function (doc) {
-    console.log("Reandering the EDIFact File into OpenTrans XML")
+    // console.log("Reandering the EDIFact File into OpenTrans XML")
     if (doc.substring(0, 3) !== "UNA") {
         console.error("The Document is not valid Edifact file", "renderEDI")
         return

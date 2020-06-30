@@ -11,6 +11,8 @@ const settings = Meteor.settings;
 
 /* -------------------------------------------------------------------------- */
 
+project.processEdifactDir(project.edifact_orders)
+
 if(settings.private.resetDB){
   console.log('Resetting DB......')
   Items.remove({})
