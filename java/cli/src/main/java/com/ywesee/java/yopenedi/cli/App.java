@@ -12,8 +12,17 @@ import com.ywesee.java.yopenedi.OpenTrans.OpenTransWriter;
 import com.ywesee.java.yopenedi.Edifact.EdifactReader;
 import org.apache.commons.cli.*;
 
+import javax.activation.DataHandler;
+import javax.activation.DataSource;
+import javax.activation.FileDataSource;
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeBodyPart;
+import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMultipart;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.Properties;
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -40,6 +49,40 @@ public class App {
 
         Option helpOption = new Option("h", "help", false, "Display help message");
         options.addOption(helpOption);
+
+        Option sendToOption = new Option(null, "mail-to", true, "Where to send the converted document");
+        sendToOption.setType(String.class);
+        options.addOption(sendToOption);
+
+        Option sendFromOption = new Option(null, "mail-from", true, "Where to send the converted document");
+        sendFromOption.setType(String.class);
+        options.addOption(sendFromOption);
+
+        Option usernameOption = new Option(null, "mail-username", true, "Username for SMTP");
+        usernameOption.setType(String.class);
+        options.addOption(usernameOption);
+
+        Option passwordOption = new Option(null, "mail-password", true, "Password for SMTP");
+        passwordOption.setType(String.class);
+        options.addOption(passwordOption);
+
+        Option hostOption = new Option(null, "mail-host", true, "Host for SMTP");
+        hostOption.setType(String.class);
+        options.addOption(hostOption);
+
+        Option portOption = new Option(null, "mail-port", true, "Port for SMTP");
+        portOption.setType(String.class);
+        options.addOption(portOption);
+
+        Option subjectOption = new Option(null, "mail-subject", true, "Subject for email");
+        portOption.setType(String.class);
+        options.addOption(subjectOption);
+
+        Option secureOption = new Option(null, "mail-secure", false, "Use TLS for SMTP?");
+        options.addOption(secureOption);
+
+        Option debugOption = new Option(null, "debug", false, "Show debug messages");
+        options.addOption(debugOption);
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
@@ -101,6 +144,7 @@ public class App {
                 edifactToOpenTrans(buffered, outFile, cmd);
                 break;
         }
+        sendEmail(cmd, outFile);
     }
 
     static void edifactToOpenTrans(InputStream in, File outFile, CommandLine cmd) throws Exception {
@@ -178,5 +222,87 @@ public class App {
             return FileType.Edifact;
         }
         throw new Exception("Unrecognised file type");
+    }
+
+    static void sendEmail(CommandLine cmd, File file) {
+        boolean showDebugMessages = true;
+        String mailHost = cmd.getOptionValue("mail-host"); // smtp.gmail.com
+        String mailPort = cmd.getOptionValue("mail-port"); // 587
+        String mailSubject;
+        if (cmd.hasOption("mail-subject")) {
+            mailSubject = cmd.getOptionValue("mail-subject");
+        } else {
+            mailSubject = "No Subject";
+        }
+        boolean mailSecure = cmd.hasOption("mail-secure");
+        String username = cmd.getOptionValue("mail-username");
+        String password = cmd.getOptionValue("mail-password");
+
+        String to = cmd.getOptionValue("mail-to");
+        String from;
+        if (cmd.hasOption("mail-from")) {
+            from = cmd.getOptionValue("mail-from");
+        } else {
+            from = username;
+        }
+
+        boolean wantToSendEmail = to != null;
+        if (!wantToSendEmail) {
+            return;
+        }
+        if (wantToSendEmail && (mailHost == null || mailPort == null || username == null || password == null)) {
+            System.err.println("Please specify all --mail-host --mail-port --mail-username --mail-password to send email");
+            return;
+        }
+        if (file == null) {
+            System.err.println("To send an email, you need to use the -o/--out option.");
+            return;
+        }
+
+        Properties prop = new Properties();
+        prop.put("mail.smtp.host", mailHost);
+        prop.put("mail.smtp.port", mailPort);
+        prop.put("mail.smtp.auth", "true");
+        if (mailSecure) {
+            prop.put("mail.smtp.starttls.enable", "true"); //TLS
+        }
+
+        Session session = Session.getInstance(prop,
+                new javax.mail.Authenticator() {
+                    protected PasswordAuthentication getPasswordAuthentication() {
+                        return new PasswordAuthentication(username, password);
+                    }
+                });
+        if (cmd.hasOption("debug")) {
+            session.setDebug(showDebugMessages);
+        }
+        try {
+
+            System.out.println("Sending email to " + to);
+
+            MimeMessage message = new MimeMessage(session);
+            message.setFrom(new InternetAddress(from));
+            message.setRecipients(
+                    Message.RecipientType.TO,
+                    InternetAddress.parse(to)
+            );
+            message.setSubject(mailSubject);
+            Multipart multipart = new MimeMultipart();
+            BodyPart messageBodyPart = new MimeBodyPart();
+            DataSource source = new FileDataSource(file);
+            messageBodyPart.setDataHandler(new DataHandler(source));
+            messageBodyPart.setFileName(file.getName());
+            multipart.addBodyPart(messageBodyPart);
+
+            // Send the complete message parts
+            message.setContent(multipart);
+
+            Transport.send(message);
+
+            System.out.println("Finished sending email");
+
+        } catch (MessagingException e) {
+            e.printStackTrace();
+        }
     }
 }
