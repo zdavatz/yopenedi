@@ -10,6 +10,10 @@ const path = require('path');
 const child_process = require('child_process');
 const axios = require('axios');
 const FormData = require('form-data');
+/* -------------------------------------------------------------------------- */
+const settings = Meteor.settings;
+/* -------------------------------------------------------------------------- */
+
 log = console.log
 /* -------------------------------------------------------------------------- */
 const util = require('util');
@@ -244,7 +248,12 @@ project.ediToXML = function (fileData) {
     fileData.filepath = xmlFilePath;
     fileData.name = filename + '.xml'
     // CHECK XML FILE..
-    project.XMLcheckFile(fileData)
+    if(!settings.private.isDev){
+      project.XMLcheckFile(fileData)
+    }else{
+      console.log('Dev. Skipping XML Check')
+    }
+    
     // Close else
   }
 }

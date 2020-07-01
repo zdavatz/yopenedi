@@ -14,9 +14,12 @@ import {
 import bodyParser from 'body-parser'
 import Parse from './parse.edi.js'
 const nodersa = require('node-rsa');
+const S = require('string');
 const fs = require('fs');
 const moment = require('moment');
 const path = require('path');
+const exec = require('child_process').exec;
+const cmd = Meteor.wrapAsync(exec);
 /* -------------------------------------------------------------------------- */
 const multer = require('multer');
 const upload = multer();
@@ -47,6 +50,7 @@ WebApp.connectHandlers.use(bodyParser.json())
 //
 // WebApp.connectHandlers.use(MultipartParser);
 // Listen to incoming HTTP requests (can only be used on the server).
+// 
 /* -------------------------------------------------------------------------- */
 // Active
 /* -------------------------------------------------------------------------- */
@@ -86,7 +90,8 @@ Picker.route('/as2', function (params, req, res, next) {
       fileData.filepath = outputPath;
       fileData.name = filename
       console.log('Success file upload at:', outputPath,data)
-      writeFile(outputPath, data)
+      var doc = extractEdiFactData(data)
+      writeFile(outputPath, doc)
       res.end(JSON.stringify(responseData));
     }
   }
@@ -99,7 +104,8 @@ Picker.route('/as2', function (params, req, res, next) {
     fileData.filepath = outputPath;
     fileData.name = file.originalname
     console.log('Success file upload at:', outputPath)
-    writeFile(outputPath, file.buffer)
+    var doc = extractEdiFactData(file.buffer)
+    writeFile(outputPath, doc)
     // deencrypt 
     // var ediFileData = new nodersa(privateKey).decrypt(file.data, 'utf8');
     // console.log('DeencryptedData: ',{ediFileData})
@@ -134,6 +140,7 @@ Picker.route('/as2', function (params, req, res, next) {
       console.log('headers: -T ', JSON.stringify(req.headers))
       var filename = setFileName();
       var outputPath = project.edifact_orders_encryped + filename
+      var doc = extractEdiFactData(doc)
       writeFile(outputPath, doc)
       fileData.filepath = outputPath;
       fileData.name = filename;
@@ -171,6 +178,25 @@ Picker.route('/as2', function (params, req, res, next) {
     convertFile(fileData)
   }
 })
+/* -------------------------------------------------------------------------- */
+
+// var getAS2EdiData = '091124_01072020'
+// var ediData = Assets.getText(getAS2EdiData)
+// extractEdiFactData(ediData)
+
+function extractEdiFactData(data){
+  if(!data){
+    console.error("There is No Data in the submitted file")
+    return
+  }
+  var result = S(data).between('UNA', 'UNZ').s
+  var tail = S(data).between('UNZ', "'").s
+  var tail = "UNZ" + tail + "'"
+  var result = "UNA" + result  + tail ;
+  console.log('extractEdiFactData: ',{result})
+  return result
+}
+
 /* -------------------------------------------------------------------------- */
 function convertFile(fileData){
   console.log('Converting the file: (convertFile)',JSON.stringify(fileData))

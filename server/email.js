@@ -205,11 +205,11 @@ function runCmd(cmd) {
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
 
-if (settings && settings.private.isDev) {
-  getMail()
-}
+// if (settings && settings.private.isDev) {
+//   getMail()
+// }
 
-getMail()
+
 
 module.exports = getMail;
 // return
