@@ -1,12 +1,15 @@
-package com.ywesee.java.yopenedi.converter;
+package com.ywesee.java.yopenedi.Edifact;
+
+import com.ywesee.java.yopenedi.Edifact.ContactDetail;
 
 import java.util.ArrayList;
 
 public class Party {
-    enum Role {
+    public enum Role {
         Buyer,
         Supplier,
         Delivery,
+        Invoicee,
     }
     public String id;
     public Role role;
@@ -16,6 +19,10 @@ public class Party {
     public String city;
     public String zip;
     public String countryCoded;
+
+    public String vatId; // this is VAT registration number, not tax number (Fiscal number)
+    public String fiscalNumber;
+
     public ArrayList<ContactDetail> contactDetails = new ArrayList<>();
 
     public void addContactDetail(ContactDetail contactDetail) {

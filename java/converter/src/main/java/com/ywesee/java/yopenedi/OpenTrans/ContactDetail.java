@@ -1,4 +1,4 @@
-package com.ywesee.java.yopenedi.converter.OpenTrans;
+package com.ywesee.java.yopenedi.OpenTrans;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -7,6 +7,7 @@ import static com.ywesee.java.yopenedi.converter.Utility.notNullOrEmpty;
 
 public class ContactDetail {
     public String name;
+    public String firstName;
     public String phone;
     public String email;
     public String fax;

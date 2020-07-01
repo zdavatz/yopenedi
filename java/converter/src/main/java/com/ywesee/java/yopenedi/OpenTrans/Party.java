@@ -1,4 +1,4 @@
-package com.ywesee.java.yopenedi.converter.OpenTrans;
+package com.ywesee.java.yopenedi.OpenTrans;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
@@ -11,6 +11,7 @@ public class Party {
         Buyer,
         Supplier,
         Delivery,
+        InvoiceRecipient,
     }
 
     public String id;
@@ -22,6 +23,9 @@ public class Party {
     public String zip;
     public String countryCoded;
     public ArrayList<ContactDetail> contactDetails = new ArrayList<>();
+
+    public String vatId;
+    public String taxNumber;
 
     public void write(XMLStreamWriter s) throws XMLStreamException {
         s.writeStartElement("PARTY");

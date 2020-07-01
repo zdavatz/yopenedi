@@ -1,4 +1,4 @@
-package com.ywesee.java.yopenedi.converter.OpenTrans;
+package com.ywesee.java.yopenedi.OpenTrans;
 
 import com.ywesee.java.yopenedi.converter.Utility;
 
