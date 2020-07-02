@@ -25,6 +25,7 @@ public class InvoiceItem {
     public Date deliveryEndDate;
     public Float price;  // How much is it per (this.priceQuantity)
     public Integer priceQuantity; // The quantity that (this.price) can buy.
+    public Float priceLineAmount; // The total amount of the item
 
     public String supplierOrderId;
     public String supplierOrderItemId; // Like line number, e.g. 1

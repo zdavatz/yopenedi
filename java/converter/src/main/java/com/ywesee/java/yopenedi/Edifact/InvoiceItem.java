@@ -25,6 +25,8 @@ public class InvoiceItem {
     public BigDecimal price;  // How much is it per (this.priceQuantity)
     public BigDecimal priceQuantity; // The quantity that (this.price) can buy.
 
+    public BigDecimal priceLineAmount; // Total amount of this item
+
     public String supplierOrderId;
     public String supplierOrderItemId; // Like line number, e.g. 1
     public String buyerOrderId;
