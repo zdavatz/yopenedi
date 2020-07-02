@@ -190,6 +190,9 @@ public class Converter {
         if (invoiceItem.priceQuantity != null) {
             ii.priceQuantity = BigDecimal.valueOf(invoiceItem.priceQuantity);
         }
+        if (invoiceItem.priceLineAmount != null) {
+            ii.priceLineAmount = BigDecimal.valueOf(invoiceItem.priceLineAmount);
+        }
 
         ii.supplierOrderId = invoiceItem.supplierOrderId;
         ii.supplierOrderItemId = invoiceItem.supplierOrderItemId;
