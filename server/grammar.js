@@ -99,8 +99,8 @@ Grammar = [{
     }, {
         "name": "FTX",
         "tag": "FreeText",
-        renderX: '',
-        "render": "<FreeText><CODE>code</CODE><CONTENT>FREETXT1 - FREETXT2</CONTENT></FreeText>",
+        render: '',
+        "renderX": "<FreeText><CODE>code</CODE><CONTENT>FREETXT1 - FREETXT2</CONTENT></FreeText>",
         "match": [
             ["", "code", "REF"],
             ["FREETXT1", "FREETXT2"]
