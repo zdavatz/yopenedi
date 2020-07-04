@@ -506,6 +506,21 @@ public class EdifactWriter {
                 sg25.setDTMDateTimePeriod(dtms);
             }
 
+            if (ii.priceLineAmount != null) {
+                ArrayList<SegmentGroup26> sg26s = new ArrayList<>();
+                SegmentGroup26 sg26 = new SegmentGroup26();
+                MOAMonetaryAmount moa = new MOAMonetaryAmount();
+                C516MonetaryAmount c516 = new C516MonetaryAmount();
+                c516.setE5025MonetaryAmountTypeQualifier("203");
+                c516.setE5004MonetaryAmount(ii.priceLineAmount);
+                c516.setE6345CurrencyCoded(invoice.currencyCode);
+                c516.setE6343CurrencyQualifier("4");
+                moa.setC516MonetaryAmount(c516);
+                sg26.setMOAMonetaryAmount(moa);
+                sg26s.add(sg26);
+                sg25.setSegmentGroup26(sg26s);
+            }
+
             {
                 ArrayList<SegmentGroup28> sg28s = new ArrayList<>();
                 SegmentGroup28 sg28 = new SegmentGroup28();

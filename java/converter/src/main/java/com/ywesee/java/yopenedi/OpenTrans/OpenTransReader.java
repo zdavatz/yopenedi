@@ -361,6 +361,10 @@ public class OpenTransReader {
                     } catch (Exception e) {}
                 } else if (name.equals("ALLOW_OR_CHARGE")) {
                     processAllowOrCharge(ii, er, se);
+                } else if (name.equals("PRICE_LINE_AMOUNT")) {
+                    try {
+                        ii.priceLineAmount = Float.parseFloat(nextStringOrNull(er));
+                    } catch (Exception e) {}
                 }
             }
             if (event.isEndElement()) {

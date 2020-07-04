@@ -25,6 +25,7 @@ dependencies {
     // This dependency is used by the application.
     implementation 'com.google.guava:guava:28.0-jre'
     compile project(':converter')
+    compile group: 'javax.mail', name: 'mail', version: '1.5.0-b01'
 
     implementation 'commons-cli:commons-cli:1.4'
 
