@@ -230,14 +230,14 @@ function generateStructuredArr(jsonData) {
     var orderJSON = []
     var parent = ["UNB", "UNG", "UNH", "LIN", "NAD", "CUX"]
     var start = ["UNB", "UNG", "UNH", "LIN"]
-    var skip = ["UNT", "UNE", "UNZ"]
+    var skip = ["UNT", "UNE", "UNZ", "FTX"]
     var looped = ["LIN", "NAD"] //
     // var skipRendering = ["RFF", ""]
     _.each(tags, (tag, index) => {
 
         // Skip upsported tags
         if (!_.includes(supportedTags(), tag)) {
-            console.error(`The tag ${tag} is not supported`)
+            console.error(`The tag ${tag} is Skipped`)
             return
         }
         //
