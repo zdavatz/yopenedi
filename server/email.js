@@ -205,9 +205,9 @@ function runCmd(cmd) {
 /* -------------------------------------------------------------------------- */
 /* -------------------------------------------------------------------------- */
 
-// if (settings && settings.private.isDev) {
-//   getMail()
-// }
+if (settings && settings.private.isDev && settings.private.checkEmail) {
+  getMail()
+}
 
 
 

@@ -11,6 +11,9 @@ import './io.js';
 import './grammar.js';
 /* -------------------------------------------------------------------------- */
 
+const settings = Meteor.settings;
+/* -------------------------------------------------------------------------- */
+
 console.log('Converter {init}')
 
 /* -------------------------------------------------------------------------- */
@@ -753,13 +756,23 @@ parse.renderEDI = function (doc) {
 }
 /* -------------------------------------------------------------------------- */
 // Edifact TEST
-// var fileName = 'edi_unsportedTags'
-// // var fileName = "43_"
-// //
-// var testDoc = Assets.getText(fileName)
-// var testXML = parse.renderEDI(testDoc)
-// project.writeFile(project.opentrans_orders + 'skippedtags_edi.xml', testXML)
 
+
+if (settings && settings.private.isDev) {
+
+
+var fileName = '143721_08072020.txt'
+
+//
+var testDoc = Assets.getText(fileName)
+var testXML = parse.renderEDI(testDoc)
+
+console.log(`Testing DOC ${fileName}`)
+project.writeFile(project.opentrans_orders + fileName+'.xml', testXML)
+
+
+    
+}
 /* -------------------------------------------------------------------------- */
 
 module.exports = parse
