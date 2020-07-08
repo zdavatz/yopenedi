@@ -233,7 +233,7 @@ function generateStructuredArr(jsonData) {
     var orderJSON = []
     var parent = ["UNB", "UNG", "UNH", "LIN", "NAD", "CUX"]
     var start = ["UNB", "UNG", "UNH", "LIN"]
-    var skip = ["UNT", "UNE", "UNZ", "FTX"]
+    var skip = ["UNT", "UNE", "UNZ"]
     var looped = ["LIN", "NAD"] //
     // var skipRendering = ["RFF", ""]
     _.each(tags, (tag, index) => {
@@ -762,7 +762,7 @@ if (settings && settings.private.isDev) {
 
 
 var fileName = '143721_08072020.txt'
-
+var fileName = '143606_08072020'
 //
 var testDoc = Assets.getText(fileName)
 var testXML = parse.renderEDI(testDoc)
