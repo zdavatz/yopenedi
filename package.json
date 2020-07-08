@@ -8,7 +8,7 @@
     "visualize": "meteor --production --extra-packages bundle-visualizer"
   },
   "dependencies": {
-    "@babel/runtime": "^7.8.3",
+    "@babel/runtime": "^7.10.4",
     "axios": "^0.19.2",
     "base64-stream": "^1.0.0",
     "body-parser": "^1.19.0",
@@ -33,7 +33,6 @@
     "nodemailer": "^6.4.6",
     "pretty-data": "^0.40.0",
     "request": "^2.88.2",
-    "string": "^3.3.3",
     "xml": "^1.0.1",
     "xml-formatter": "^2.0.1",
     "xmlbuilder": "^15.1.1",

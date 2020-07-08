@@ -14,7 +14,6 @@ import {
 import bodyParser from 'body-parser'
 import Parse from './parse.edi.js'
 const nodersa = require('node-rsa');
-const S = require('string');
 const fs = require('fs');
 const moment = require('moment');
 const path = require('path');
@@ -184,18 +183,21 @@ Picker.route('/as2', function (params, req, res, next) {
 // var ediData = Assets.getText(getAS2EdiData)
 // extractEdiFactData(ediData)
 
+
 function extractEdiFactData(data){
   if(!data){
     console.error("There is No Data in the submitted file")
     return
   }
-  var result = S(data).between('UNA', 'UNZ').s
-  var tail = S(data).between('UNZ', "'").s
-  var tail = "UNZ" + tail + "'"
-  var result = "UNA" + result  + tail ;
-  console.log('extractEdiFactData: ',{result})
-  return result
+  var message = data.match(/UNA(.*)UNZ/ig)
+  var tail = data.match(/UNZ(.*)'/ig)
+  var message = message + tail;
+  console.log("Extracting Edifact Message From The Binary Message: ",{message})
+  return message;
+
 }
+
+
 
 /* -------------------------------------------------------------------------- */
 function convertFile(fileData){
