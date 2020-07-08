@@ -3,3 +3,9 @@
 
 # Ignore Gradle build output directory
 build
+
+.idea
+cli/out
+converter/out
+email-fetcher/out
+.DS_Store

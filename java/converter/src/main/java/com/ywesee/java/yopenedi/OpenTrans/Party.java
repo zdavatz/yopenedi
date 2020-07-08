@@ -41,10 +41,18 @@ public class Party {
         s.writeEndElement(); // PARTY_ID
 
         s.writeStartElement("PARTY_ROLE");
-        switch (this.role) {
-            case Buyer: s.writeCharacters("buyer"); break;
-            case Supplier: s.writeCharacters("supplier"); break;
-            case Delivery: s.writeCharacters("delivery"); break; // TODO: or deliverer?
+        if (this.role != null) {
+            switch (this.role) {
+                case Buyer:
+                    s.writeCharacters("buyer");
+                    break;
+                case Supplier:
+                    s.writeCharacters("supplier");
+                    break;
+                case Delivery:
+                    s.writeCharacters("delivery");
+                    break; // TODO: or deliverer?
+            }
         }
         s.writeEndElement(); // PARTY_ROLE
 

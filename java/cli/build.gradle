@@ -41,3 +41,8 @@ application {
 run{
     standardInput = System.in
 }
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}

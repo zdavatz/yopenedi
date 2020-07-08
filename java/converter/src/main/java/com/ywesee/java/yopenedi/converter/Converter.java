@@ -32,13 +32,15 @@ public class Converter {
                 .map(this::orderItemToOpenTrans).collect(Collectors.toCollection(ArrayList::new));
 
         for (com.ywesee.java.yopenedi.Edifact.Party p : order.parties) {
-            switch (p.role) {
-                case Supplier:
-                    o.supplierIdRef = p.id;
-                    break;
-                case Buyer:
-                    o.buyerIdRef = p.id;
-                    break;
+            if (p.role != null) {
+                switch (p.role) {
+                    case Supplier:
+                        o.supplierIdRef = p.id;
+                        break;
+                    case Buyer:
+                        o.buyerIdRef = p.id;
+                        break;
+                }
             }
         }
 
@@ -48,19 +50,21 @@ public class Converter {
     public Party partyToOpenTrans(com.ywesee.java.yopenedi.Edifact.Party party) {
         Party p = new Party();
         p.id = party.id;
-        switch (party.role) {
-            case Buyer:
-                p.role = Party.Role.Buyer;
-                break;
-            case Delivery:
-                p.role = Party.Role.Delivery;
-                break;
-            case Supplier:
-                p.role = Party.Role.Supplier;
-                break;
-            case Invoicee:
-                p.role = Party.Role.InvoiceRecipient;
-                break;
+        if (party.role != null) {
+            switch (party.role) {
+                case Buyer:
+                    p.role = Party.Role.Buyer;
+                    break;
+                case Delivery:
+                    p.role = Party.Role.Delivery;
+                    break;
+                case Supplier:
+                    p.role = Party.Role.Supplier;
+                    break;
+                case Invoicee:
+                    p.role = Party.Role.InvoiceRecipient;
+                    break;
+            }
         }
         p.supplierSpecificPartyId = party.supplierSpecificPartyId;
         p.name = party.name;
@@ -216,19 +220,21 @@ public class Converter {
     public com.ywesee.java.yopenedi.Edifact.Party partyToEdifact(Party party) {
         com.ywesee.java.yopenedi.Edifact.Party p = new com.ywesee.java.yopenedi.Edifact.Party();
         p.id = party.id;
-        switch (party.role) {
-            case Buyer:
-                p.role = com.ywesee.java.yopenedi.Edifact.Party.Role.Buyer;
-                break;
-            case Supplier:
-                p.role = com.ywesee.java.yopenedi.Edifact.Party.Role.Supplier;
-                break;
-            case Delivery:
-                p.role = com.ywesee.java.yopenedi.Edifact.Party.Role.Delivery;
-                break;
-            case InvoiceRecipient:
-                p.role = com.ywesee.java.yopenedi.Edifact.Party.Role.Invoicee;
-                break;
+        if (party.role != null) {
+            switch (party.role) {
+                case Buyer:
+                    p.role = com.ywesee.java.yopenedi.Edifact.Party.Role.Buyer;
+                    break;
+                case Supplier:
+                    p.role = com.ywesee.java.yopenedi.Edifact.Party.Role.Supplier;
+                    break;
+                case Delivery:
+                    p.role = com.ywesee.java.yopenedi.Edifact.Party.Role.Delivery;
+                    break;
+                case InvoiceRecipient:
+                    p.role = com.ywesee.java.yopenedi.Edifact.Party.Role.Invoicee;
+                    break;
+            }
         }
         p.supplierSpecificPartyId = party.supplierSpecificPartyId;
         p.name = party.name;
@@ -255,11 +261,13 @@ public class Converter {
 
     public com.ywesee.java.yopenedi.Edifact.AllowanceOrCharge allowanceOrChargesToEdifact(AllowanceOrCharge allowanceOrCharge) {
         com.ywesee.java.yopenedi.Edifact.AllowanceOrCharge aoc = new com.ywesee.java.yopenedi.Edifact.AllowanceOrCharge();
-        switch (allowanceOrCharge.type) {
-            case Charge:
-                aoc.type = com.ywesee.java.yopenedi.Edifact.AllowanceOrCharge.Type.Charge;
-            case Allowance:
-                aoc.type = com.ywesee.java.yopenedi.Edifact.AllowanceOrCharge.Type.Allowance;
+        if (allowanceOrCharge.type != null) {
+            switch (allowanceOrCharge.type) {
+                case Charge:
+                    aoc.type = com.ywesee.java.yopenedi.Edifact.AllowanceOrCharge.Type.Charge;
+                case Allowance:
+                    aoc.type = com.ywesee.java.yopenedi.Edifact.AllowanceOrCharge.Type.Allowance;
+            }
         }
         aoc.name = allowanceOrCharge.name;
         aoc.sequence = allowanceOrCharge.sequence;
@@ -273,6 +281,9 @@ public class Converter {
     }
 
     static String dateStringToISOString(String dateString) {
+        if (dateString == null) {
+            return null;
+        }
         DateFormat df = new SimpleDateFormat("yyyyMMdd");
         try {
             Date date = df.parse(dateString);
