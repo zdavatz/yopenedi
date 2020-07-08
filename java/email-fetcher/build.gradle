@@ -38,3 +38,8 @@ application {
     // Define the main class for the application.
     mainClassName = 'com.ywesee.java.yopenedi.emailfetcher.App'
 }
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+}
