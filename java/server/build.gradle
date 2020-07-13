@@ -1,6 +1,5 @@
 plugins {
     id 'play'
-    // id 'idea'
 }
 
 def playVersion = "2.6.22"
@@ -56,12 +55,17 @@ def dependencyFor(String lib, String scalaVersion, String version) {
 }
 
 dependencies {
+    play project(':converter')
 
     play dependencyFor("com.typesafe.play:play-guice", scalaVersion, playVersion)
     play dependencyFor("com.typesafe.play:play-logback", scalaVersion, playVersion)
     play dependencyFor("com.typesafe.play:filters-helpers", scalaVersion, playVersion)
 
     playTest dependencyFor("org.scalatestplus.play:scalatestplus-play", scalaVersion, "3.1.2")
+}
+
+jar {
+  enabled = false
 }
 
 repositories {
@@ -75,4 +79,9 @@ repositories {
         url "https://repo.lightbend.com/lightbend/ivy-releases"
         layout "ivy"
     }
+}
+
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
 }
