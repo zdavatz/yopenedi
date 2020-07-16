@@ -3,6 +3,7 @@ package controllers
 import javax.inject._
 import play.api._
 import play.api.mvc._
+import play.api.libs.json._
 
 import org.apache.commons.io.IOUtils
 import java.io.File
@@ -100,7 +101,10 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         writer.write(otOrder, outStream)
     }
 
-    return Ok(views.html.index())
+    val obj = Json.obj(
+      "ok" -> true
+    )
+    return Ok(Json.toJson(obj))
   }
   def as2() = Action(as2Fn(_))
 }
