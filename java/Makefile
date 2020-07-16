@@ -13,3 +13,8 @@ clean:
 run-server:
 	./gradlew server:runPlay
 .PHONEY: run-server
+
+dist-server:
+	./gradlew server:dist
+	echo "You can find the zips under java/server/build/distributions"
+.PHONEY: dist-server
