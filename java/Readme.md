@@ -3,6 +3,7 @@ This repository has multiple Gradle projects.
 - openedi-converter - A library that parse EDIFACT D.96A and output Opentrans 2.1 XML
 - openedi-exe - A command line (jar) for converting EDIFACT files
 - openedi-email-fetcher - A tool that connects to an inbox and automatically convert EDIFACT files from attachments
+- openedi-server - A server that receives HTTP POST requests of edifact
 
 To build jar files:
 
@@ -51,3 +52,14 @@ Post XML:
 ```
   --http-post-to="https://connect.boni.ch/OpaccOne/B2B/Channel/XmlOverHttp/YWE"
 ```
+
+To run server:
+
+```
+make run-server
+```
+
+To configure server:
+- In `server/conf/application.conf`, you can set where to save the files
+  - `edifact-orders`
+  - `opentrans-orders`
