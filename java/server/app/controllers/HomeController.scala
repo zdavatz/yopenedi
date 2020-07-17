@@ -10,6 +10,8 @@ import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
+import java.net._
+import java.nio.charset.Charset
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 import com.ywesee.java.yopenedi.converter._
@@ -82,6 +84,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         val ediOutStream = new FileOutputStream(new File(ediOrdersFolder, filename))
         IOUtils.copy(s, ediOutStream)
     }
+    val outFile = new File(otOrdersFolder, filename)
 
     val result = retryWithEdifactExtracted(encoding, makeStream, (s: InputStream) => {
       val er = new EdifactReader()
@@ -96,11 +99,18 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         val otOrder = converter.orderToOpenTrans(ediOrders.get(0))
         println(otOrder)
         val writer = new OpenTransWriter()
-        val outStream = new FileOutputStream(new File(otOrdersFolder, filename))
+        val outStream = new FileOutputStream(outFile)
         writer.write(otOrder, outStream)
         Right(Unit)
       }
     })
+
+    val postToUrl = config.getOptional[String]("http-post-to")
+    for (url <- postToUrl) {
+      if (!url.isEmpty()) {
+        uploadFile(url, outFile)
+      }
+    }
 
     result match {
       case Left(e) => return e
@@ -137,6 +147,23 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
             }
           }
       }
+    }
+  }
+  def uploadFile(urlStr: String, file: File) {
+    try {
+      println("Uploading file (" + file.getAbsolutePath() + ") to " + urlStr);
+      val url = new URL(urlStr);
+      val con = url.openConnection();
+      val http = con.asInstanceOf[HttpURLConnection];
+      http.setRequestMethod("POST");
+      http.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
+      http.setDoInput(true);
+      http.setDoOutput(true);
+      IOUtils.copy(new FileInputStream(file), con.getOutputStream());
+      val res = IOUtils.toString(con.getInputStream(), Charset.defaultCharset());
+      println("Response: " + res);
+    } catch {
+      case e: Exception => println(e.getMessage());
     }
   }
 }
