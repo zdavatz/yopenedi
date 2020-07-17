@@ -39,10 +39,10 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     val as2To = request.headers.get("as2-to")
     val as2From = request.headers.get("as2-from")
     val body = request.body.asText
-    println(messageId)
 
     val now = LocalDateTime.now()
     val filename = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"))
+    val encoding = request.charset.getOrElse("UTF-8")
 
     val ediOrdersPath = config.get[String]("edifact-orders")
     val otOrdersPath = config.get[String]("opentrans-orders")
@@ -66,7 +66,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
             Right(new FileInputStream(file.ref.path.toFile()))
           }
         case c: AnyContentAsText =>
-          Right(IOUtils.toInputStream(c.txt, request.charset.getOrElse("UTF-8")))
+          Right(IOUtils.toInputStream(c.txt, encoding))
         case c: AnyContentAsRaw =>
           val file = c.raw.asFile
           Right(new FileInputStream(file))
@@ -83,28 +83,60 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         IOUtils.copy(s, ediOutStream)
     }
 
-    makeStream() match {
-      case Left(r) =>
-        return r
-      case Right(s) =>
-        val er = new EdifactReader()
-        val ediOrders = er.run(s)
-        println(ediOrders)
-        val converter = new Converter()
-        if (ediOrders.size() == 0) {
-          return BadRequest("More than 1 order in EDIFACT file.")
-        }
+    val result = retryWithEdifactExtracted(encoding, makeStream, (s: InputStream) => {
+      val er = new EdifactReader()
+      val ediOrders = er.run(s)
+      println(ediOrders)
+      val converter = new Converter()
+      if (ediOrders.size() == 0) {
+        Left(BadRequest("No order found in EDIFACT file."))
+      } else if (ediOrders.size() > 1) {
+        Left(BadRequest("More than 1 order in EDIFACT file."))
+      } else {
         val otOrder = converter.orderToOpenTrans(ediOrders.get(0))
         println(otOrder)
         val writer = new OpenTransWriter()
         val outStream = new FileOutputStream(new File(otOrdersFolder, filename))
         writer.write(otOrder, outStream)
-    }
+        Right(Unit)
+      }
+    })
 
-    val obj = Json.obj(
-      "ok" -> true
-    )
-    return Ok(Json.toJson(obj))
+    result match {
+      case Left(e) => return e
+      case Right(_) =>
+        val obj = Json.obj(
+          "ok" -> true
+        )
+        return Ok(Json.toJson(obj))
+    }
   }
   def as2() = Action(as2Fn(_))
+
+  // Sometimes Play fails to parse request, e.g. it doesn't understand
+  // the request when multipart boundary has "="
+  // We retry when the stream fails, by manually extracting the EDIFACT out of the request body
+  def retryWithEdifactExtracted[A, B](encoding: String, mkStream: () => Either[A, InputStream], op: InputStream => Either[A, B]): Either[A, B] = {
+    mkStream().right.flatMap { s =>
+      val result = op(s)
+      result match {
+        case Right(a) => Right(a)
+        case Left(_) =>
+          mkStream().right.flatMap { s =>
+            val it = IOUtils.lineIterator(s, encoding)
+            var ediLine: Option[String] = None
+            while (it.hasNext()) {
+              val line = it.nextLine()
+              if (line.startsWith("UNA") && line.contains("UNZ")) {
+                ediLine = Some(line)
+              }
+            }
+            ediLine match {
+              case Some(l) => op(IOUtils.toInputStream(l, encoding))
+              case None => op(IOUtils.toInputStream("", encoding))
+            }
+          }
+      }
+    }
+  }
 }
