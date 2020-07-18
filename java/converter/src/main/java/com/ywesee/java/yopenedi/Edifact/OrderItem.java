@@ -10,4 +10,5 @@ public class OrderItem {
     public String quantityUnit;
     public BigDecimal price;
     public BigDecimal priceQuantity;
+    public String deliveryDate;
 }

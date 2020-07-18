@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 import static com.ywesee.java.yopenedi.converter.Utility.formatDateISO;
@@ -20,8 +21,8 @@ public class Converter {
         Order o = new Order();
         o.id = order.id;
 
-        o.deliveryStartDate = dateStringToISOString(order.deliveryStartDate);
-        o.deliveryEndDate = dateStringToISOString(order.deliveryEndDate);
+        o.deliveryStartDate = dateStringToOpenTransString(order.deliveryStartDate);
+        o.deliveryEndDate = dateStringToOpenTransString(order.deliveryEndDate);
         o.deliveryConditionCode = order.deliveryConditionCode;
         o.deliveryConditionDetails = order.deliveryConditionDetails;
         o.currencyCoded = order.currencyCoded;
@@ -100,6 +101,8 @@ public class Converter {
         oi.quantityUnit = orderItem.quantityUnit;
         oi.price = orderItem.price;
         oi.priceQuantity = orderItem.priceQuantity;
+        oi.deliveryStartDate = dateStringToOpenTransString(orderItem.deliveryDate);
+        oi.deliveryEndDate = dateStringToOpenTransString(orderItem.deliveryDate);
         return oi;
     }
 
@@ -280,14 +283,17 @@ public class Converter {
         return aoc;
     }
 
-    static String dateStringToISOString(String dateString) {
+    static String dateStringToOpenTransString(String dateString) {
         if (dateString == null) {
             return null;
         }
         DateFormat df = new SimpleDateFormat("yyyyMMdd");
         try {
             Date date = df.parse(dateString);
-            return formatDateISO(date);
+            TimeZone tz = TimeZone.getTimeZone("UTC");
+            SimpleDateFormat otdf = new SimpleDateFormat("yyyy-MM-dd");
+            df.setTimeZone(tz);
+            return otdf.format(date);
         } catch (ParseException e) {
             return "";
         }

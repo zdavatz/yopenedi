@@ -53,8 +53,8 @@ public class EdifactReader {
                 for (SegmentGroup1 segmentGroup1 : orders.getSegmentGroup1()) {
                     C506Reference ref = segmentGroup1.getRFFReference().getC506Reference();
                     if (ref.getE1153ReferenceQualifier().equals("AJK")) {
-                        order.deliveryConditionCode = "AJK"; // UDX.JA.DeliveryConditionCode
-                        order.deliveryConditionDetails = ref.getE1154ReferenceNumber(); // UDX.JA.DeliveryConditionDetails
+                        order.deliveryConditionCode = "AJK"; // UDX.JA.DeliveryConditionID
+                        order.deliveryConditionDetails = ref.getE1154ReferenceNumber(); // UDX.JA.DeliveryCondition
                     }
                 }
                 for (SegmentGroup2 segmentGroup2 : orders.getSegmentGroup2()) {
@@ -183,6 +183,15 @@ public class EdifactReader {
                         } catch (NullPointerException e) {
                         }
                     }
+
+                    List<DTMDateTimePeriod> dtms = segmentGroup25.getDTMDateTimePeriod();
+                    for (DTMDateTimePeriod dtm : dtms) {
+                        C507DateTimePeriod c507 = dtm.getC507DateTimePeriod();
+                        if (c507.getE2005DateTimePeriodQualifier().equals("2")) {
+                            orderItem.deliveryDate = c507.getE2380DateTimePeriod();
+                        }
+                    }
+
                     for (SegmentGroup28 segmentGroup28 : segmentGroup25.getSegmentGroup28()) {
                         try {
                             PRIPriceDetails priceDetails = segmentGroup28.getPRIPriceDetails();
