@@ -53,8 +53,8 @@ public class EdifactReader {
                 for (SegmentGroup1 segmentGroup1 : orders.getSegmentGroup1()) {
                     C506Reference ref = segmentGroup1.getRFFReference().getC506Reference();
                     if (ref.getE1153ReferenceQualifier().equals("AJK")) {
-                        order.deliveryConditionCode = "AJK"; // UDX.JA.DeliveryConditionCode
-                        order.deliveryConditionDetails = ref.getE1154ReferenceNumber(); // UDX.JA.DeliveryConditionDetails
+                        order.deliveryConditionCode = "AJK"; // UDX.JA.DeliveryConditionID
+                        order.deliveryConditionDetails = ref.getE1154ReferenceNumber(); // UDX.JA.DeliveryCondition
                     }
                 }
                 for (SegmentGroup2 segmentGroup2 : orders.getSegmentGroup2()) {

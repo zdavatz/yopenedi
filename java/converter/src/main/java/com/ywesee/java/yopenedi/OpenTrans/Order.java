@@ -116,14 +116,14 @@ public class Order {
 
         streamWriter.writeStartElement("HEADER_UDX");
         if (notNullOrEmpty(this.deliveryConditionCode)) {
-            streamWriter.writeStartElement("UDX.JA.DeliveryConditionCode");
+            streamWriter.writeStartElement("UDX.JA.DeliveryConditionID");
             streamWriter.writeCharacters(this.deliveryConditionCode);
-            streamWriter.writeEndElement(); // UDX.JA.DeliveryConditionCode
+            streamWriter.writeEndElement(); // UDX.JA.DeliveryConditionID
         }
         if (notNullOrEmpty(this.deliveryConditionDetails)) {
-            streamWriter.writeStartElement("UDX.JA.DeliveryConditionDetails");
+            streamWriter.writeStartElement("UDX.JA.DeliveryCondition");
             streamWriter.writeCharacters(this.deliveryConditionDetails);
-            streamWriter.writeEndElement();
+            streamWriter.writeEndElement(); // UDX.JA.DeliveryCondition
         }
         streamWriter.writeEndElement(); // HEADER_UDX
 
