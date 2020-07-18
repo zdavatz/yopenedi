@@ -94,6 +94,26 @@ public class Order {
             streamWriter.writeEndElement(); // CURRENCY
         }
 
+        for (Party p : parties) {
+            if (p.role == Party.Role.Buyer) {
+                String partnerName = null;
+                if (p.id.equals("4028684094012")) {
+                    partnerName = "REXEL";
+                } else if (p.id.equals("4015828000008")) {
+                    partnerName = "DEHA";
+                } else if (p.id.equals("4031271000006")) {
+                    partnerName = "OBETA";
+                }
+                if (partnerName != null) {
+                    streamWriter.writeStartElement("REMARKS");
+                    streamWriter.writeAttribute("type", "udx.channel");
+                    streamWriter.writeCharacters(partnerName);
+                    streamWriter.writeEndElement(); // REMARKS
+                    break;
+                }
+            }
+        }
+
         streamWriter.writeStartElement("HEADER_UDX");
         if (notNullOrEmpty(this.deliveryConditionCode)) {
             streamWriter.writeStartElement("UDX.JA.DeliveryConditionCode");
