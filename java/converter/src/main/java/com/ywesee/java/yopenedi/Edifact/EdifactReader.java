@@ -183,6 +183,15 @@ public class EdifactReader {
                         } catch (NullPointerException e) {
                         }
                     }
+
+                    List<DTMDateTimePeriod> dtms = segmentGroup25.getDTMDateTimePeriod();
+                    for (DTMDateTimePeriod dtm : dtms) {
+                        C507DateTimePeriod c507 = dtm.getC507DateTimePeriod();
+                        if (c507.getE2005DateTimePeriodQualifier().equals("2")) {
+                            orderItem.deliveryDate = c507.getE2380DateTimePeriod();
+                        }
+                    }
+
                     for (SegmentGroup28 segmentGroup28 : segmentGroup25.getSegmentGroup28()) {
                         try {
                             PRIPriceDetails priceDetails = segmentGroup28.getPRIPriceDetails();

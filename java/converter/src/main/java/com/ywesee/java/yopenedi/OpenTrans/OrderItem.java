@@ -16,6 +16,23 @@ public class OrderItem {
     public BigDecimal price; // How much is it per (this.priceQuantity)
     // e.g. When this.priceQuantity = 3 and this.price = 100, it's possible to buy 3 unit with $100
 
+    public String deliveryStartDate;
+    public String deliveryEndDate;
+
+    public String getDeliveryStartDateOrFallback() {
+        if (deliveryStartDate != null) {
+            return deliveryStartDate;
+        }
+        return deliveryEndDate;
+    }
+
+    public String getDeliveryEndDateOrFallback() {
+        if (deliveryEndDate != null) {
+            return deliveryEndDate;
+        }
+        return deliveryStartDate;
+    }
+
     public BigDecimal totalPrice() {
         return this.price.multiply(this.quantity).divide(this.priceQuantity, BigDecimal.ROUND_HALF_UP);
     }
@@ -65,6 +82,21 @@ public class OrderItem {
         s.writeStartElement("PRICE_LINE_AMOUNT");
         s.writeCharacters(this.totalPrice().toString());
         s.writeEndElement(); // PRICE_LINE_AMOUNT
+
+        s.writeStartElement("DELIVERY_DATE");
+        String startDateString = getDeliveryStartDateOrFallback();
+        if (startDateString != null) {
+            s.writeStartElement("DELIVERY_START_DATE");
+            s.writeCharacters(startDateString);
+            s.writeEndElement(); // DELIVERY_START_DATE
+        }
+        String endDateString = getDeliveryEndDateOrFallback();
+        if (endDateString != null) {
+            s.writeStartElement("DELIVERY_END_DATE");
+            s.writeCharacters(endDateString);
+            s.writeEndElement(); // DELIVERY_END_DATE
+        }
+        s.writeEndElement(); // DELIVERY_DATE
 
         s.writeEndElement(); // ORDER_ITEM
     }
