@@ -23,6 +23,20 @@ public class Order {
     public ArrayList<Party> parties = new ArrayList<>();
     public ArrayList<OrderItem> orderItems = new ArrayList<>();
 
+    public String getDeliveryStartDateOrFallback() {
+        if (deliveryStartDate != null) {
+            return deliveryStartDate;
+        }
+        return deliveryEndDate;
+    }
+
+    public String getDeliveryEndDateOrFallback() {
+        if (deliveryEndDate != null) {
+            return deliveryEndDate;
+        }
+        return deliveryStartDate;
+    }
+
     public void write(XMLStreamWriter streamWriter) throws XMLStreamException {
 
         streamWriter.writeStartElement("ORDER");
@@ -60,16 +74,20 @@ public class Order {
         streamWriter.writeCharacters(Utility.formatDateISO(new Date()));
         streamWriter.writeEndElement(); // ORDER_DATE
 
-        if (this.deliveryStartDate != null && this.deliveryEndDate != null) {
-            streamWriter.writeStartElement("DELIVERY_DATE");
+        streamWriter.writeStartElement("DELIVERY_DATE");
+        String startDateString = getDeliveryStartDateOrFallback();
+        if (startDateString != null) {
             streamWriter.writeStartElement("DELIVERY_START_DATE");
-            streamWriter.writeCharacters(this.deliveryStartDate);
+            streamWriter.writeCharacters(startDateString);
             streamWriter.writeEndElement();
-            streamWriter.writeStartElement("DELIVERY_END_DATE");
-            streamWriter.writeCharacters(this.deliveryEndDate);
-            streamWriter.writeEndElement();
-            streamWriter.writeEndElement(); // DELIVERY_DATE
         }
+        String endDateString = getDeliveryEndDateOrFallback();
+        if (endDateString != null) {
+            streamWriter.writeStartElement("DELIVERY_END_DATE");
+            streamWriter.writeCharacters(endDateString);
+            streamWriter.writeEndElement();
+        }
+        streamWriter.writeEndElement(); // DELIVERY_DATE
 
         streamWriter.writeStartElement("PARTIES");
         for (Party party : this.parties) {
