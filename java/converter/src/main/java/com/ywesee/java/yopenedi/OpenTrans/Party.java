@@ -34,14 +34,9 @@ public class Party {
         s.writeAttribute("type", "iln");
         s.writeCharacters(this.id);
         s.writeEndElement(); // PARTY_ID
-
-        s.writeStartElement("bmecat:PARTY_ID");
-        s.writeAttribute("type", "supplier_specific");
-        s.writeCharacters(this.supplierSpecificPartyId);
-        s.writeEndElement(); // PARTY_ID
-
-        s.writeStartElement("PARTY_ROLE");
+        
         if (this.role != null) {
+            s.writeStartElement("PARTY_ROLE");
             switch (this.role) {
                 case Buyer:
                     s.writeCharacters("buyer");
@@ -53,8 +48,8 @@ public class Party {
                     s.writeCharacters("delivery");
                     break; // TODO: or deliverer?
             }
+            s.writeEndElement(); // PARTY_ROLE
         }
-        s.writeEndElement(); // PARTY_ROLE
 
         s.writeStartElement("ADDRESS");
         if (notNullOrEmpty(this.name)) {
