@@ -82,8 +82,10 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       case Left(r) =>
         return r
       case Right(s) =>
-        val ediOutStream = new FileOutputStream(new File(ediOrdersFolder, filename))
+        val outFile = new File(ediOrdersFolder, filename)
+        val ediOutStream = new FileOutputStream(outFile)
         IOUtils.copy(s, ediOutStream)
+        Logger.debug("Edifact File size: " + outFile.length())
     }
     val outFile = new File(otOrdersFolder, filename)
 
@@ -106,6 +108,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         val writer = new OpenTransWriter()
         val outStream = new FileOutputStream(outFile)
         writer.write(otOrder, outStream)
+        Logger.debug("File size: " + outFile.length())
         Right(Unit)
       }
     })
@@ -122,7 +125,9 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         case Right(s) =>
           extractedEdifact(s, encoding) match {
             case Some(ediStr) =>
-              FileUtils.write(new File(ediOrdersFolder, filename), ediStr, encoding, false)
+              val ediOutFile = new File(ediOrdersFolder, filename)
+              FileUtils.write(ediOutFile, ediStr, encoding, false)
+              Logger.debug("Edifact file size: " + ediOutFile.length())
             case _ => {}
           }
       }
