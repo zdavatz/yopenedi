@@ -89,7 +89,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     val result = retryWithEdifactExtracted(encoding, makeStream, (s: InputStream) => {
       val er = new EdifactReader()
       val ediOrders = er.run(s)
-      println(ediOrders)
+      Logger.debug("EDIFACT orders: " + ediOrders.toString())
       val converter = new Converter()
       if (ediOrders.size() == 0) {
         Left(BadRequest("No order found in EDIFACT file."))
@@ -97,7 +97,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         Left(BadRequest("More than 1 order in EDIFACT file."))
       } else {
         val otOrder = converter.orderToOpenTrans(ediOrders.get(0))
-        println(otOrder)
+        Logger.debug("Opentrans order: " + otOrder.toString())
         val writer = new OpenTransWriter()
         val outStream = new FileOutputStream(outFile)
         writer.write(otOrder, outStream)
@@ -132,18 +132,22 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       result match {
         case Right(a) => Right(a)
         case Left(_) =>
+          Logger.info("Retrying by extracting EDIFACT from request body")
           mkStream().right.flatMap { s =>
             val it = IOUtils.lineIterator(s, encoding)
             var ediLine: Option[String] = None
             while (it.hasNext()) {
               val line = it.nextLine()
               if (line.startsWith("UNA") && line.contains("UNZ")) {
+                Logger.info("Extracted EDIFACT from request body")
                 ediLine = Some(line)
               }
             }
             ediLine match {
               case Some(l) => op(IOUtils.toInputStream(l, encoding))
-              case None => op(IOUtils.toInputStream("", encoding))
+              case None =>
+                Logger.error("Cannot find EDIFACT from request body")
+                op(IOUtils.toInputStream("", encoding))
             }
           }
       }
@@ -151,7 +155,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
   }
   def uploadFile(urlStr: String, file: File) {
     try {
-      println("Uploading file (" + file.getAbsolutePath() + ") to " + urlStr);
+      Logger.info("Uploading file (" + file.getAbsolutePath() + ") to " + urlStr);
       val url = new URL(urlStr);
       val con = url.openConnection();
       val http = con.asInstanceOf[HttpURLConnection];
@@ -161,9 +165,9 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       http.setDoOutput(true);
       IOUtils.copy(new FileInputStream(file), con.getOutputStream());
       val res = IOUtils.toString(con.getInputStream(), Charset.defaultCharset());
-      println("Response: " + res);
+      Logger.info("Response: " + res);
     } catch {
-      case e: Exception => println(e.getMessage());
+      case e: Exception => Logger.error(e.getMessage());
     }
   }
 }
