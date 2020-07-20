@@ -5,6 +5,7 @@ import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 
+import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
 import java.io.File
 import java.io.FileInputStream
@@ -86,7 +87,11 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     }
     val outFile = new File(otOrdersFolder, filename)
 
-    val result = retryWithEdifactExtracted(encoding, makeStream, (s: InputStream) => {
+    var retried = false
+    val result = retryWithEdifactExtracted(encoding, makeStream, (s: InputStream, isRetry) => {
+      if (isRetry) {
+        retried = true
+      }
       val er = new EdifactReader()
       val ediOrders = er.run(s)
       Logger.debug("EDIFACT orders: " + ediOrders.toString())
@@ -104,6 +109,24 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         Right(Unit)
       }
     })
+
+    result match {
+      case Left(e) => return e
+      case _ => {}
+    }
+
+    if (retried) {
+      makeStream() match {
+        case Left(r) =>
+          return r
+        case Right(s) =>
+          extractedEdifact(s, encoding) match {
+            case Some(ediStr) =>
+              FileUtils.write(new File(ediOrdersFolder, filename), ediStr, encoding, false)
+            case _ => {}
+          }
+      }
+    }
 
     val postToUrl = config.getOptional[String]("http-post-to")
     for (url <- postToUrl) {
@@ -126,34 +149,38 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
   // Sometimes Play fails to parse request, e.g. it doesn't understand
   // the request when multipart boundary has "="
   // We retry when the stream fails, by manually extracting the EDIFACT out of the request body
-  def retryWithEdifactExtracted[A, B](encoding: String, mkStream: () => Either[A, InputStream], op: InputStream => Either[A, B]): Either[A, B] = {
+  private def retryWithEdifactExtracted[A, B](encoding: String, mkStream: () => Either[A, InputStream], op: (InputStream, Boolean) => Either[A, B]): Either[A, B] = {
     mkStream().right.flatMap { s =>
-      val result = op(s)
+      val result = op(s, false)
       result match {
         case Right(a) => Right(a)
         case Left(_) =>
           Logger.info("Retrying by extracting EDIFACT from request body")
           mkStream().right.flatMap { s =>
-            val it = IOUtils.lineIterator(s, encoding)
-            var ediLine: Option[String] = None
-            while (it.hasNext()) {
-              val line = it.nextLine()
-              if (line.startsWith("UNA") && line.contains("UNZ")) {
-                Logger.info("Extracted EDIFACT from request body")
-                ediLine = Some(line)
-              }
-            }
+            var ediLine: Option[String] = extractedEdifact(s, encoding)
             ediLine match {
-              case Some(l) => op(IOUtils.toInputStream(l, encoding))
+              case Some(l) => op(IOUtils.toInputStream(l, encoding), true)
               case None =>
                 Logger.error("Cannot find EDIFACT from request body")
-                op(IOUtils.toInputStream("", encoding))
+                op(IOUtils.toInputStream("", encoding), true)
             }
           }
       }
     }
   }
-  def uploadFile(urlStr: String, file: File) {
+
+  private def extractedEdifact(s: InputStream, encoding: String): Option[String] = {
+    val it = IOUtils.lineIterator(s, encoding)
+    while (it.hasNext()) {
+      val line = it.nextLine()
+      if (line.startsWith("UNA") && line.contains("UNZ")) {
+        return Some(line)
+      }
+    }
+    return None
+  }
+
+  private def uploadFile(urlStr: String, file: File) {
     try {
       Logger.info("Uploading file (" + file.getAbsolutePath() + ") to " + urlStr);
       val url = new URL(urlStr);
