@@ -35,11 +35,6 @@ public class Party {
         s.writeCharacters(this.id);
         s.writeEndElement(); // PARTY_ID
 
-        s.writeStartElement("bmecat:PARTY_ID");
-        s.writeAttribute("type", "supplier_specific");
-        s.writeCharacters(this.supplierSpecificPartyId);
-        s.writeEndElement(); // PARTY_ID
-
         s.writeStartElement("PARTY_ROLE");
         if (this.role != null) {
             switch (this.role) {
