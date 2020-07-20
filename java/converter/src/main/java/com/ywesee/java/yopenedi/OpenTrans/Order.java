@@ -11,6 +11,7 @@ import java.util.Date;
 import static com.ywesee.java.yopenedi.converter.Utility.notNullOrEmpty;
 
 public class Order {
+    public Boolean isTestEnvironment = false;
     public String id;
     public String deliveryStartDate;
     public String deliveryEndDate;
@@ -56,6 +57,11 @@ public class Order {
         streamWriter.writeStartElement("ORDER_HEADER");
 
         streamWriter.writeStartElement("CONTROL_INFO");
+        if (isTestEnvironment) {
+            streamWriter.writeStartElement("STOP_AUTOMATIC_PROCESSING");
+            streamWriter.writeCharacters("Document from Test-Environment");
+            streamWriter.writeEndElement(); // STOP_AUTOMATIC_ PROCESSING
+        }
         streamWriter.writeStartElement("GENERATOR_INFO");
         streamWriter.writeCharacters("Yopenedi Java");
         streamWriter.writeEndElement(); // GENERATOR_INFO
