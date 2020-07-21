@@ -198,6 +198,12 @@ public class App {
             out = System.out;
         }
         writer.write(invoice, out);
+        out.flush();
+        FileDescriptor fd = out.getFD();
+        if (fd != null) {
+            fd.sync();
+        }
+        out.close();
     }
 
     enum FileType {

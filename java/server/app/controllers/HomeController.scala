@@ -58,6 +58,8 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     val otOrdersFolder = new File(otOrdersPath)
     if (!otOrdersFolder.exists()) {
       otOrdersFolder.mkdirs()
+    } else if (!otOrdersFolder.isDirectory()) {
+      throw new Exception(otOrdersPath + " is not a directory");
     }
 
     def makeStream(): Either[Result, InputStream] = {
@@ -89,6 +91,9 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         Logger.debug("Edifact File size: " + outFile.length())
     }
     val outFile = new File(otOrdersFolder, filename)
+    if (outFile.exists() && !outFile.canWrite()) {
+      throw new Exception("Cannot write file to: " + outFile.getAbsolutePath())
+    }
 
     var retried = false
     val result = retryWithEdifactExtracted(encoding, makeStream, (s: InputStream, isRetry) => {
@@ -97,7 +102,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       }
       val er = new EdifactReader()
       val ediOrders = er.run(s)
-      Logger.debug("EDIFACT orders: " + ediOrders.toString())
+      Logger.debug("EDIFACT orders count: " + ediOrders.size())
       val converter = new Converter()
       if (ediOrders.size() == 0) {
         Left(BadRequest("No order found in EDIFACT file."))
@@ -110,6 +115,9 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         val writer = new OpenTransWriter()
         val outStream = new FileOutputStream(outFile)
         writer.write(otOrder, outStream)
+        outStream.flush()
+        outStream.getFD().sync()
+        outStream.close()
         Logger.debug("File written: " + outFile.getAbsolutePath())
         Logger.debug("File size: " + outFile.length())
         Right(Unit)

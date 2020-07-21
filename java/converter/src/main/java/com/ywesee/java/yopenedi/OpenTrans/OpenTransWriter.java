@@ -11,5 +11,7 @@ public class OpenTransWriter {
         xmlWriter.writeStartDocument();
         order.write(xmlWriter);
         xmlWriter.writeEndDocument();
+        xmlWriter.flush();
+        xmlWriter.close();
     }
 }
