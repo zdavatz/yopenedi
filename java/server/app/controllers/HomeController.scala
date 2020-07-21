@@ -49,6 +49,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
 
     val ediOrdersPath = config.get[String]("edifact-orders")
     val otOrdersPath = config.get[String]("opentrans-orders")
+    val environment = config.getOptional[String]("environment")
 
     val ediOrdersFolder = new File(ediOrdersPath)
     if (!ediOrdersFolder.exists()) {
@@ -104,10 +105,12 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         Left(BadRequest("More than 1 order in EDIFACT file."))
       } else {
         val otOrder = converter.orderToOpenTrans(ediOrders.get(0))
+        otOrder.isTestEnvironment = environment.equals(Some("test"))
         Logger.debug("Opentrans order: " + otOrder.toString())
         val writer = new OpenTransWriter()
         val outStream = new FileOutputStream(outFile)
         writer.write(otOrder, outStream)
+        Logger.debug("File written: " + outFile.getAbsolutePath())
         Logger.debug("File size: " + outFile.length())
         Right(Unit)
       }
