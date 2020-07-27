@@ -127,6 +127,8 @@ public class Order {
                     partnerName = "DEHA";
                 } else if (p.id.equals("4031271000006")) {
                     partnerName = "OBETA";
+                } else if (p.id.equals("4018062000001")) {
+                    partnerName = "BÜRKLE";
                 }
                 if (partnerName != null) {
                     streamWriter.writeStartElement("REMARKS");
