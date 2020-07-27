@@ -199,10 +199,13 @@ public class App {
         }
         writer.write(invoice, out);
         out.flush();
-        FileDescriptor fd = out.getFD();
-        if (fd != null) {
-            fd.sync();
+        if (out instanceof FileOutputStream) {
+            FileDescriptor fd = ((FileOutputStream)out).getFD();
+            if (fd != null) {
+                fd.sync();
+            }
         }
+
         out.close();
     }
 
