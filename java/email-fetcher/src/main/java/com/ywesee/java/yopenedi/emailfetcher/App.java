@@ -37,6 +37,7 @@ public class App {
     static boolean skipSeenMessage;
     static boolean markMessageAsSeen;
     static boolean showDebugMessages;
+    static boolean isTestEnvironment;
     static String httpPostTo = null;
 
     static boolean setupCliFromArgs(String[] args) {
@@ -94,6 +95,9 @@ public class App {
         Option debugOption = new Option(null, "debug", false, "Show debug messages");
         options.addOption(debugOption);
 
+        Option testOption = new Option(null, "test", false, "Add test environment message to OpenTrans file");
+        options.addOption(testOption);
+
         CommandLineParser parser = new DefaultParser();
         try {
             CommandLine cmd = parser.parse(options, args);
@@ -145,6 +149,7 @@ public class App {
             skipSeenMessage = cmd.hasOption("skip-seen");
             markMessageAsSeen = cmd.hasOption("mark-as-seen");
             showDebugMessages = cmd.hasOption("debug");
+            isTestEnvironment = cmd.hasOption("test");
             if (cmd.hasOption("http-post-to")) {
                 httpPostTo = cmd.getOptionValue("http-post-to");
             }
@@ -242,6 +247,7 @@ public class App {
             Converter converter = new Converter();
             converter.shouldMergeContactDetails = true;
             com.ywesee.java.yopenedi.OpenTrans.Order otOrder = converter.orderToOpenTrans(orders.get(0));
+            otOrder.isTestEnvironment = isTestEnvironment;
 
             File targetFile = new File(openTransFolder, uid + ".xml");
             FileOutputStream otStream = new FileOutputStream(targetFile);
