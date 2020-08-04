@@ -103,6 +103,7 @@ public class Converter {
         oi.priceQuantity = orderItem.priceQuantity;
         oi.deliveryStartDate = dateStringToOpenTransString(orderItem.deliveryDate);
         oi.deliveryEndDate = dateStringToOpenTransString(orderItem.deliveryDate);
+        oi.supplierSpecificProductId = orderItem.supplierSpecificProductId;
         return oi;
     }
 

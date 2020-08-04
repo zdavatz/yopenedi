@@ -4,6 +4,7 @@ import com.ywesee.java.yopenedi.Edifact.ContactDetail;
 import com.ywesee.java.yopenedi.Edifact.Order;
 import com.ywesee.java.yopenedi.Edifact.OrderItem;
 import com.ywesee.java.yopenedi.Edifact.Party;
+import com.ywesee.java.yopenedi.converter.Utility;
 import org.milyn.edi.unedifact.d96a.D96AInterchangeFactory;
 import org.milyn.edi.unedifact.d96a.ORDERS.*;
 import org.milyn.edi.unedifact.d96a.common.*;
@@ -165,7 +166,16 @@ public class EdifactReader {
                     ArrayList<String> descriptions = new ArrayList<String>();
                     for (IMDItemDescription itemDescription : segmentGroup25.getIMDItemDescription()) {
                         try {
-                            descriptions.add(itemDescription.getC273ItemDescription().getE70081ItemDescription());
+                            String desc = itemDescription.getC273ItemDescription().getE70081ItemDescription();
+
+                            // Seems like it's possible for supplier to put their product id
+                            // into description. We treat description string that's a number as the supplier product id
+                            // https://github.com/zdavatz/yopenedi/issues/92
+                            if (Utility.isAllDigit(desc)) {
+                                orderItem.supplierSpecificProductId = desc;
+                            } else {
+                                descriptions.add(desc);
+                            }
                         } catch (NullPointerException e) {
                         }
                     }
