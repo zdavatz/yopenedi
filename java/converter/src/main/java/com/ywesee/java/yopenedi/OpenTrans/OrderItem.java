@@ -10,6 +10,7 @@ public class OrderItem {
     public String ean;
     public String descriptionShort;
     public String descriptionLong;
+    public String supplierSpecificProductId;
     public String quantityUnit;
     public BigDecimal quantity; // How many unit is ordered
     public BigDecimal priceQuantity; // The quantity that (this.price) can buy.
@@ -45,6 +46,12 @@ public class OrderItem {
         s.writeEndElement(); // LINE_ITEM_ID
 
         s.writeStartElement("PRODUCT_ID");
+        if (notNullOrEmpty(this.supplierSpecificProductId)) {
+            s.writeStartElement("SUPPLIER_PID");
+            s.writeAttribute("type" ,"supplier_specific");
+            s.writeCharacters(this.supplierSpecificProductId);
+            s.writeEndElement(); // SUPPLIER_PID
+        }
         s.writeStartElement("bmecat:INTERNATIONAL_PID");
         s.writeAttribute("type", "ean");
         s.writeCharacters(this.ean);

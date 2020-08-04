@@ -78,4 +78,14 @@ public class Utility {
         }
         return null;
     }
+
+    public static boolean isAllDigit(String s) {
+        char[] chars = s.toCharArray();
+        for (char c : chars) {
+            if (c < '0' || c > '9') {
+                return false;
+            }
+        }
+        return true;
+    }
 }
