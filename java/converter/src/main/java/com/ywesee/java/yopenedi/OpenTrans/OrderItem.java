@@ -47,7 +47,7 @@ public class OrderItem {
 
         s.writeStartElement("PRODUCT_ID");
         if (notNullOrEmpty(this.supplierSpecificProductId)) {
-            s.writeStartElement("SUPPLIER_PID");
+            s.writeStartElement("bmecat:SUPPLIER_PID");
             s.writeAttribute("type" ,"supplier_specific");
             s.writeCharacters(this.supplierSpecificProductId);
             s.writeEndElement(); // SUPPLIER_PID
