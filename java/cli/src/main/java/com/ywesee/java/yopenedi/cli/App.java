@@ -7,6 +7,7 @@ import com.ywesee.java.yopenedi.Edifact.EdifactWriter;
 import com.ywesee.java.yopenedi.Edifact.Invoice;
 import com.ywesee.java.yopenedi.OpenTrans.OpenTransReader;
 import com.ywesee.java.yopenedi.OpenTrans.Order;
+import com.ywesee.java.yopenedi.converter.Config;
 import com.ywesee.java.yopenedi.converter.Converter;
 import com.ywesee.java.yopenedi.OpenTrans.OpenTransWriter;
 import com.ywesee.java.yopenedi.Edifact.EdifactReader;
@@ -83,6 +84,10 @@ public class App {
 
         Option debugOption = new Option(null, "debug", false, "Show debug messages");
         options.addOption(debugOption);
+
+        Option conf = new Option("c", "conf", true, "Config folder");
+        conf.setType(String.class);
+        options.addOption(conf);
 
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
@@ -175,8 +180,13 @@ public class App {
             } else {
                 out = System.out;
             }
+            String confPath = cmd.getOptionValue("conf");
+            if (confPath == null) {
+                confPath = "./conf";
+            }
+            Config config = new Config(confPath);
             OpenTransWriter w = new OpenTransWriter();
-            w.write(otOrder, out);
+            w.write(otOrder, out, config);
             out.close();
             if (!isMultiple) {
                 break;
@@ -186,9 +196,7 @@ public class App {
 
     static void openTransToEdifact(InputStream in, File outFile, CommandLine cmd) throws Exception {
         OpenTransReader reader = new OpenTransReader();
-        com.ywesee.java.yopenedi.OpenTrans.Invoice otInvoice = reader.run(in);
         Converter converter = new Converter();
-        Invoice invoice = converter.invoiceToEdifact(otInvoice);
         EdifactWriter writer = new EdifactWriter();
         OutputStream out;
         if (outFile != null) {
@@ -197,7 +205,13 @@ public class App {
         } else {
             out = System.out;
         }
-        writer.write(invoice, out);
+
+        Object otObject = reader.run(in);
+        if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.Invoice) {
+            com.ywesee.java.yopenedi.OpenTrans.Invoice otInvoice = (com.ywesee.java.yopenedi.OpenTrans.Invoice)otObject;
+            Invoice invoice = converter.invoiceToEdifact(otInvoice);
+            writer.write(invoice, out);
+        }
         out.flush();
         if (out instanceof FileOutputStream) {
             FileDescriptor fd = ((FileOutputStream)out).getFD();
@@ -205,7 +219,6 @@ public class App {
                 fd.sync();
             }
         }
-
         out.close();
     }
 
