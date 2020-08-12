@@ -1,5 +1,6 @@
 package com.ywesee.java.yopenedi.OpenTrans;
 
+import com.sun.tools.javac.util.Pair;
 import com.ywesee.java.yopenedi.converter.Utility;
 
 import javax.xml.namespace.QName;
@@ -14,7 +15,22 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 public class OpenTransReader {
-    public Invoice run(InputStream stream) throws XMLStreamException {
+    public Object run(InputStream stream) throws Exception {
+        Pair<InputStream, Detector.FileType> result = new Detector().detect(stream);
+        switch (result.snd) {
+            case Invoice:
+                return readInvoice(result.fst);
+            case OrderResponse:
+                throw new Exception("Reading OpenTrans ORDERRESPONSE is not supported yet");
+            case DispatchNotification:
+                throw new Exception("Reading OpenTrans DISPATCHNOTIFICATION is not supported yet");
+            case Order:
+                throw new Exception("Reading OpenTrans ORDER is not supported yet");
+        }
+        throw new Exception("Cannot detect file type");
+    }
+
+    public Invoice readInvoice(InputStream stream) throws XMLStreamException {
         XMLInputFactory factory = XMLInputFactory.newFactory();
         XMLEventReader eventReader = factory.createXMLEventReader(stream);
         while (eventReader.hasNext()) {

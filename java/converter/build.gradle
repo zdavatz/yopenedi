@@ -24,8 +24,10 @@ dependencies {
     implementation 'org.milyn:milyn-smooks-all:1.7.1'
     implementation 'org.milyn:milyn-smooks-core:1.7.1'
     implementation 'org.milyn:milyn-commons:1.7.1'
+    compile group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1'
 
     implementation 'org.apache.commons:commons-lang3:3.10'
+    compile group: 'commons-io', name: 'commons-io', version: '2.7'
 
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     // implementation 'com.google.guava:guava:28.0-jre'

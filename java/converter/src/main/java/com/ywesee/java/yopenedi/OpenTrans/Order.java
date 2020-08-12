@@ -1,5 +1,6 @@
 package com.ywesee.java.yopenedi.OpenTrans;
 
+import com.ywesee.java.yopenedi.converter.Config;
 import com.ywesee.java.yopenedi.converter.Utility;
 
 import javax.xml.stream.XMLStreamException;
@@ -7,6 +8,7 @@ import javax.xml.stream.XMLStreamWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Map;
 
 import static com.ywesee.java.yopenedi.converter.Utility.notNullOrEmpty;
 
@@ -38,7 +40,7 @@ public class Order {
         return deliveryStartDate;
     }
 
-    public void write(XMLStreamWriter streamWriter) throws XMLStreamException {
+    public void write(XMLStreamWriter streamWriter, Config config) throws XMLStreamException {
 
         streamWriter.writeStartElement("ORDER");
         streamWriter.writeAttribute("xmlns", "http://www.opentrans.org/XMLSchema/2.1");
@@ -46,14 +48,14 @@ public class Order {
         streamWriter.writeAttribute("version", "2.1");
         streamWriter.writeAttribute("type", "standard");
 
-        writeOrderHeader(streamWriter);
+        writeOrderHeader(streamWriter, config);
         writeOrderItemList(streamWriter);
         writeOrderSummary(streamWriter);
 
         streamWriter.writeEndElement(); // ORDER
     }
 
-    private void writeOrderHeader(XMLStreamWriter streamWriter) throws XMLStreamException {
+    private void writeOrderHeader(XMLStreamWriter streamWriter, Config config) throws XMLStreamException {
         streamWriter.writeStartElement("ORDER_HEADER");
 
         streamWriter.writeStartElement("CONTROL_INFO");
@@ -120,16 +122,8 @@ public class Order {
 
         for (Party p : parties) {
             if (p.role == Party.Role.Buyer) {
-                String partnerName = null;
-                if (p.id.equals("4028684094012")) {
-                    partnerName = "REXEL";
-                } else if (p.id.equals("4015828000008")) {
-                    partnerName = "DEHA";
-                } else if (p.id.equals("4031271000006")) {
-                    partnerName = "OBETA";
-                } else if (p.id.equals("4018062000001")) {
-                    partnerName = "BÜRKLE";
-                }
+                Map<String, String> channelNameMap = config.udxChannel();
+                String partnerName = channelNameMap.get(p.id);
                 if (partnerName != null) {
                     streamWriter.writeStartElement("REMARKS");
                     streamWriter.writeAttribute("type", "udx.channel");
