@@ -3,6 +3,7 @@
  */
 package com.ywesee.java.yopenedi.emailfetcher;
 
+import com.ywesee.java.yopenedi.converter.Config;
 import com.ywesee.java.yopenedi.converter.Converter;
 import com.ywesee.java.yopenedi.OpenTrans.OpenTransWriter;
 import com.ywesee.java.yopenedi.Edifact.Order;
@@ -26,6 +27,7 @@ import java.util.Properties;
 public class App {
     static File edifactFolder;
     static File openTransFolder;
+    static String confPath;
 
     static String mailboxName = "inbox";
     static String mailUsername;
@@ -98,6 +100,10 @@ public class App {
         Option testOption = new Option(null, "test", false, "Add test environment message to OpenTrans file");
         options.addOption(testOption);
 
+        Option confOption = new Option("c", "conf", true, "Config folder");
+        confOption.setType(String.class);
+        options.addOption(confOption);
+
         CommandLineParser parser = new DefaultParser();
         try {
             CommandLine cmd = parser.parse(options, args);
@@ -150,6 +156,7 @@ public class App {
             markMessageAsSeen = cmd.hasOption("mark-as-seen");
             showDebugMessages = cmd.hasOption("debug");
             isTestEnvironment = cmd.hasOption("test");
+            confPath = cmd.getOptionValue("conf", "./conf");
             if (cmd.hasOption("http-post-to")) {
                 httpPostTo = cmd.getOptionValue("http-post-to");
             }
@@ -253,8 +260,9 @@ public class App {
             FileOutputStream otStream = new FileOutputStream(targetFile);
             System.out.println("Outputting order(id=" + otOrder.id + ") to " + targetFile.getAbsolutePath());
 
+            Config config = new Config(confPath);
             OpenTransWriter w = new OpenTransWriter();
-            w.write(otOrder, otStream);
+            w.write(otOrder, otStream, config);
             otStream.close();
             otStream.close();
 
