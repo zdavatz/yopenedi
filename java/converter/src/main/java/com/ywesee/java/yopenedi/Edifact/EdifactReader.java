@@ -1,9 +1,5 @@
 package com.ywesee.java.yopenedi.Edifact;
 
-import com.ywesee.java.yopenedi.Edifact.ContactDetail;
-import com.ywesee.java.yopenedi.Edifact.Order;
-import com.ywesee.java.yopenedi.Edifact.OrderItem;
-import com.ywesee.java.yopenedi.Edifact.Party;
 import com.ywesee.java.yopenedi.converter.Utility;
 import org.milyn.edi.unedifact.d96a.D96AInterchangeFactory;
 import org.milyn.edi.unedifact.d96a.ORDERS.*;
