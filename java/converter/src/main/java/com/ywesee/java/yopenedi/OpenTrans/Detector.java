@@ -1,6 +1,6 @@
 package com.ywesee.java.yopenedi.OpenTrans;
 
-import com.sun.tools.javac.util.Pair;
+import com.ywesee.java.yopenedi.converter.Pair;
 
 import java.io.IOException;
 import java.io.InputStream;
