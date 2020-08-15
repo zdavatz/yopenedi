@@ -1,9 +1,15 @@
 package com.ywesee.java.yopenedi.OpenTrans;
 
+import javax.xml.namespace.QName;
+import javax.xml.stream.XMLEventReader;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import java.util.ArrayList;
 
+import static com.ywesee.java.yopenedi.OpenTrans.Utility.nextStringOrNull;
 import static com.ywesee.java.yopenedi.converter.Utility.notNullOrEmpty;
 
 public class Party {
@@ -26,6 +32,98 @@ public class Party {
 
     public String vatId;
     public String taxNumber;
+
+    public Party() {
+    }
+
+    public Party(XMLEventReader er, StartElement _se) throws XMLStreamException {
+        while (er.hasNext()) {
+            XMLEvent event = er.nextEvent();
+            if (event.isStartElement()) {
+                StartElement se = event.asStartElement();
+                String name = se.getName().getLocalPart();
+
+                if (name.equals("CONTACT_DETAILS")) {
+                    processContactDetail(er, se);
+                } else if (name.equals("PARTY_ID") && se.getAttributeByName(new QName("type")).getValue().equals("iln")) {
+                    this.id = nextStringOrNull(er);
+                } else if (name.equals("PARTY_ID") && se.getAttributeByName(new QName("type")).getValue().equals("supplier_specific")) {
+                    this.supplierSpecificPartyId = nextStringOrNull(er);
+                } else if (name.equals("PARTY_ROLE")) {
+                    String roleStr = nextStringOrNull(er);
+                    if (roleStr.equals("buyer")) {
+                        this.role = Party.Role.Buyer;
+                    } else if (roleStr.equals("supplier")) {
+                        this.role = Party.Role.Supplier;
+                    } else if (roleStr.equals("delivery")) {
+                        this.role = Party.Role.Delivery;
+                    } else if (roleStr.equals("invoice_recipient") || roleStr.equals("recipient")) {
+                        this.role = Party.Role.InvoiceRecipient;
+                    }
+                } else if (name.equals("NAME")) {
+                    this.name = nextStringOrNull(er);
+                } else if (name.equals("NAME2")) {
+                    this.name = this.name + " " + nextStringOrNull(er);
+                } else if (name.equals("NAME3")) {
+                    this.name = this.name + " " + nextStringOrNull(er);
+                } else if (name.equals("STREET")) {
+                    this.street = nextStringOrNull(er);
+                } else if (name.equals("ZIP")) {
+                    this.zip = nextStringOrNull(er);
+                } else if (name.equals("CITY")) {
+                    this.city = nextStringOrNull(er);
+                } else if (name.equals("COUNTRY_CODED")) {
+                    this.countryCoded = nextStringOrNull(er);
+                } else if (name.equals("VAT_ID")) {
+                    this.vatId = nextStringOrNull(er);
+                } else if (name.equals("TAX_NUMBER")) {
+                    this.taxNumber = nextStringOrNull(er);
+                }
+                // TODO, more info e.g. PHONE / FAX / EMAIL in <PARTY><ADDRESS>
+                // or put into contact details?
+            }
+
+            if (event.isEndElement()) {
+                EndElement ee = event.asEndElement();
+                String name = ee.getName().getLocalPart();
+                if (name.equals("PARTY")) {
+                    break;
+                }
+            }
+        }
+    }
+
+    void processContactDetail(XMLEventReader er, StartElement _se) throws XMLStreamException {
+        ContactDetail cd = new ContactDetail();
+        this.contactDetails.add(cd);
+
+        while(er.hasNext()) {
+            XMLEvent event = er.nextEvent();
+
+            if (event.isStartElement()) {
+                StartElement se = event.asStartElement();
+                String name = se.getName().getLocalPart();
+                if (name.equals("CONTACT_NAME")) {
+                    cd.name = nextStringOrNull(er);
+                } else if (name.equals("FIRST_NAME")) {
+                    cd.firstName = nextStringOrNull(er);
+                } else if (name.equals("PHONE")) {
+                    cd.phone = nextStringOrNull(er);
+                } else if (name.equals("FAX")) {
+                    cd.fax = nextStringOrNull(er);
+                } else if (name.equals("EMAILS")) {
+                    cd.email = nextStringOrNull(er);
+                }
+            }
+            if (event.isEndElement()) {
+                EndElement ee = event.asEndElement();
+                String name = ee.getName().getLocalPart();
+                if (name.equals("CONTACT_DETAILS")) {
+                    break;
+                }
+            }
+        }
+    }
 
     public void write(XMLStreamWriter s) throws XMLStreamException {
         s.writeStartElement("PARTY");
