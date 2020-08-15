@@ -16,9 +16,9 @@ public class OrderResponseItem {
     public BigDecimal orderQuantity;
     public BigDecimal deliveryQuantity;
 
-    public String requestedDeliveryDate;
-    public String promisedDeliveryDate;
-    public String actualDeliveryDate;
+    public Date requestedDeliveryDate;
+    public Date promisedDeliveryDate;
+    public Date actualDeliveryDate;
 
     public BigDecimal priceLineAmount;
     public BigDecimal price;

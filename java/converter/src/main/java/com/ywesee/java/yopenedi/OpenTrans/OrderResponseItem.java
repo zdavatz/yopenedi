@@ -6,7 +6,10 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import java.util.Date;
+
 import static com.ywesee.java.yopenedi.OpenTrans.Utility.nextStringOrNull;
+import static com.ywesee.java.yopenedi.OpenTrans.Utility.parseNextDateString;
 
 public class OrderResponseItem {
     public String lineItemId;
@@ -25,8 +28,8 @@ public class OrderResponseItem {
     public Float tax; // 0.19 means 19%
     public String taxAmount;
     public String priceLineAmount;
-    public String deliveryStartDate;
-    public String deliveryEndDate;
+    public Date deliveryStartDate;
+    public Date deliveryEndDate;
 
     public OrderResponseItem(XMLEventReader er, StartElement _se) throws XMLStreamException {
         while (er.hasNext()) {
@@ -67,9 +70,9 @@ public class OrderResponseItem {
                 } else if (name.equals("PRICE_LINE_AMOUNT")) {
                     this.priceLineAmount = nextStringOrNull(er);
                 } else if (name.equals("DELIVERY_START_DATE")) {
-                    this.deliveryStartDate = nextStringOrNull(er);
+                    this.deliveryStartDate = parseNextDateString(er);
                 } else if (name.equals("DELIVERY_END_DATE")) {
-                    this.deliveryEndDate = nextStringOrNull(er);
+                    this.deliveryEndDate = parseNextDateString(er);
                 }
             }
             if (event.isEndElement()) {

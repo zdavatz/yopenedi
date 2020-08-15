@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import static com.ywesee.java.yopenedi.OpenTrans.Utility.nextStringOrNull;
+import static com.ywesee.java.yopenedi.OpenTrans.Utility.parseNextDateString;
 
 public class OrderResponse {
     public String orderId;
@@ -164,14 +165,5 @@ public class OrderResponse {
                 }
             }
         }
-    }
-
-    private Date parseNextDateString(XMLEventReader er) {
-        try {
-            String dateStr = nextStringOrNull(er);
-            DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-            return df.parse(dateStr);
-        } catch (Exception e) {}
-        return null;
     }
 }

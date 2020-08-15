@@ -284,6 +284,68 @@ public class Converter {
         return aoc;
     }
 
+    public com.ywesee.java.yopenedi.Edifact.OrderResponse orderResponseToEdifact(OrderResponse orderResponse) {
+        com.ywesee.java.yopenedi.Edifact.OrderResponse or = new com.ywesee.java.yopenedi.Edifact.OrderResponse();
+        or.referenceNumber = orderResponse.orderId;
+        or.documentNumber = orderResponse.orderId;
+        or.orderDate = orderResponse.orderResponseDate;
+        or.deliveryDate = orderResponse.deliveryEndDate;
+        or.orderNumberFromBuyer = orderResponse.buyerIdRef;
+
+        or.referenceDate = orderResponse.orderResponseDate;
+
+        or.taxType = orderResponse.getTaxType();
+        try {
+            or.taxRate = String.valueOf(orderResponse.getTaxRate() * 100);
+        } catch (Exception e){ }
+        or.currencyCode = orderResponse.currencyCode;
+
+        or.items = new ArrayList<>();
+        for (OrderResponseItem orderResponseItem : orderResponse.orderResponseItems) {
+            com.ywesee.java.yopenedi.Edifact.OrderResponseItem converted = orderResponseItemToEdifact(orderResponseItem);
+            converted.buyerOrderId = orderResponse.orderId;
+            converted.referenceDate = orderResponse.orderResponseDate;
+            or.items.add(converted);
+        }
+        or.items = orderResponse.orderResponseItems.stream()
+                .map(this::orderResponseItemToEdifact)
+                .collect(Collectors.toCollection(ArrayList::new));
+        or.parties = orderResponse.parties.stream()
+                .map(this::partyToEdifact)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        return or;
+    }
+
+    public com.ywesee.java.yopenedi.Edifact.OrderResponseItem orderResponseItemToEdifact(OrderResponseItem orderResponseItem) {
+        com.ywesee.java.yopenedi.Edifact.OrderResponseItem ori = new com.ywesee.java.yopenedi.Edifact.OrderResponseItem();
+
+        ori.lineItemId = new BigDecimal(orderResponseItem.lineItemId);
+        ori.ean = orderResponseItem.internationalProductId;
+        ori.supplierSpecificProductId = orderResponseItem.supplierProductId;
+        ori.buyerSpecificProductId = orderResponseItem.buyerProductId;
+
+        ori.shortDescription = orderResponseItem.descriptionShort;
+        ori.longDescription = orderResponseItem.descriptionLong;
+        ori.orderQuantity = new BigDecimal(orderResponseItem.quantity);
+        ori.deliveryQuantity = new BigDecimal(orderResponseItem.quantity);
+
+        ori.promisedDeliveryDate = orderResponseItem.deliveryStartDate;
+        ori.actualDeliveryDate = orderResponseItem.deliveryEndDate;
+
+        ori.priceLineAmount = new BigDecimal(orderResponseItem.priceLineAmount);
+        ori.priceQuantity = new BigDecimal(orderResponseItem.priceQuantity);
+        ori.price = new BigDecimal(orderResponseItem.priceAmount);
+        ori.buyerOrderItemId = orderResponseItem.lineItemId;
+
+        ArrayList<com.ywesee.java.yopenedi.Edifact.AllowanceOrCharge> aocs = new ArrayList<>();
+        if (orderResponseItem.allowanceOrCharge != null) {
+            aocs.add(allowanceOrChargesToEdifact(orderResponseItem.allowanceOrCharge));
+        }
+        ori.allowanceOrCharges = aocs;
+        return ori;
+    }
+
     static String dateStringToOpenTransString(String dateString) {
         if (dateString == null) {
             return null;

@@ -2,6 +2,7 @@ package com.ywesee.java.yopenedi.converter;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
@@ -87,5 +88,32 @@ public class Utility {
             }
         }
         return true;
+    }
+
+    public static ArrayList<String> splitStringIntoParts(String input, int lengthLimit, int maxNumOfParts) {
+        ArrayList<String> arr = new ArrayList<>();
+        String[] parts = input.split(" ");
+        for (String part : parts) {
+            String cur;
+            boolean createNew;
+            if (arr.size() > 0) {
+                cur = arr.get(arr.size() - 1);
+                createNew = false;
+            } else {
+                cur = "";
+                createNew = true;
+            }
+            if (cur.length() + part.length() + 1 > lengthLimit && arr.size() < maxNumOfParts) {
+                cur = "";
+                createNew = true;
+            }
+            String newStr = cur + " " + part;
+            if (createNew) {
+                arr.add(newStr);
+            } else {
+                arr.set(arr.size() - 1, newStr);
+            }
+        }
+        return arr;
     }
 }

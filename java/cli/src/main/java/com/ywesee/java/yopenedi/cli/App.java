@@ -5,6 +5,7 @@ package com.ywesee.java.yopenedi.cli;
 
 import com.ywesee.java.yopenedi.Edifact.EdifactWriter;
 import com.ywesee.java.yopenedi.Edifact.Invoice;
+import com.ywesee.java.yopenedi.Edifact.OrderResponse;
 import com.ywesee.java.yopenedi.OpenTrans.OpenTransReader;
 import com.ywesee.java.yopenedi.OpenTrans.Order;
 import com.ywesee.java.yopenedi.converter.Config;
@@ -211,6 +212,10 @@ public class App {
             com.ywesee.java.yopenedi.OpenTrans.Invoice otInvoice = (com.ywesee.java.yopenedi.OpenTrans.Invoice)otObject;
             Invoice invoice = converter.invoiceToEdifact(otInvoice);
             writer.write(invoice, out);
+        } else if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.OrderResponse) {
+            com.ywesee.java.yopenedi.OpenTrans.OrderResponse or = (com.ywesee.java.yopenedi.OpenTrans.OrderResponse)otObject;
+            OrderResponse orderResponse = converter.orderResponseToEdifact(or);
+            writer.write(orderResponse, out);
         }
         out.flush();
         if (out instanceof FileOutputStream) {
