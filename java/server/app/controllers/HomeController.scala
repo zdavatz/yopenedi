@@ -41,12 +41,12 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     val messageId = request.headers.get("message-id")
     val as2To = request.headers.get("as2-to")
     val as2From = request.headers.get("as2-from")
-    val body = request.body.asText
 
     val now = LocalDateTime.now()
     val filename = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"))
     val encoding = request.charset.getOrElse("UTF-8")
 
+    val configPath = config.getOptional[String]("conversion-config").getOrElse("./conf")
     val ediOrdersPath = config.get[String]("edifact-orders")
     val otOrdersPath = config.get[String]("opentrans-orders")
     val environment = config.getOptional[String]("environment")
@@ -113,11 +113,10 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         otOrder.isTestEnvironment = environment.equals(Some("test"))
         Logger.debug("Opentrans order: " + otOrder.toString())
 
-        val configPath = config.getOptional[String]("conversion-config").getOrElse("./conf")
         val converterConfig = new Config(configPath)
-        val writer = new OpenTransWriter()
+        val writer = new OpenTransWriter(converterConfig)
         val outStream = new FileOutputStream(outFile)
-        writer.write(otOrder, outStream, converterConfig)
+        writer.write(otOrder, outStream)
         outStream.flush()
         outStream.getFD().sync()
         outStream.close()
@@ -164,6 +163,85 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     }
   }
   def as2() = Action(as2Fn(_))
+
+  def janicoFn(request: Request[AnyContent]): Result = {
+    val now = LocalDateTime.now()
+    val filename = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"))
+    val encoding = request.charset.getOrElse("UTF-8")
+
+    val configPath = config.getOptional[String]("conversion-config").getOrElse("./conf")
+    val ediOrderResponsesPath = config.get[String]("edifact-order-responses")
+    val otOrderResponsesPath = config.get[String]("opentrans-order-responses")
+    val environment = config.getOptional[String]("environment")
+
+    val ediOrderResponsesFolder = new File(ediOrderResponsesPath)
+    if (!ediOrderResponsesFolder.exists()) {
+      ediOrderResponsesFolder.mkdirs()
+    }
+    val otOrderResponsesFolder = new File(otOrderResponsesPath)
+    if (!otOrderResponsesFolder.exists()) {
+      otOrderResponsesFolder.mkdirs()
+    } else if (!otOrderResponsesFolder.isDirectory()) {
+      throw new Exception(otOrderResponsesPath + " is not a directory");
+    }
+
+    def makeStream(): Either[Result, InputStream] = {
+      request.body match {
+        case c: AnyContentAsMultipartFormData =>
+          if (c.mfd.files.length == 0) {
+            Left(BadRequest("No file found"))
+          } else {
+            val file = c.mfd.files.head
+            Right(new FileInputStream(file.ref.path.toFile()))
+          }
+        case c: AnyContentAsText =>
+          Right(IOUtils.toInputStream(c.txt, encoding))
+        case c: AnyContentAsRaw =>
+          val file = c.raw.asFile
+          Right(new FileInputStream(file))
+        case c: AnyContentAsXml =>
+          Right(IOUtils.toInputStream(c.xml.toString(), encoding))
+        case _ =>
+          Left(BadRequest("Invalid content type"))
+      }
+    }
+
+    val inFile = new File(otOrderResponsesFolder, filename)
+    if (inFile.exists() && !inFile.canWrite()) {
+      throw new Exception("Cannot write file to: " + inFile.getAbsolutePath())
+    }
+
+    makeStream() match {
+      case Left(r) =>
+        return r
+      case Right(s) =>
+        val otStream = new FileOutputStream(inFile)
+        IOUtils.copy(s, otStream)
+        Logger.debug("OpenTrans File size: " + inFile.length())
+    }
+
+    val outFile = new File(ediOrderResponsesFolder, filename)
+    if (outFile.exists() && !outFile.canWrite()) {
+      throw new Exception("Cannot write file to: " + outFile.getAbsolutePath())
+    }
+
+    makeStream() match {
+      case Left(r) =>
+        return r
+      case Right(s) =>
+        val converter = new Converter()
+        val writable = converter.run(s).snd
+        val otOutStream = new FileOutputStream(outFile)
+        writable.write(otOutStream, new Config(configPath))
+        Logger.debug("Wrote file to: " + outFile.length())
+    }
+
+    val obj = Json.obj(
+      "ok" -> true
+    )
+    return Ok(Json.toJson(obj))
+  }
+  def janico() = Action(janicoFn(_))
 
   // Sometimes Play fails to parse request, e.g. it doesn't understand
   // the request when multipart boundary has "="

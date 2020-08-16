@@ -12,6 +12,7 @@ import com.ywesee.java.yopenedi.converter.Config;
 import com.ywesee.java.yopenedi.converter.Converter;
 import com.ywesee.java.yopenedi.OpenTrans.OpenTransWriter;
 import com.ywesee.java.yopenedi.Edifact.EdifactReader;
+import com.ywesee.java.yopenedi.converter.Pair;
 import org.apache.commons.cli.*;
 
 import javax.activation.DataHandler;
@@ -106,7 +107,7 @@ public class App {
             s = System.in;
         }
         PushbackInputStream buffered = new PushbackInputStream(s, 8);
-        FileType ft = detectFileType(buffered);
+        Pair<InputStream, Converter.FileType> detected = Converter.detectFileType(buffered);
 
         File outFile = null;
         if (cmd.hasOption("out")) {
@@ -116,7 +117,7 @@ public class App {
                 if (isMultiple) {
                     outFile = new File(cmd.getOptionValue("in")+"_out");
                 } else {
-                    switch (ft) {
+                    switch (detected.snd) {
                         case Edifact:
                             outFile = new File(cmd.getOptionValue("in") + ".xml");
                             break;
@@ -142,12 +143,12 @@ public class App {
             }
         }
 
-        switch (ft) {
+        switch (detected.snd) {
             case OpenTrans:
-                openTransToEdifact(buffered, outFile, cmd);
+                openTransToEdifact(detected.fst, outFile, cmd);
                 break;
             case Edifact:
-                edifactToOpenTrans(buffered, outFile, cmd);
+                edifactToOpenTrans(detected.fst, outFile, cmd);
                 break;
         }
         sendEmail(cmd, outFile);
@@ -186,8 +187,8 @@ public class App {
                 confPath = "./conf";
             }
             Config config = new Config(confPath);
-            OpenTransWriter w = new OpenTransWriter();
-            w.write(otOrder, out, config);
+            OpenTransWriter w = new OpenTransWriter(config);
+            w.write(otOrder, out);
             out.close();
             if (!isMultiple) {
                 break;
@@ -225,30 +226,6 @@ public class App {
             }
         }
         out.close();
-    }
-
-    enum FileType {
-        Edifact,
-        OpenTrans,
-    }
-
-    static FileType detectFileType(PushbackInputStream s) throws Exception {
-        final int bufferSize = 8;
-        final byte[] buffer = new byte[bufferSize];
-        s.read(buffer);
-        String firstBitOfFile = new String(buffer).trim();
-        s.unread(buffer);
-
-        if (firstBitOfFile.startsWith("\uFEFF")) { // BOM
-            firstBitOfFile = firstBitOfFile.substring(1);
-        }
-
-        if (firstBitOfFile.startsWith("<")) {
-            return FileType.OpenTrans;
-        } else if (firstBitOfFile.startsWith("U")) {
-            return FileType.Edifact;
-        }
-        throw new Exception("Unrecognised file type");
     }
 
     static void sendEmail(CommandLine cmd, File file) {

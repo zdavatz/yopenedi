@@ -1,5 +1,7 @@
 package com.ywesee.java.yopenedi.Edifact;
 
+import com.ywesee.java.yopenedi.converter.Config;
+import com.ywesee.java.yopenedi.converter.Writable;
 import org.milyn.edi.unedifact.d96a.D96AInterchangeFactory;
 import org.milyn.edi.unedifact.d96a.INVOIC.*;
 import org.milyn.edi.unedifact.d96a.common.*;
@@ -21,7 +23,7 @@ import java.util.Date;
 
 import static com.ywesee.java.yopenedi.converter.Utility.*;
 
-public class Invoice {
+public class Invoice implements Writable {
     public String referenceNumber;
     public String documentNumber;
     public Date orderDate;
@@ -732,5 +734,9 @@ public class Invoice {
         invoic.setSegmentGroup48(sg48s);
 
         factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream));
+    }
+
+    public void write(OutputStream s, Config _config) throws Exception {
+        this.write(s);
     }
 }

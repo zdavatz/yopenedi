@@ -11,14 +11,13 @@ import com.ywesee.java.yopenedi.Edifact.EdifactReader;
 
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.util.BASE64DecoderStream;
+import com.ywesee.java.yopenedi.converter.Pair;
+import com.ywesee.java.yopenedi.converter.Writable;
 import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 
 import javax.mail.*;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.*;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -238,33 +237,46 @@ public class App {
             }
             BASE64DecoderStream stream = (BASE64DecoderStream) content;
 
-            File f = new File(edifactFolder, "" + uid);
+            Pair<InputStream, Converter.FileType> detected = Converter.detectFileType(stream);
+            File inFolder;
+            File outFolder;
+            switch (detected.snd) {
+                case OpenTrans:
+                    // Detected OpenTrans
+                    inFolder = openTransFolder;
+                    outFolder = edifactFolder;
+                    break;
+                case Edifact:
+                default:
+                    // Detected Edifact
+                    inFolder = edifactFolder;
+                    outFolder = openTransFolder;
+                    break;
+            }
+
+            File f = new File(inFolder, "" + uid);
             FileOutputStream fos = new FileOutputStream(f);
-            IOUtils.copy(stream, fos);
+            IOUtils.copy(detected.fst, fos);
 
             System.out.println("Saved file to " + f.getAbsolutePath());
 
-            FileInputStream ediInputStream = new FileInputStream(f);
-            EdifactReader edifactReader = new EdifactReader();
-            ArrayList<Order> orders = edifactReader.run(ediInputStream);
-            if (orders.size() > 1) {
-                System.err.println("More than 1 order in edifact, ignore the rest");
-            }
-
             Converter converter = new Converter();
             converter.shouldMergeContactDetails = true;
-            com.ywesee.java.yopenedi.OpenTrans.Order otOrder = converter.orderToOpenTrans(orders.get(0));
-            otOrder.isTestEnvironment = isTestEnvironment;
 
-            File targetFile = new File(openTransFolder, uid + ".xml");
-            FileOutputStream otStream = new FileOutputStream(targetFile);
-            System.out.println("Outputting order(id=" + otOrder.id + ") to " + targetFile.getAbsolutePath());
+            Pair<Converter.FileType, Writable> converted = converter.run(new FileInputStream(f));
+
+            File targetFile = new File(outFolder, uid + ".xml");
+            FileOutputStream outputStream = new FileOutputStream(targetFile);
+
+            if (converted.snd instanceof com.ywesee.java.yopenedi.OpenTrans.Order) {
+                com.ywesee.java.yopenedi.OpenTrans.Order otOrder = (com.ywesee.java.yopenedi.OpenTrans.Order)converted.snd;
+                otOrder.isTestEnvironment = isTestEnvironment;
+                System.out.println("Outputting order(id=" + otOrder.id + ") to " + targetFile.getAbsolutePath());
+            }
 
             Config config = new Config(confPath);
-            OpenTransWriter w = new OpenTransWriter();
-            w.write(otOrder, otStream, config);
-            otStream.close();
-            otStream.close();
+            converted.snd.write(outputStream, config);
+            outputStream.close();
 
             if (markMessageAsSeen) {
                 System.out.println("Marking message as seen.");

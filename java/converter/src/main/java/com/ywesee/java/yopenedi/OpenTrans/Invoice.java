@@ -1,6 +1,7 @@
 package com.ywesee.java.yopenedi.OpenTrans;
 
 import com.ywesee.java.yopenedi.converter.Utility;
+import com.ywesee.java.yopenedi.converter.Writable;
 
 import javax.xml.namespace.QName;
 import javax.xml.stream.XMLEventReader;
@@ -10,7 +11,6 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.io.InputStream;
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.time.temporal.ChronoUnit;

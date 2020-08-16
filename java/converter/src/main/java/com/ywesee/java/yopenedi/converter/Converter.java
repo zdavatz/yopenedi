@@ -1,7 +1,10 @@
 package com.ywesee.java.yopenedi.converter;
 
+import com.ywesee.java.yopenedi.Edifact.EdifactReader;
+import com.ywesee.java.yopenedi.Edifact.EdifactWriter;
 import com.ywesee.java.yopenedi.OpenTrans.*;
 
+import java.io.*;
 import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -12,10 +15,40 @@ import java.util.Date;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
-import static com.ywesee.java.yopenedi.converter.Utility.formatDateISO;
-
 public class Converter {
     public boolean shouldMergeContactDetails;
+
+    public Pair<FileType, Writable> run(InputStream s) {
+        try {
+            Pair<InputStream, FileType> pair = Converter.detectFileType(s);
+            switch (pair.snd) {
+                case OpenTrans:
+                    OpenTransReader reader = new OpenTransReader();
+                    Object otObject = reader.run(pair.fst);
+                    if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.Invoice) {
+                        com.ywesee.java.yopenedi.OpenTrans.Invoice otInvoice = (com.ywesee.java.yopenedi.OpenTrans.Invoice) otObject;
+                        com.ywesee.java.yopenedi.Edifact.Invoice invoice = this.invoiceToEdifact(otInvoice);
+                        return new Pair<>(pair.snd, invoice);
+                    } else if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.OrderResponse) {
+                        com.ywesee.java.yopenedi.OpenTrans.OrderResponse or = (com.ywesee.java.yopenedi.OpenTrans.OrderResponse) otObject;
+                        com.ywesee.java.yopenedi.Edifact.OrderResponse orderResponse = this.orderResponseToEdifact(or);
+                        return new Pair<>(pair.snd, orderResponse);
+                    }
+                    break;
+                case Edifact:
+                    EdifactReader edifactReader = new EdifactReader();
+                    ArrayList<com.ywesee.java.yopenedi.Edifact.Order> ediOrders = edifactReader.run(pair.fst);
+                    System.err.println("Detected " + ediOrders.size() + " orders");
+                    if (ediOrders.size() == 0) {
+                        return null;
+                    }
+                    com.ywesee.java.yopenedi.Edifact.Order ediOrder = ediOrders.get(0);
+                    Order otOrder = orderToOpenTrans(ediOrder);
+                    return new Pair<>(pair.snd, otOrder);
+            }
+        } catch (Exception e) {}
+        return null;
+    }
 
     public Order orderToOpenTrans(com.ywesee.java.yopenedi.Edifact.Order order) {
         Order o = new Order();
@@ -373,5 +406,30 @@ public class Converter {
             return a;
         }
         return b;
+    }
+
+    public enum FileType {
+        Edifact,
+        OpenTrans,
+    }
+
+    public static Pair<InputStream, FileType> detectFileType(InputStream inputStream) throws Exception {
+        final int bufferSize = 8;
+        PushbackInputStream s = new PushbackInputStream(inputStream, bufferSize);
+        final byte[] buffer = new byte[bufferSize];
+        s.read(buffer);
+        String firstBitOfFile = new String(buffer).trim();
+        s.unread(buffer);
+
+        if (firstBitOfFile.startsWith("\uFEFF")) { // BOM
+            firstBitOfFile = firstBitOfFile.substring(1);
+        }
+
+        if (firstBitOfFile.startsWith("<")) {
+            return new Pair<>(s, FileType.OpenTrans);
+        } else if (firstBitOfFile.startsWith("U")) {
+            return new Pair<>(s, FileType.Edifact);
+        }
+        throw new Exception("Unrecognised file type");
     }
 }
