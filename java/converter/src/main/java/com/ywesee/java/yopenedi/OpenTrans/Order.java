@@ -2,9 +2,11 @@ package com.ywesee.java.yopenedi.OpenTrans;
 
 import com.ywesee.java.yopenedi.converter.Config;
 import com.ywesee.java.yopenedi.converter.Utility;
+import com.ywesee.java.yopenedi.converter.Writable;
 
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
+import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -12,7 +14,7 @@ import java.util.Map;
 
 import static com.ywesee.java.yopenedi.converter.Utility.notNullOrEmpty;
 
-public class Order {
+public class Order implements Writable {
     public Boolean isTestEnvironment = false;
     public String id;
     public String deliveryStartDate;
@@ -174,5 +176,10 @@ public class Order {
         streamWriter.writeCharacters(totalPrice.toString());
         streamWriter.writeEndElement(); // TOTAL_AMOUNT
         streamWriter.writeEndElement(); // ORDER_SUMMARY
+    }
+
+    public void write(OutputStream s, Config config) throws Exception {
+        OpenTransWriter writer = new OpenTransWriter(config);
+        writer.write(this, s);
     }
 }

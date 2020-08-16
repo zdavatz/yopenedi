@@ -7,7 +7,13 @@ import javax.xml.stream.XMLStreamWriter;
 import java.io.OutputStream;
 
 public class OpenTransWriter {
-    public void write(Order order, OutputStream outputStream, Config config) throws Exception {
+    public Config config;
+
+    public OpenTransWriter(Config config) {
+        this.config = config;
+    }
+
+    public void write(Order order, OutputStream outputStream) throws Exception {
         XMLOutputFactory xof = XMLOutputFactory.newFactory();
         XMLStreamWriter xmlWriter = xof.createXMLStreamWriter(outputStream);
         xmlWriter.writeStartDocument();

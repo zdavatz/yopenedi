@@ -1,5 +1,7 @@
 package com.ywesee.java.yopenedi.Edifact;
 
+import com.ywesee.java.yopenedi.converter.Config;
+import com.ywesee.java.yopenedi.converter.Writable;
 import org.milyn.edi.unedifact.d96a.D96AInterchangeFactory;
 import org.milyn.edi.unedifact.d96a.ORDRSP.*;
 import org.milyn.edi.unedifact.d96a.common.*;
@@ -21,7 +23,7 @@ import java.util.Date;
 import static com.ywesee.java.yopenedi.converter.Utility.*;
 import static com.ywesee.java.yopenedi.converter.Utility.getIndexOrNull;
 
-public class OrderResponse {
+public class OrderResponse implements Writable {
     public String referenceNumber;
     public String documentNumber;
     public Date orderDate;
@@ -532,5 +534,9 @@ public class OrderResponse {
         ordrsp.setUNSSectionControl(uns);
 
         factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream));
+    }
+
+    public void write(OutputStream s, Config _config) throws Exception {
+        this.write(s);
     }
 }
