@@ -100,6 +100,11 @@ public class OrderResponse implements Writable {
 
         interchange.setInterchangeHeader(unb41);
 
+        UNZ41 unz41 = new UNZ41();
+        unz41.setControlRef(this.referenceNumber); // interchange reference number
+        unz41.setControlCount(1);
+        interchange.setInterchangeTrailer(unz41);
+
         Ordrsp ordrsp = new Ordrsp();
 
         UNEdifactMessage41 message41 = new UNEdifactMessage41();
