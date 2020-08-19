@@ -70,7 +70,7 @@ public class OrderResponse implements Writable {
 
         UNB41 unb41 = new UNB41();
         SyntaxIdentifier syntaxIdentifier = new SyntaxIdentifier();
-        syntaxIdentifier.setId("UNOB");
+        syntaxIdentifier.setId("UNOC");
         syntaxIdentifier.setVersionNum("3");
         unb41.setSyntaxIdentifier(syntaxIdentifier);
 
@@ -324,6 +324,7 @@ public class OrderResponse implements Writable {
                 LINLineItem lineItem = new LINLineItem();
                 sg26.setLINLineItem(lineItem);
                 lineItem.setE1082LineItemNumber(item.lineItemId);
+                Utility.patchLineItem(lineItem);
                 C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
                 c212.setE7140ItemNumber(item.ean);
                 c212.setE7143ItemNumberTypeCoded("EN");
@@ -408,7 +409,7 @@ public class OrderResponse implements Writable {
                     DateFormat df = new SimpleDateFormat("yyyyMMdd");
                     DTMDateTimePeriod dtm = new DTMDateTimePeriod();
                     C507DateTimePeriod c507 = new C507DateTimePeriod();
-                    c507.setE2005DateTimePeriodQualifier("2");
+                    c507.setE2005DateTimePeriodQualifier("69");
                     c507.setE2379DateTimePeriodFormatQualifier("102");
                     c507.setE2380DateTimePeriod(df.format(item.promisedDeliveryDate));
                     dtm.setC507DateTimePeriod(c507);
@@ -418,7 +419,7 @@ public class OrderResponse implements Writable {
                     DateFormat df = new SimpleDateFormat("yyyyMMdd");
                     DTMDateTimePeriod dtm = new DTMDateTimePeriod();
                     C507DateTimePeriod c507 = new C507DateTimePeriod();
-                    c507.setE2005DateTimePeriodQualifier("2");
+                    c507.setE2005DateTimePeriodQualifier("35");
                     c507.setE2379DateTimePeriodFormatQualifier("102");
                     c507.setE2380DateTimePeriod(df.format(item.actualDeliveryDate));
                     dtm.setC507DateTimePeriod(c507);
@@ -495,16 +496,14 @@ public class OrderResponse implements Writable {
                     case Allowance:
                         alc.setE5463AllowanceOrChargeQualifier("A");
                 }
-                if (notNullOrEmpty(aoc.name)) {
-                    C552AllowanceChargeInformation c552 = new C552AllowanceChargeInformation();
-                    c552.setE5189ChargeAllowanceDescriptionCoded(aoc.name);
-                    alc.setC552AllowanceChargeInformation(c552);
-                }
                 if (notNullOrEmpty(aoc.sequence)) {
                     alc.setE1227CalculationSequenceIndicatorCoded(aoc.sequence);
                 }
                 C214SpecialServicesIdentification c214 = new C214SpecialServicesIdentification();
                 c214.setE7161SpecialServicesCoded("FC");
+                if (notNullOrEmpty(aoc.name)) {
+                    c214.setE71601SpecialService(aoc.name);
+                }
                 alc.setC214SpecialServicesIdentification(c214);
 
                 if (aoc.percentage != null) {
