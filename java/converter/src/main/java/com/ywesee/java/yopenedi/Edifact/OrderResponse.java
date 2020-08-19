@@ -408,7 +408,7 @@ public class OrderResponse implements Writable {
                     DateFormat df = new SimpleDateFormat("yyyyMMdd");
                     DTMDateTimePeriod dtm = new DTMDateTimePeriod();
                     C507DateTimePeriod c507 = new C507DateTimePeriod();
-                    c507.setE2005DateTimePeriodQualifier("2");
+                    c507.setE2005DateTimePeriodQualifier("69");
                     c507.setE2379DateTimePeriodFormatQualifier("102");
                     c507.setE2380DateTimePeriod(df.format(item.promisedDeliveryDate));
                     dtm.setC507DateTimePeriod(c507);
@@ -418,7 +418,7 @@ public class OrderResponse implements Writable {
                     DateFormat df = new SimpleDateFormat("yyyyMMdd");
                     DTMDateTimePeriod dtm = new DTMDateTimePeriod();
                     C507DateTimePeriod c507 = new C507DateTimePeriod();
-                    c507.setE2005DateTimePeriodQualifier("2");
+                    c507.setE2005DateTimePeriodQualifier("35");
                     c507.setE2379DateTimePeriodFormatQualifier("102");
                     c507.setE2380DateTimePeriod(df.format(item.actualDeliveryDate));
                     dtm.setC507DateTimePeriod(c507);
