@@ -496,16 +496,14 @@ public class OrderResponse implements Writable {
                     case Allowance:
                         alc.setE5463AllowanceOrChargeQualifier("A");
                 }
-                if (notNullOrEmpty(aoc.name)) {
-                    C552AllowanceChargeInformation c552 = new C552AllowanceChargeInformation();
-                    c552.setE5189ChargeAllowanceDescriptionCoded(aoc.name);
-                    alc.setC552AllowanceChargeInformation(c552);
-                }
                 if (notNullOrEmpty(aoc.sequence)) {
                     alc.setE1227CalculationSequenceIndicatorCoded(aoc.sequence);
                 }
                 C214SpecialServicesIdentification c214 = new C214SpecialServicesIdentification();
                 c214.setE7161SpecialServicesCoded("FC");
+                if (notNullOrEmpty(aoc.name)) {
+                    c214.setE71601SpecialService(aoc.name);
+                }
                 alc.setC214SpecialServicesIdentification(c214);
 
                 if (aoc.percentage != null) {
