@@ -39,6 +39,8 @@ public class OrderResponseItem {
                 String name = se.getName().getLocalPart();
                 if (name.equals("LINE_ITEM_ID")) {
                     this.lineItemId = nextStringOrNull(er);
+                } else if (name.equals("UDX.JA.BUYER_LINE_ITEM_ID")) {
+                    this.lineItemId = nextStringOrNull(er);
                 } else if (name.equals("SUPPLIER_PID")) {
                     this.supplierProductId = nextStringOrNull(er);
                 } else if (name.equals("INTERNATIONAL_PID")) {

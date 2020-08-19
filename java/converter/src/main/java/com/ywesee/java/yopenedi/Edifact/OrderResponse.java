@@ -324,6 +324,7 @@ public class OrderResponse implements Writable {
                 LINLineItem lineItem = new LINLineItem();
                 sg26.setLINLineItem(lineItem);
                 lineItem.setE1082LineItemNumber(item.lineItemId);
+                Utility.patchLineItem(lineItem);
                 C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
                 c212.setE7140ItemNumber(item.ean);
                 c212.setE7143ItemNumberTypeCoded("EN");
