@@ -3,11 +3,9 @@
  */
 package com.ywesee.java.yopenedi.emailfetcher;
 
-import com.ywesee.java.yopenedi.converter.Config;
+import com.ywesee.java.yopenedi.common.Config;
+import com.ywesee.java.yopenedi.common.EmailCredential;
 import com.ywesee.java.yopenedi.converter.Converter;
-import com.ywesee.java.yopenedi.OpenTrans.OpenTransWriter;
-import com.ywesee.java.yopenedi.Edifact.Order;
-import com.ywesee.java.yopenedi.Edifact.EdifactReader;
 
 import com.sun.mail.imap.IMAPFolder;
 import com.sun.mail.util.BASE64DecoderStream;
@@ -18,9 +16,6 @@ import org.apache.commons.io.IOUtils;
 
 import javax.mail.*;
 import java.io.*;
-import java.net.*;
-import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.Properties;
 
 public class App {
@@ -29,17 +24,11 @@ public class App {
     static String confPath;
 
     static String mailboxName = "inbox";
-    static String mailUsername;
-    static String mailPassword;
-    static String mailHost;
-    static String mailPort;
-    static boolean mailSecure = false;
 
     static boolean skipSeenMessage;
     static boolean markMessageAsSeen;
     static boolean showDebugMessages;
     static boolean isTestEnvironment;
-    static String httpPostTo = null;
 
     static boolean setupCliFromArgs(String[] args) {
         Options options = new Options();
@@ -61,34 +50,11 @@ public class App {
         mailboxOption.setType(String.class);
         options.addOption(mailboxOption);
 
-        Option usernameOption = new Option(null, "mail-username", true, "Username for mailbox");
-        usernameOption.setType(String.class);
-        options.addOption(usernameOption);
-
-        Option passwordOption = new Option(null, "mail-password", true, "Password for mailbox");
-        passwordOption.setType(String.class);
-        options.addOption(passwordOption);
-
-        Option hostOption = new Option(null, "mail-host", true, "Host for mailbox");
-        hostOption.setType(String.class);
-        options.addOption(hostOption);
-
-        Option portOption = new Option(null, "mail-port", true, "Port for mailbox");
-        portOption.setType(String.class);
-        options.addOption(portOption);
-
-        Option secureOption = new Option(null, "mail-secure", false, "Use SSL for imap?");
-        options.addOption(secureOption);
-
         Option skipSeenOption = new Option(null, "skip-seen", false, "Skip seen message?");
         options.addOption(skipSeenOption);
 
         Option markAsSeenOption = new Option(null, "mark-as-seen", false, "Mark message as seen after processing?");
         options.addOption(markAsSeenOption);
-
-        Option uploadOption = new Option(null, "http-post-to", true, "Where to upload the file after processing.");
-        uploadOption.setType(String.class);
-        options.addOption(uploadOption);
 
         Option helpOption = new Option("h", "help", false, "Display help message");
         options.addOption(helpOption);
@@ -119,22 +85,6 @@ public class App {
                     System.err.println("Missing Option: --opentrans");
                     showHelp = true;
                 }
-                if (!cmd.hasOption("mail-username")) {
-                    System.err.println("Missing Option: --mail-username");
-                    showHelp = true;
-                }
-                if (!cmd.hasOption("mail-password")) {
-                    System.err.println("Missing Option: --mail-password");
-                    showHelp = true;
-                }
-                if (!cmd.hasOption("mail-host")) {
-                    System.err.println("Missing Option: --mail-host");
-                    showHelp = true;
-                }
-                if (!cmd.hasOption("mail-port")) {
-                    System.err.println("Missing Option: --mail-port");
-                    showHelp = true;
-                }
             }
             if (showHelp) {
                 HelpFormatter formatter = new HelpFormatter();
@@ -146,19 +96,11 @@ public class App {
             if (cmd.hasOption("mailbox")) {
                 mailboxName = cmd.getOptionValue("mailbox");
             }
-            mailUsername = cmd.getOptionValue("mail-username");
-            mailPassword = cmd.getOptionValue("mail-password");
-            mailHost = cmd.getOptionValue("mail-host");
-            mailPort = cmd.getOptionValue("mail-port");
-            mailSecure = cmd.hasOption("mail-secure");
             skipSeenMessage = cmd.hasOption("skip-seen");
             markMessageAsSeen = cmd.hasOption("mark-as-seen");
             showDebugMessages = cmd.hasOption("debug");
             isTestEnvironment = cmd.hasOption("test");
             confPath = cmd.getOptionValue("conf", "./conf");
-            if (cmd.hasOption("http-post-to")) {
-                httpPostTo = cmd.getOptionValue("http-post-to");
-            }
             return true;
         } catch (ParseException e) {
             return false;
@@ -178,12 +120,15 @@ public class App {
             openTransFolder.mkdirs();
         }
 
+        Config config = new Config(confPath);
+        EmailCredential emailCreds = config.getEmailCredential();
+
         final Properties properties = new Properties();
-        if (mailSecure) {
+        if (emailCreds.secure) {
             properties.put("mail.imap.ssl.enable", "true");
         }
-        properties.setProperty("mail.imap.host", mailHost);
-        properties.setProperty("mail.imap.port", mailPort);
+        properties.setProperty("mail.imap.host", emailCreds.imapHost);
+        properties.setProperty("mail.imap.port", emailCreds.imapPort);
         properties.setProperty("mail.imap.connectiontimeout", "5000");
         properties.setProperty("mail.imap.timeout", "5000");
 
@@ -193,7 +138,7 @@ public class App {
         }
         Store imapStore = imapSession.getStore("imap");
 
-        imapStore.connect(mailHost, mailUsername, mailPassword);
+        imapStore.connect(emailCreds.imapHost, emailCreds.user, emailCreds.password);
 
         Folder defaultFolder = imapStore.getDefaultFolder();
         Folder[] folders = defaultFolder.list();
@@ -268,13 +213,34 @@ public class App {
             File targetFile = new File(outFolder, uid + ".xml");
             FileOutputStream outputStream = new FileOutputStream(targetFile);
 
+            String recipientGLN = null;
+            String orderId = null;
+            String edifactType = null;
             if (converted.snd instanceof com.ywesee.java.yopenedi.OpenTrans.Order) {
                 com.ywesee.java.yopenedi.OpenTrans.Order otOrder = (com.ywesee.java.yopenedi.OpenTrans.Order)converted.snd;
                 otOrder.isTestEnvironment = isTestEnvironment;
                 System.out.println("Outputting order(id=" + otOrder.id + ") to " + targetFile.getAbsolutePath());
+                com.ywesee.java.yopenedi.OpenTrans.Party recipient = otOrder.getRecipient();
+                if (recipient != null) {
+                    recipientGLN = recipient.id;
+                }
+                orderId = otOrder.id;
+                edifactType = "ORDERS";
+            } else if (converted.snd instanceof com.ywesee.java.yopenedi.Edifact.OrderResponse) {
+                com.ywesee.java.yopenedi.Edifact.OrderResponse ediOrderResponse = (com.ywesee.java.yopenedi.Edifact.OrderResponse)converted.snd;
+                com.ywesee.java.yopenedi.Edifact.Party recipient = ediOrderResponse.getRecipient();
+                if (recipient != null) {
+                    recipientGLN = recipient.id;
+                }
+                edifactType = "ORDRSP";
+            } else if (converted.snd instanceof com.ywesee.java.yopenedi.Edifact.Invoice) {
+                com.ywesee.java.yopenedi.Edifact.Invoice ediInvoice = (com.ywesee.java.yopenedi.Edifact.Invoice)converted.snd;
+                com.ywesee.java.yopenedi.Edifact.Party recipient = ediInvoice.getRecipient();
+                if (recipient != null) {
+                    recipientGLN = recipient.id;
+                }
+                edifactType = "INVOIC";
             }
-
-            Config config = new Config(confPath);
             converted.snd.write(outputStream, config);
             outputStream.close();
 
@@ -282,30 +248,9 @@ public class App {
                 System.out.println("Marking message as seen.");
                 message.setFlag(Flags.Flag.SEEN, true);
             }
-            uploadFile(targetFile);
+            config.dispatchResult(recipientGLN, edifactType, targetFile, orderId);
         }
         inbox.close(false);
         System.out.println("Done");
-    }
-
-    static void uploadFile(File file) {
-        if (httpPostTo == null) {
-            return;
-        }
-        System.out.println("Uploading file (" + file.getAbsolutePath() + ") to " + httpPostTo);
-        try {
-            URL url = new URL(httpPostTo);
-            URLConnection con = url.openConnection();
-            HttpURLConnection http = (HttpURLConnection)con;
-            http.setRequestMethod("POST");
-            http.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
-            http.setDoInput(true);
-            http.setDoOutput(true);
-            IOUtils.copy(new FileInputStream(file), con.getOutputStream());
-            String res = IOUtils.toString(con.getInputStream(), Charset.defaultCharset());
-            System.out.println("Response: " + res);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
     }
 }

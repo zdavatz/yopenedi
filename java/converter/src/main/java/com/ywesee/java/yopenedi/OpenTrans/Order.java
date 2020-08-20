@@ -42,6 +42,15 @@ public class Order implements Writable {
         return deliveryStartDate;
     }
 
+    public Party getRecipient() {
+        for (Party party : parties) {
+            if (party.role == Party.Role.Supplier) {
+                return party;
+            }
+        }
+        return null;
+    }
+
     public void write(XMLStreamWriter streamWriter, Config config) throws XMLStreamException {
 
         streamWriter.writeStartElement("ORDER");

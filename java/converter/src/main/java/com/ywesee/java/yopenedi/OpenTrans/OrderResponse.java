@@ -43,6 +43,15 @@ public class OrderResponse {
         return this.orderResponseItems.get(0).tax;
     }
 
+    public Party getRecipient() {
+        for (Party party : parties) {
+            if (party.role == Party.Role.Buyer) {
+                return party;
+            }
+        }
+        return null;
+    }
+
     public OrderResponse(InputStream stream) throws XMLStreamException {
         XMLInputFactory factory = XMLInputFactory.newFactory();
         XMLEventReader eventReader = factory.createXMLEventReader(stream);

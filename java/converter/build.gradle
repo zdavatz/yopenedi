@@ -29,6 +29,8 @@ dependencies {
     implementation 'org.apache.commons:commons-lang3:3.10'
     compile group: 'commons-io', name: 'commons-io', version: '2.7'
 
+    compile group: 'javax.mail', name: 'mail', version: '1.5.0-b01'
+
     // This dependency is used internally, and not exposed to consumers on their own compile classpath.
     // implementation 'com.google.guava:guava:28.0-jre'
 
