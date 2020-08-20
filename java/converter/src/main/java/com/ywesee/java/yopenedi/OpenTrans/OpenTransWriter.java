@@ -1,6 +1,6 @@
 package com.ywesee.java.yopenedi.OpenTrans;
 
-import com.ywesee.java.yopenedi.converter.Config;
+import com.ywesee.java.yopenedi.common.Config;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;

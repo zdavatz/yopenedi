@@ -1,6 +1,6 @@
 package com.ywesee.java.yopenedi.Edifact;
 
-import com.ywesee.java.yopenedi.converter.Config;
+import com.ywesee.java.yopenedi.common.Config;
 import com.ywesee.java.yopenedi.converter.Writable;
 import org.milyn.edi.unedifact.d96a.D96AInterchangeFactory;
 import org.milyn.edi.unedifact.d96a.INVOIC.*;

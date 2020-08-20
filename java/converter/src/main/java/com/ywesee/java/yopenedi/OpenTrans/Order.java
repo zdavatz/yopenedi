@@ -1,6 +1,6 @@
 package com.ywesee.java.yopenedi.OpenTrans;
 
-import com.ywesee.java.yopenedi.converter.Config;
+import com.ywesee.java.yopenedi.common.Config;
 import com.ywesee.java.yopenedi.converter.Utility;
 import com.ywesee.java.yopenedi.converter.Writable;
 

@@ -1,0 +1,47 @@
+[
+  {
+    "filters": {
+      "edifact_types": [
+        "ORDERS"
+      ]
+    },
+    "http": {
+      "url": "https://connect.boni.ch/OpaccOne/B2B/Channel/XmlOverHttp/YWE"
+    }
+  },
+  {
+    "filters": {
+      "glns": [
+        "//DEHA",
+        "4015828000008",
+        "//BÜRKLE",
+        "4018062000001",
+        "//OBETA",
+        "4031271000006"
+      ],
+      "edifact_types": ["ORDRSP", "DESADV"]
+    },
+    "http": {
+      "url": "https://eddy.vrg.de:4443",
+      "headers": {
+        "AS2-From": "janico",
+        "AS2-To": "NOWISCC_AS2"
+      }
+    }
+  },
+  {
+    "filters": {
+      "glns": [
+        "//REXEL",
+        "4028684082606",
+        "4028684094012",
+        "4028684021018"
+      ],
+      "edifact_types": ["ORDRSP", "DESADV"]
+    },
+    "email": {
+      "subject": "No subject",
+      "to": "DEJFROE1.DEFJC@ieeur.gxs.com"
+    }
+  }
+]
