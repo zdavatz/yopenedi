@@ -16,6 +16,7 @@ import java.nio.charset.StandardCharsets
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 
+import com.ywesee.java.yopenedi.common._
 import com.ywesee.java.yopenedi.converter._
 import com.ywesee.java.yopenedi.Edifact._
 import com.ywesee.java.yopenedi.OpenTrans._
@@ -47,6 +48,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     val filename = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"))
 
     val configPath = config.getOptional[String]("conversion-config").getOrElse("./conf")
+    val converterConfig = new Config(configPath)
     val ediOrdersPath = config.get[String]("edifact-orders")
     val otOrdersPath = config.get[String]("opentrans-orders")
     val environment = config.getOptional[String]("environment")
@@ -96,6 +98,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     }
 
     var retried = false
+    var recipientGLN : String = null
     val result = retryWithEdifactExtracted(makeStream, (s: InputStream, isRetry) => {
       if (isRetry) {
         retried = true
@@ -113,7 +116,11 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         otOrder.isTestEnvironment = environment.equals(Some("test"))
         Logger.debug("Opentrans order: " + otOrder.toString())
 
-        val converterConfig = new Config(configPath)
+        val recipient = otOrder.getRecipient()
+        if (recipient != null) {
+          recipientGLN = recipient.id
+        }
+
         val writer = new OpenTransWriter(converterConfig)
         val outStream = new FileOutputStream(outFile)
         writer.write(otOrder, outStream)
@@ -146,12 +153,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       }
     }
 
-    val postToUrl = config.getOptional[String]("http-post-to")
-    for (url <- postToUrl) {
-      if (!url.isEmpty()) {
-        uploadFile(url, outFile)
-      }
-    }
+    converterConfig.dispatchResult(recipientGLN, "ORDERS", outFile, messageId.getOrElse(""))
 
     result match {
       case Left(e) => return e
@@ -169,6 +171,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     val filename = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"))
 
     val configPath = config.getOptional[String]("conversion-config").getOrElse("./conf")
+    val converterConfig = new Config(configPath)
     val ediOrderResponsesPath = config.get[String]("edifact-order-responses")
     val otOrderResponsesPath = config.get[String]("opentrans-order-responses")
     val environment = config.getOptional[String]("environment")
@@ -224,16 +227,32 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       throw new Exception("Cannot write file to: " + outFile.getAbsolutePath())
     }
 
+    var edifactType: String = null
+    var orderId: String = null
+    var recipientGLN: String = null
     makeStream() match {
       case Left(r) =>
         return r
       case Right(s) =>
         val converter = new Converter()
         val writable = converter.run(s).snd
+
+        if (writable.isInstanceOf[com.ywesee.java.yopenedi.Edifact.OrderResponse]) {
+          val r = writable.asInstanceOf[com.ywesee.java.yopenedi.Edifact.OrderResponse]
+          edifactType = "ORDRSP"
+          orderId = r.documentNumber
+          val recipient = r.getRecipient()
+          if (recipient != null) {
+            recipientGLN = recipient.id
+          }
+        }
+
         val otOutStream = new FileOutputStream(outFile)
-        writable.write(otOutStream, new Config(configPath))
-        Logger.debug("Wrote file to: " + outFile.length())
+        writable.write(otOutStream, converterConfig)
+        Logger.debug("Wrote file to: " + outFile.getAbsolutePath())
     }
+
+    converterConfig.dispatchResult(recipientGLN, edifactType, outFile, orderId)
 
     val obj = Json.obj(
       "ok" -> true
@@ -274,24 +293,6 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       }
     }
     return None
-  }
-
-  private def uploadFile(urlStr: String, file: File) {
-    try {
-      Logger.info("Uploading file (" + file.getAbsolutePath() + ") to " + urlStr);
-      val url = new URL(urlStr);
-      val con = url.openConnection();
-      val http = con.asInstanceOf[HttpURLConnection];
-      http.setRequestMethod("POST");
-      http.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
-      http.setDoInput(true);
-      http.setDoOutput(true);
-      IOUtils.copy(new FileInputStream(file), con.getOutputStream());
-      val res = IOUtils.toString(con.getInputStream(), StandardCharsets.UTF_8);
-      Logger.info("Response: " + res);
-    } catch {
-      case e: Exception => Logger.error(e.getMessage());
-    }
   }
 
   private def convertedText(encoding: Option[String], input: String): String = {
