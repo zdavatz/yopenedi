@@ -8,7 +8,7 @@ import com.ywesee.java.yopenedi.Edifact.Invoice;
 import com.ywesee.java.yopenedi.Edifact.OrderResponse;
 import com.ywesee.java.yopenedi.OpenTrans.OpenTransReader;
 import com.ywesee.java.yopenedi.OpenTrans.Order;
-import com.ywesee.java.yopenedi.converter.Config;
+import com.ywesee.java.yopenedi.common.Config;
 import com.ywesee.java.yopenedi.converter.Converter;
 import com.ywesee.java.yopenedi.OpenTrans.OpenTransWriter;
 import com.ywesee.java.yopenedi.Edifact.EdifactReader;

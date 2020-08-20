@@ -1,6 +1,6 @@
 package com.ywesee.java.yopenedi.OpenTrans;
 
-import com.ywesee.java.yopenedi.converter.Config;
+import com.ywesee.java.yopenedi.common.Config;
 import com.ywesee.java.yopenedi.converter.Utility;
 import com.ywesee.java.yopenedi.converter.Writable;
 
@@ -40,6 +40,15 @@ public class Order implements Writable {
             return deliveryEndDate;
         }
         return deliveryStartDate;
+    }
+
+    public Party getRecipient() {
+        for (Party party : parties) {
+            if (party.role == Party.Role.Supplier) {
+                return party;
+            }
+        }
+        return null;
     }
 
     public void write(XMLStreamWriter streamWriter, Config config) throws XMLStreamException {

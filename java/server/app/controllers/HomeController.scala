@@ -12,9 +12,11 @@ import java.io.FileInputStream
 import java.io.FileOutputStream
 import java.io.InputStream
 import java.net._
-import java.nio.charset.Charset
+import java.nio.charset.StandardCharsets
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
+
+import com.ywesee.java.yopenedi.common._
 import com.ywesee.java.yopenedi.converter._
 import com.ywesee.java.yopenedi.Edifact._
 import com.ywesee.java.yopenedi.OpenTrans._
@@ -44,9 +46,9 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
 
     val now = LocalDateTime.now()
     val filename = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"))
-    val encoding = request.charset.getOrElse("UTF-8")
 
     val configPath = config.getOptional[String]("conversion-config").getOrElse("./conf")
+    val converterConfig = new Config(configPath)
     val ediOrdersPath = config.get[String]("edifact-orders")
     val otOrdersPath = config.get[String]("opentrans-orders")
     val environment = config.getOptional[String]("environment")
@@ -72,7 +74,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
             Right(new FileInputStream(file.ref.path.toFile()))
           }
         case c: AnyContentAsText =>
-          Right(IOUtils.toInputStream(c.txt, encoding))
+          Right(IOUtils.toInputStream(convertedText(request.charset, c.txt), "UTF-8"))
         case c: AnyContentAsRaw =>
           val file = c.raw.asFile
           Right(new FileInputStream(file))
@@ -96,7 +98,8 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     }
 
     var retried = false
-    val result = retryWithEdifactExtracted(encoding, makeStream, (s: InputStream, isRetry) => {
+    var recipientGLN : String = null
+    val result = retryWithEdifactExtracted(makeStream, (s: InputStream, isRetry) => {
       if (isRetry) {
         retried = true
       }
@@ -113,7 +116,11 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         otOrder.isTestEnvironment = environment.equals(Some("test"))
         Logger.debug("Opentrans order: " + otOrder.toString())
 
-        val converterConfig = new Config(configPath)
+        val recipient = otOrder.getRecipient()
+        if (recipient != null) {
+          recipientGLN = recipient.id
+        }
+
         val writer = new OpenTransWriter(converterConfig)
         val outStream = new FileOutputStream(outFile)
         writer.write(otOrder, outStream)
@@ -136,22 +143,17 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         case Left(r) =>
           return r
         case Right(s) =>
-          extractedEdifact(s, encoding) match {
+          extractedEdifact(s) match {
             case Some(ediStr) =>
               val ediOutFile = new File(ediOrdersFolder, filename)
-              FileUtils.write(ediOutFile, ediStr, encoding, false)
+              FileUtils.write(ediOutFile, ediStr, "UTF-8", false)
               Logger.debug("Edifact file size: " + ediOutFile.length())
             case _ => {}
           }
       }
     }
 
-    val postToUrl = config.getOptional[String]("http-post-to")
-    for (url <- postToUrl) {
-      if (!url.isEmpty()) {
-        uploadFile(url, outFile)
-      }
-    }
+    converterConfig.dispatchResult(recipientGLN, "ORDERS", outFile, messageId.getOrElse(""))
 
     result match {
       case Left(e) => return e
@@ -167,9 +169,9 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
   def janicoFn(request: Request[AnyContent]): Result = {
     val now = LocalDateTime.now()
     val filename = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"))
-    val encoding = request.charset.getOrElse("UTF-8")
 
     val configPath = config.getOptional[String]("conversion-config").getOrElse("./conf")
+    val converterConfig = new Config(configPath)
     val ediOrderResponsesPath = config.get[String]("edifact-order-responses")
     val otOrderResponsesPath = config.get[String]("opentrans-order-responses")
     val environment = config.getOptional[String]("environment")
@@ -195,12 +197,12 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
             Right(new FileInputStream(file.ref.path.toFile()))
           }
         case c: AnyContentAsText =>
-          Right(IOUtils.toInputStream(c.txt, encoding))
+          Right(IOUtils.toInputStream(convertedText(request.charset, c.txt), StandardCharsets.UTF_8))
         case c: AnyContentAsRaw =>
           val file = c.raw.asFile
           Right(new FileInputStream(file))
         case c: AnyContentAsXml =>
-          Right(IOUtils.toInputStream(c.xml.toString(), encoding))
+          Right(IOUtils.toInputStream(convertedText(request.charset, c.xml.toString()), StandardCharsets.UTF_8))
         case _ =>
           Left(BadRequest("Invalid content type"))
       }
@@ -225,16 +227,32 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       throw new Exception("Cannot write file to: " + outFile.getAbsolutePath())
     }
 
+    var edifactType: String = null
+    var orderId: String = null
+    var recipientGLN: String = null
     makeStream() match {
       case Left(r) =>
         return r
       case Right(s) =>
         val converter = new Converter()
         val writable = converter.run(s).snd
+
+        if (writable.isInstanceOf[com.ywesee.java.yopenedi.Edifact.OrderResponse]) {
+          val r = writable.asInstanceOf[com.ywesee.java.yopenedi.Edifact.OrderResponse]
+          edifactType = "ORDRSP"
+          orderId = r.documentNumber
+          val recipient = r.getRecipient()
+          if (recipient != null) {
+            recipientGLN = recipient.id
+          }
+        }
+
         val otOutStream = new FileOutputStream(outFile)
-        writable.write(otOutStream, new Config(configPath))
-        Logger.debug("Wrote file to: " + outFile.length())
+        writable.write(otOutStream, converterConfig)
+        Logger.debug("Wrote file to: " + outFile.getAbsolutePath())
     }
+
+    converterConfig.dispatchResult(recipientGLN, edifactType, outFile, orderId)
 
     val obj = Json.obj(
       "ok" -> true
@@ -246,7 +264,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
   // Sometimes Play fails to parse request, e.g. it doesn't understand
   // the request when multipart boundary has "="
   // We retry when the stream fails, by manually extracting the EDIFACT out of the request body
-  private def retryWithEdifactExtracted[A, B](encoding: String, mkStream: () => Either[A, InputStream], op: (InputStream, Boolean) => Either[A, B]): Either[A, B] = {
+  private def retryWithEdifactExtracted[A, B](mkStream: () => Either[A, InputStream], op: (InputStream, Boolean) => Either[A, B]): Either[A, B] = {
     mkStream().right.flatMap { s =>
       val result = op(s, false)
       result match {
@@ -254,20 +272,20 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         case Left(_) =>
           Logger.info("Retrying by extracting EDIFACT from request body")
           mkStream().right.flatMap { s =>
-            var ediLine: Option[String] = extractedEdifact(s, encoding)
+            var ediLine: Option[String] = extractedEdifact(s)
             ediLine match {
-              case Some(l) => op(IOUtils.toInputStream(l, encoding), true)
+              case Some(l) => op(IOUtils.toInputStream(l, "UTF-8"), true)
               case None =>
                 Logger.error("Cannot find EDIFACT from request body")
-                op(IOUtils.toInputStream("", encoding), true)
+                op(IOUtils.toInputStream("", "UTF-8"), true)
             }
           }
       }
     }
   }
 
-  private def extractedEdifact(s: InputStream, encoding: String): Option[String] = {
-    val it = IOUtils.lineIterator(s, encoding)
+  private def extractedEdifact(s: InputStream): Option[String] = {
+    val it = IOUtils.lineIterator(s, "UTF-8")
     while (it.hasNext()) {
       val line = it.nextLine()
       if (line.startsWith("UNA") && line.contains("UNZ")) {
@@ -277,21 +295,10 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     return None
   }
 
-  private def uploadFile(urlStr: String, file: File) {
-    try {
-      Logger.info("Uploading file (" + file.getAbsolutePath() + ") to " + urlStr);
-      val url = new URL(urlStr);
-      val con = url.openConnection();
-      val http = con.asInstanceOf[HttpURLConnection];
-      http.setRequestMethod("POST");
-      http.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
-      http.setDoInput(true);
-      http.setDoOutput(true);
-      IOUtils.copy(new FileInputStream(file), con.getOutputStream());
-      val res = IOUtils.toString(con.getInputStream(), Charset.defaultCharset());
-      Logger.info("Response: " + res);
-    } catch {
-      case e: Exception => Logger.error(e.getMessage());
+  private def convertedText(encoding: Option[String], input: String): String = {
+    encoding match {
+      case None => new String(input.getBytes("ISO-8859-1"), "UTF-8")
+      case Some(enc) => new String(input.getBytes(enc), "UTF-8")
     }
   }
 }

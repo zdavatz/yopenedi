@@ -16,6 +16,7 @@ public class OrderResponseItem {
     public String supplierProductId;
     public String internationalProductId;
     public String buyerProductId;
+    public String buyerLineItemId;
     public String descriptionShort;
     public String descriptionLong;
     public String quantity;
@@ -40,7 +41,7 @@ public class OrderResponseItem {
                 if (name.equals("LINE_ITEM_ID")) {
                     this.lineItemId = nextStringOrNull(er);
                 } else if (name.equals("UDX.JA.BUYER_LINE_ITEM_ID")) {
-                    this.lineItemId = nextStringOrNull(er);
+                    this.buyerLineItemId = nextStringOrNull(er);
                 } else if (name.equals("SUPPLIER_PID")) {
                     this.supplierProductId = nextStringOrNull(er);
                 } else if (name.equals("INTERNATIONAL_PID")) {

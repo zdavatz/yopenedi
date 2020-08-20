@@ -369,7 +369,8 @@ public class Converter {
         ori.priceLineAmount = new BigDecimal(orderResponseItem.priceLineAmount);
         ori.priceQuantity = new BigDecimal(orderResponseItem.priceQuantity);
         ori.price = new BigDecimal(orderResponseItem.priceAmount);
-        ori.buyerOrderItemId = orderResponseItem.lineItemId;
+        ori.buyerOrderId = orderResponseItem.lineItemId;
+        ori.buyerOrderItemId = orderResponseItem.buyerLineItemId;
 
         ArrayList<com.ywesee.java.yopenedi.Edifact.AllowanceOrCharge> aocs = new ArrayList<>();
         if (orderResponseItem.allowanceOrCharge != null) {
