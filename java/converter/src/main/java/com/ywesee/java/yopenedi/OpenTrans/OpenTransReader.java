@@ -12,7 +12,7 @@ public class OpenTransReader {
             case OrderResponse:
                 return new OrderResponse(result.fst);
             case DispatchNotification:
-                throw new Exception("Reading OpenTrans DISPATCHNOTIFICATION is not supported yet");
+                return new DispatchNotification(result.fst);
             case Order:
                 throw new Exception("Reading OpenTrans ORDER is not supported yet");
         }
