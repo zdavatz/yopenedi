@@ -3,15 +3,12 @@
  */
 package com.ywesee.java.yopenedi.cli;
 
-import com.ywesee.java.yopenedi.Edifact.EdifactWriter;
-import com.ywesee.java.yopenedi.Edifact.Invoice;
-import com.ywesee.java.yopenedi.Edifact.OrderResponse;
+import com.ywesee.java.yopenedi.Edifact.*;
 import com.ywesee.java.yopenedi.OpenTrans.OpenTransReader;
 import com.ywesee.java.yopenedi.OpenTrans.Order;
 import com.ywesee.java.yopenedi.common.Config;
 import com.ywesee.java.yopenedi.converter.Converter;
 import com.ywesee.java.yopenedi.OpenTrans.OpenTransWriter;
-import com.ywesee.java.yopenedi.Edifact.EdifactReader;
 import com.ywesee.java.yopenedi.converter.Pair;
 import org.apache.commons.cli.*;
 
@@ -217,6 +214,10 @@ public class App {
             com.ywesee.java.yopenedi.OpenTrans.OrderResponse or = (com.ywesee.java.yopenedi.OpenTrans.OrderResponse)otObject;
             OrderResponse orderResponse = converter.orderResponseToEdifact(or);
             writer.write(orderResponse, out);
+        } else if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.DispatchNotification) {
+            com.ywesee.java.yopenedi.OpenTrans.DispatchNotification od = (com.ywesee.java.yopenedi.OpenTrans.DispatchNotification)otObject;
+            DespatchAdvice despatchAdvice = converter.dispatchNotificationToEdifact(od);
+            writer.write(despatchAdvice, out);
         }
         out.flush();
         if (out instanceof FileOutputStream) {
