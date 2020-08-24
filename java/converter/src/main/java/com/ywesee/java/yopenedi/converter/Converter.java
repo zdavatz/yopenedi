@@ -1,7 +1,7 @@
 package com.ywesee.java.yopenedi.converter;
 
+import com.ywesee.java.yopenedi.Edifact.DespatchAdviceItem;
 import com.ywesee.java.yopenedi.Edifact.EdifactReader;
-import com.ywesee.java.yopenedi.Edifact.EdifactWriter;
 import com.ywesee.java.yopenedi.OpenTrans.*;
 
 import java.io.*;
@@ -33,6 +33,10 @@ public class Converter {
                         com.ywesee.java.yopenedi.OpenTrans.OrderResponse or = (com.ywesee.java.yopenedi.OpenTrans.OrderResponse) otObject;
                         com.ywesee.java.yopenedi.Edifact.OrderResponse orderResponse = this.orderResponseToEdifact(or);
                         return new Pair<>(pair.snd, orderResponse);
+                    } else if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.DispatchNotification) {
+                        com.ywesee.java.yopenedi.OpenTrans.DispatchNotification od = (com.ywesee.java.yopenedi.OpenTrans.DispatchNotification) otObject;
+                        com.ywesee.java.yopenedi.Edifact.DespatchAdvice despatchAdvice = this.dispatchNotificationToEdifact(od);
+                        return new Pair<>(pair.snd, despatchAdvice);
                     }
                     break;
                 case Edifact:
@@ -378,6 +382,68 @@ public class Converter {
         }
         ori.allowanceOrCharges = aocs;
         return ori;
+    }
+
+    public com.ywesee.java.yopenedi.Edifact.DespatchAdvice dispatchNotificationToEdifact(DispatchNotification dispatchNotification) {
+        com.ywesee.java.yopenedi.Edifact.DespatchAdvice despatchAdvice = new com.ywesee.java.yopenedi.Edifact.DespatchAdvice();
+        despatchAdvice.referenceNumber = dispatchNotification.id;
+        despatchAdvice.documentNumber = dispatchNotification.id;
+        despatchAdvice.orderDate = dispatchNotification.orderDate;
+        despatchAdvice.fixedDeliveryDate = dispatchNotification.fixedDeliveryEndDate;
+        despatchAdvice.deliveryDate = dispatchNotification.fixedDeliveryStartDate;
+        despatchAdvice.deliveryNoteNumber = dispatchNotification.id;
+        despatchAdvice.orderNumber = dispatchNotification.getOrderId();
+//        despatchAdvice.shipmentReferenceNumber;
+//        despatchAdvice.numberOfPackage;
+
+        despatchAdvice.parties = dispatchNotification.parties.stream()
+                .map(this::partyToEdifact)
+                .collect(Collectors.toCollection(ArrayList::new));
+        despatchAdvice.items = dispatchNotification.items.stream()
+                .map(this::dispatchNotificationItemToEdifact)
+                .collect(Collectors.toCollection(ArrayList::new));
+
+        return despatchAdvice;
+    }
+
+    public com.ywesee.java.yopenedi.Edifact.DespatchAdviceItem dispatchNotificationItemToEdifact(DispatchNotificationItem dispatchNotificationItem) {
+        com.ywesee.java.yopenedi.Edifact.DespatchAdviceItem despatchAdviceItem = new com.ywesee.java.yopenedi.Edifact.DespatchAdviceItem();
+//        public String goodsIdentityNumberStart;
+//        public String goodsIdentityNumberEnd;
+        despatchAdviceItem.lineItemNumber = new BigDecimal(dispatchNotificationItem.lineItemId);
+        despatchAdviceItem.ean = dispatchNotificationItem.internationalProductId;
+        despatchAdviceItem.supplierProductId = dispatchNotificationItem.supplierProductId;
+        despatchAdviceItem.buyerProductId = dispatchNotificationItem.buyerProductId;
+
+        despatchAdviceItem.orderId = dispatchNotificationItem.orderId;
+        despatchAdviceItem.orderLineItemId = dispatchNotificationItem.orderLineItemId;
+        despatchAdviceItem.supplierOrderId = dispatchNotificationItem.supplierOrderId;
+        despatchAdviceItem.supplierOrderItemId = dispatchNotificationItem.supplierOrderItemId;
+        despatchAdviceItem.tariffCustomsNumber = dispatchNotificationItem.tariffCustomsNumber;
+
+        despatchAdviceItem.shortDescription = dispatchNotificationItem.descriptionShort;
+        despatchAdviceItem.longDescription = dispatchNotificationItem.descriptionLong;
+
+        if (dispatchNotificationItem.volume != null) {
+            despatchAdviceItem.volume = new BigDecimal(dispatchNotificationItem.volume);
+        }
+        if (dispatchNotificationItem.weight != null) {
+            despatchAdviceItem.weight = new BigDecimal(dispatchNotificationItem.weight);
+        }
+        if (dispatchNotificationItem.length != null) {
+            despatchAdviceItem.length = new BigDecimal(dispatchNotificationItem.length);
+        }
+        if (dispatchNotificationItem.width != null) {
+            despatchAdviceItem.width = new BigDecimal(dispatchNotificationItem.width);
+        }
+        if (dispatchNotificationItem.depth != null) {
+            despatchAdviceItem.depth = new BigDecimal(dispatchNotificationItem.depth);
+        }
+
+        despatchAdviceItem.quantity = new BigDecimal(dispatchNotificationItem.quantity);
+        despatchAdviceItem.quantityUnit = dispatchNotificationItem.orderUnit;
+
+        return despatchAdviceItem;
     }
 
     static String dateStringToOpenTransString(String dateString) {
