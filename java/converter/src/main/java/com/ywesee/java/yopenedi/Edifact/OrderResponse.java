@@ -469,6 +469,17 @@ public class OrderResponse implements Writable {
                 rff.setC506Reference(c506);
                 sg31.setRFFReference(rff);
             }
+            if (item.lineItemId != null) {
+                SegmentGroup31 sg31 = new SegmentGroup31();
+                sg31s.add(sg31);
+                RFFReference rff = new RFFReference();
+                C506Reference c506 = new C506Reference();
+                c506.setE1153ReferenceQualifier("LI");
+                IntegerBigDecimalDecoder integerEncoder = new IntegerBigDecimalDecoder();
+                c506.setE1156LineNumber(integerEncoder.encode(item.lineItemId));
+                rff.setC506Reference(c506);
+                sg31.setRFFReference(rff);
+            }
             if (item.referenceDate != null) {
                 DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 SegmentGroup31 sg31 = new SegmentGroup31();
