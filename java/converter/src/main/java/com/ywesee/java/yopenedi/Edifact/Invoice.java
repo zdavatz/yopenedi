@@ -431,6 +431,7 @@ public class Invoice implements Writable {
             ArrayList<IMDItemDescription> imds = new ArrayList<>();
             if (notNullOrEmpty(ii.shortDescription)) {
                 IMDItemDescription imd = new IMDItemDescription();
+                imds.add(imd);
                 imd.setE7077ItemDescriptionTypeCoded("F");
                 C273ItemDescription c273 = new C273ItemDescription();
                 ArrayList<String> parts = splitStringIntoParts(ii.shortDescription, 35, 2);
@@ -440,6 +441,7 @@ public class Invoice implements Writable {
             }
             if (notNullOrEmpty(ii.longDescription)) {
                 IMDItemDescription imd = new IMDItemDescription();
+                imds.add(imd);
                 imd.setE7077ItemDescriptionTypeCoded("F");
                 C273ItemDescription c273 = new C273ItemDescription();
                 ArrayList<String> parts = splitStringIntoParts(ii.longDescription, 35, 2);

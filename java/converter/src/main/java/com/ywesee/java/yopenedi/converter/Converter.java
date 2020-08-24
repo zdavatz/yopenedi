@@ -323,7 +323,7 @@ public class Converter {
         or.documentNumber = orderResponse.orderId;
         or.orderDate = orderResponse.orderResponseDate;
         or.deliveryDate = orderResponse.deliveryEndDate;
-        or.orderNumberFromBuyer = orderResponse.buyerIdRef;
+        or.orderNumberFromBuyer = orderResponse.orderId;
 
         or.referenceDate = orderResponse.orderResponseDate;
 
