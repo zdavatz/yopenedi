@@ -240,6 +240,13 @@ public class App {
                     recipientGLN = recipient.id;
                 }
                 edifactType = "INVOIC";
+            } else if (converted.snd instanceof com.ywesee.java.yopenedi.Edifact.DespatchAdvice) {
+                com.ywesee.java.yopenedi.Edifact.DespatchAdvice ediDispatchAdvice = (com.ywesee.java.yopenedi.Edifact.DespatchAdvice)converted.snd;
+                com.ywesee.java.yopenedi.Edifact.Party recipient = ediDispatchAdvice.getRecipient();
+                if (recipient != null) {
+                    recipientGLN = recipient.id;
+                }
+                edifactType = "DESADV";
             }
             converted.snd.write(outputStream, config);
             outputStream.close();
