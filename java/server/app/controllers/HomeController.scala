@@ -174,6 +174,8 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     val converterConfig = new Config(configPath)
     val ediOrderResponsesPath = config.get[String]("edifact-order-responses")
     val otOrderResponsesPath = config.get[String]("opentrans-order-responses")
+    val ediDespatchAdvicesPath = config.get[String]("edifact-despatch-advices")
+    val otDispatchNotificationsPath = config.get[String]("opentrans-dispatch-notifications")
     val environment = config.getOptional[String]("environment")
 
     val ediOrderResponsesFolder = new File(ediOrderResponsesPath)
@@ -183,8 +185,14 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     val otOrderResponsesFolder = new File(otOrderResponsesPath)
     if (!otOrderResponsesFolder.exists()) {
       otOrderResponsesFolder.mkdirs()
-    } else if (!otOrderResponsesFolder.isDirectory()) {
-      throw new Exception(otOrderResponsesPath + " is not a directory");
+    }
+    val ediDespatchAdvicesFolder = new File(ediDespatchAdvicesPath)
+    if (!ediDespatchAdvicesFolder.exists()) {
+      ediDespatchAdvicesFolder.mkdirs()
+    }
+    val otDispatchNotificationsFolder = new File(otDispatchNotificationsPath)
+    if (!otDispatchNotificationsFolder.exists()) {
+      otDispatchNotificationsFolder.mkdirs()
     }
 
     def makeStream(): Either[Result, InputStream] = {
@@ -208,28 +216,12 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       }
     }
 
-    val inFile = new File(otOrderResponsesFolder, filename)
-    if (inFile.exists() && !inFile.canWrite()) {
-      throw new Exception("Cannot write file to: " + inFile.getAbsolutePath())
-    }
-
-    makeStream() match {
-      case Left(r) =>
-        return r
-      case Right(s) =>
-        val otStream = new FileOutputStream(inFile)
-        IOUtils.copy(s, otStream)
-        Logger.debug("OpenTrans File size: " + inFile.length())
-    }
-
-    val outFile = new File(ediOrderResponsesFolder, filename)
-    if (outFile.exists() && !outFile.canWrite()) {
-      throw new Exception("Cannot write file to: " + outFile.getAbsolutePath())
-    }
-
     var edifactType: String = null
     var orderId: String = null
     var recipientGLN: String = null
+    var ediFolder: File = null
+    var otFolder: File = null
+    var outFile: File = null
     makeStream() match {
       case Left(r) =>
         return r
@@ -241,15 +233,46 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
           val r = writable.asInstanceOf[com.ywesee.java.yopenedi.Edifact.OrderResponse]
           edifactType = "ORDRSP"
           orderId = r.documentNumber
+          ediFolder = ediOrderResponsesFolder
+          otFolder = otOrderResponsesFolder
+          val recipient = r.getRecipient()
+          if (recipient != null) {
+            recipientGLN = recipient.id
+          }
+        } else if (writable.isInstanceOf[com.ywesee.java.yopenedi.Edifact.DespatchAdvice]) {
+          val r = writable.asInstanceOf[com.ywesee.java.yopenedi.Edifact.DespatchAdvice]
+          edifactType = "DESADV"
+          orderId = r.documentNumber
+          ediFolder = ediDespatchAdvicesFolder
+          otFolder = otDispatchNotificationsFolder
           val recipient = r.getRecipient()
           if (recipient != null) {
             recipientGLN = recipient.id
           }
         }
 
+        outFile = new File(ediFolder, filename)
+        if (outFile.exists() && !outFile.canWrite()) {
+          throw new Exception("Cannot write file to: " + outFile.getAbsolutePath())
+        }
+
         val otOutStream = new FileOutputStream(outFile)
         writable.write(otOutStream, converterConfig)
         Logger.debug("Wrote file to: " + outFile.getAbsolutePath())
+    }
+
+    val inFile = new File(otFolder, filename)
+    if (inFile.exists() && !inFile.canWrite()) {
+      throw new Exception("Cannot write file to: " + inFile.getAbsolutePath())
+    }
+
+    makeStream() match {
+      case Left(r) =>
+        return r
+      case Right(s) =>
+        val otStream = new FileOutputStream(inFile)
+        IOUtils.copy(s, otStream)
+        Logger.debug("OpenTrans File size: " + inFile.length())
     }
 
     converterConfig.dispatchResult(recipientGLN, edifactType, outFile, orderId)
