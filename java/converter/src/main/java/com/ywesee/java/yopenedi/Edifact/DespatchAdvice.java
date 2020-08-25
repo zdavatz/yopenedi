@@ -212,6 +212,18 @@ public class DespatchAdvice implements Writable {
                 NADNameAndAddress nad = new NADNameAndAddress();
                 sg2.setNADNameAndAddress(nad);
 
+                switch (p.role) {
+                    case Buyer:
+                        nad.setE3035PartyQualifier("BY");
+                        break;
+                    case Supplier:
+                        nad.setE3035PartyQualifier("SU");
+                        break;
+                    case Delivery:
+                        nad.setE3035PartyQualifier("DP");
+                        break;
+                }
+
                 C082PartyIdentificationDetails c082 = new C082PartyIdentificationDetails();
                 c082.setE3039PartyIdIdentification(p.id);
                 c082.setE3055CodeListResponsibleAgencyCoded("9");
