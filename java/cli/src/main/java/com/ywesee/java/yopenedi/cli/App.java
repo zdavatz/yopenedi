@@ -4,12 +4,12 @@
 package com.ywesee.java.yopenedi.cli;
 
 import com.ywesee.java.yopenedi.Edifact.*;
-import com.ywesee.java.yopenedi.OpenTrans.OpenTransReader;
 import com.ywesee.java.yopenedi.OpenTrans.Order;
 import com.ywesee.java.yopenedi.common.Config;
 import com.ywesee.java.yopenedi.converter.Converter;
 import com.ywesee.java.yopenedi.OpenTrans.OpenTransWriter;
 import com.ywesee.java.yopenedi.converter.Pair;
+import com.ywesee.java.yopenedi.converter.Writable;
 import org.apache.commons.cli.*;
 
 import javax.activation.DataHandler;
@@ -140,18 +140,24 @@ public class App {
             }
         }
 
+        String confPath = cmd.getOptionValue("conf");
+        if (confPath == null) {
+            confPath = "./conf";
+        }
+        Config config = new Config(confPath);
+
         switch (detected.snd) {
             case OpenTrans:
-                openTransToEdifact(detected.fst, outFile, cmd);
+                openTransToEdifact(detected.fst, outFile, cmd, config);
                 break;
             case Edifact:
-                edifactToOpenTrans(detected.fst, outFile, cmd);
+                edifactToOpenTrans(detected.fst, outFile, cmd, config);
                 break;
         }
         sendEmail(cmd, outFile);
     }
 
-    static void edifactToOpenTrans(InputStream in, File outFile, CommandLine cmd) throws Exception {
+    static void edifactToOpenTrans(InputStream in, File outFile, CommandLine cmd, Config config) throws Exception {
         boolean isMultiple = cmd.hasOption("m");
         EdifactReader edifactReader = new EdifactReader();
         ArrayList<com.ywesee.java.yopenedi.Edifact.Order> ediOrders = edifactReader.run(in);
@@ -162,7 +168,7 @@ public class App {
         if (ediOrders.size() > 1 && !isMultiple) {
             System.out.println("Only the first order is used, if you want to export multiple orders, use the -m flag.");
         }
-        Converter converter = new Converter();
+        Converter converter = new Converter(config);
         converter.shouldMergeContactDetails = !cmd.hasOption("no-merge-contact-details");
         for (com.ywesee.java.yopenedi.Edifact.Order edi : ediOrders) {
             Order otOrder = converter.orderToOpenTrans(edi);
@@ -179,11 +185,6 @@ public class App {
             } else {
                 out = System.out;
             }
-            String confPath = cmd.getOptionValue("conf");
-            if (confPath == null) {
-                confPath = "./conf";
-            }
-            Config config = new Config(confPath);
             OpenTransWriter w = new OpenTransWriter(config);
             w.write(otOrder, out);
             out.close();
@@ -193,10 +194,8 @@ public class App {
         }
     }
 
-    static void openTransToEdifact(InputStream in, File outFile, CommandLine cmd) throws Exception {
-        OpenTransReader reader = new OpenTransReader();
-        Converter converter = new Converter();
-        EdifactWriter writer = new EdifactWriter();
+    static void openTransToEdifact(InputStream in, File outFile, CommandLine cmd, Config config) throws Exception {
+        Converter converter = new Converter(config);
         OutputStream out;
         if (outFile != null) {
             out = new FileOutputStream(outFile);
@@ -204,21 +203,9 @@ public class App {
         } else {
             out = System.out;
         }
+        Pair<Converter.FileType, Writable> result = converter.run(in);
+        result.snd.write(out, config);
 
-        Object otObject = reader.run(in);
-        if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.Invoice) {
-            com.ywesee.java.yopenedi.OpenTrans.Invoice otInvoice = (com.ywesee.java.yopenedi.OpenTrans.Invoice)otObject;
-            Invoice invoice = converter.invoiceToEdifact(otInvoice);
-            writer.write(invoice, out);
-        } else if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.OrderResponse) {
-            com.ywesee.java.yopenedi.OpenTrans.OrderResponse or = (com.ywesee.java.yopenedi.OpenTrans.OrderResponse)otObject;
-            OrderResponse orderResponse = converter.orderResponseToEdifact(or);
-            writer.write(orderResponse, out);
-        } else if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.DispatchNotification) {
-            com.ywesee.java.yopenedi.OpenTrans.DispatchNotification od = (com.ywesee.java.yopenedi.OpenTrans.DispatchNotification)otObject;
-            DespatchAdvice despatchAdvice = converter.dispatchNotificationToEdifact(od);
-            writer.write(despatchAdvice, out);
-        }
         out.flush();
         if (out instanceof FileOutputStream) {
             FileDescriptor fd = ((FileOutputStream)out).getFD();
