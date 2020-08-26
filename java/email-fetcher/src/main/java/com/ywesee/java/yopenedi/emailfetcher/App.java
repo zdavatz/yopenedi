@@ -205,7 +205,7 @@ public class App {
 
             System.out.println("Saved file to " + f.getAbsolutePath());
 
-            Converter converter = new Converter();
+            Converter converter = new Converter(config);
             converter.shouldMergeContactDetails = true;
 
             Pair<Converter.FileType, Writable> converted = converter.run(new FileInputStream(f));

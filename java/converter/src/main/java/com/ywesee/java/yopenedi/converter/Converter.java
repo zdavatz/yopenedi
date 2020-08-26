@@ -3,6 +3,7 @@ package com.ywesee.java.yopenedi.converter;
 import com.ywesee.java.yopenedi.Edifact.DespatchAdviceItem;
 import com.ywesee.java.yopenedi.Edifact.EdifactReader;
 import com.ywesee.java.yopenedi.OpenTrans.*;
+import com.ywesee.java.yopenedi.common.Config;
 
 import java.io.*;
 import java.math.BigDecimal;
@@ -17,6 +18,11 @@ import java.util.stream.Collectors;
 
 public class Converter {
     public boolean shouldMergeContactDetails;
+    public Config config;
+
+    public Converter(Config config) {
+        this.config = config;
+    }
 
     public Pair<FileType, Writable> run(InputStream s) {
         try {
@@ -28,14 +34,17 @@ public class Converter {
                     if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.Invoice) {
                         com.ywesee.java.yopenedi.OpenTrans.Invoice otInvoice = (com.ywesee.java.yopenedi.OpenTrans.Invoice) otObject;
                         com.ywesee.java.yopenedi.Edifact.Invoice invoice = this.invoiceToEdifact(otInvoice);
+                        config.replaceGLN(invoice);
                         return new Pair<>(pair.snd, invoice);
                     } else if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.OrderResponse) {
                         com.ywesee.java.yopenedi.OpenTrans.OrderResponse or = (com.ywesee.java.yopenedi.OpenTrans.OrderResponse) otObject;
                         com.ywesee.java.yopenedi.Edifact.OrderResponse orderResponse = this.orderResponseToEdifact(or);
+                        config.replaceGLN(orderResponse);
                         return new Pair<>(pair.snd, orderResponse);
                     } else if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.DispatchNotification) {
                         com.ywesee.java.yopenedi.OpenTrans.DispatchNotification od = (com.ywesee.java.yopenedi.OpenTrans.DispatchNotification) otObject;
                         com.ywesee.java.yopenedi.Edifact.DespatchAdvice despatchAdvice = this.dispatchNotificationToEdifact(od);
+                        config.replaceGLN(despatchAdvice);
                         return new Pair<>(pair.snd, despatchAdvice);
                     }
                     break;

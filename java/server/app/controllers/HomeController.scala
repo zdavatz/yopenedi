@@ -106,7 +106,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       val er = new EdifactReader()
       val ediOrders = er.run(s)
       Logger.debug("EDIFACT orders count: " + ediOrders.size())
-      val converter = new Converter()
+      val converter = new Converter(converterConfig)
       if (ediOrders.size() == 0) {
         Left(BadRequest("No order found in EDIFACT file."))
       } else if (ediOrders.size() > 1) {
@@ -226,7 +226,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       case Left(r) =>
         return r
       case Right(s) =>
-        val converter = new Converter()
+        val converter = new Converter(converterConfig)
         val writable = converter.run(s).snd
 
         if (writable.isInstanceOf[com.ywesee.java.yopenedi.Edifact.OrderResponse]) {
