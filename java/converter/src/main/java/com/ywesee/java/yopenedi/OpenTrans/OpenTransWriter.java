@@ -15,7 +15,7 @@ public class OpenTransWriter {
 
     public void write(Order order, OutputStream outputStream) throws Exception {
         XMLOutputFactory xof = XMLOutputFactory.newFactory();
-        XMLStreamWriter xmlWriter = xof.createXMLStreamWriter(outputStream);
+        XMLStreamWriter xmlWriter = xof.createXMLStreamWriter(outputStream, "UTF-8");
         xmlWriter.writeStartDocument();
         order.write(xmlWriter, config);
         xmlWriter.writeEndDocument();

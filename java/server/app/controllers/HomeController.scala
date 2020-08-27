@@ -83,28 +83,24 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       }
     }
 
-    makeStream() match {
-      case Left(r) =>
-        return r
-      case Right(s) =>
-        val outFile = new File(ediOrdersFolder, filename)
-        val ediOutStream = new FileOutputStream(outFile)
-        IOUtils.copy(s, ediOutStream)
-        Logger.debug("Edifact File size: " + outFile.length())
-    }
-    val outFile = new File(otOrdersFolder, filename)
-    if (outFile.exists() && !outFile.canWrite()) {
-      throw new Exception("Cannot write file to: " + outFile.getAbsolutePath())
-    }
-
-    var retried = false
     var recipientGLN : String = null
     val result = retryWithEdifactExtracted(makeStream, (s: InputStream, isRetry) => {
-      if (isRetry) {
-        retried = true
+      // We have to save the file first, and then read from the file, instead of making a new stream from request
+      // otherwise it hits this bug:
+      // http://milyn.996300.n3.nabble.com/Character-Encoding-problem-td1055.html
+      val ediFile = new File(ediOrdersFolder, filename)
+      val ediOutStream = new FileOutputStream(ediFile)
+      IOUtils.copy(s, ediOutStream)
+      Logger.debug("Edifact File size: " + ediFile.length())
+
+      val outFile = new File(otOrdersFolder, filename)
+      if (outFile.exists() && !outFile.canWrite()) {
+        throw new Exception("Cannot write file to: " + outFile.getAbsolutePath())
       }
+
       val er = new EdifactReader()
-      val ediOrders = er.run(s)
+      val ediInStream = new FileInputStream(ediFile)
+      val ediOrders = er.run(ediInStream)
       Logger.debug("EDIFACT orders count: " + ediOrders.size())
       val converter = new Converter(converterConfig)
       if (ediOrders.size() == 0) {
@@ -112,7 +108,9 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       } else if (ediOrders.size() > 1) {
         Left(BadRequest("More than 1 order in EDIFACT file."))
       } else {
+        println(ediOrders.get(0).parties.get(0).contactDetails.get(0).name)
         val otOrder = converter.orderToOpenTrans(ediOrders.get(0))
+        println(otOrder.parties.get(0).contactDetails.get(0).name)
         otOrder.isTestEnvironment = environment.equals(Some("test"))
         Logger.debug("Opentrans order: " + otOrder.toString())
 
@@ -136,21 +134,6 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     result match {
       case Left(e) => return e
       case _ => {}
-    }
-
-    if (retried) {
-      makeStream() match {
-        case Left(r) =>
-          return r
-        case Right(s) =>
-          extractedEdifact(s) match {
-            case Some(ediStr) =>
-              val ediOutFile = new File(ediOrdersFolder, filename)
-              FileUtils.write(ediOutFile, ediStr, "UTF-8", false)
-              Logger.debug("Edifact file size: " + ediOutFile.length())
-            case _ => {}
-          }
-      }
     }
 
     converterConfig.dispatchResult(recipientGLN, "ORDERS", outFile, messageId.getOrElse(""))
