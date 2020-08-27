@@ -127,6 +127,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         outStream.close()
         Logger.debug("File written: " + outFile.getAbsolutePath())
         Logger.debug("File size: " + outFile.length())
+        converterConfig.dispatchResult(recipientGLN, "ORDERS", outFile, messageId.getOrElse(""))
         Right(Unit)
       }
     })
@@ -135,8 +136,6 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       case Left(e) => return e
       case _ => {}
     }
-
-    converterConfig.dispatchResult(recipientGLN, "ORDERS", outFile, messageId.getOrElse(""))
 
     result match {
       case Left(e) => return e
