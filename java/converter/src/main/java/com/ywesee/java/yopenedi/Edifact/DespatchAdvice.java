@@ -104,10 +104,12 @@ public class DespatchAdvice implements Writable {
         unz41.setControlCount(1);
         interchange.setInterchangeTrailer(unz41);
 
+        int segmentCount = 0;
         Desadv desadv = new Desadv();
 
         UNEdifactMessage41 message41 = new UNEdifactMessage41();
         UNH41 unh41 = new UNH41();
+        segmentCount++;
         unh41.setMessageRefNum("1");
         MessageIdentifier messageIdentifier = new MessageIdentifier();
         messageIdentifier.setControllingAgencyCode("UN");
@@ -118,13 +120,10 @@ public class DespatchAdvice implements Writable {
         message41.setMessageHeader(unh41);
         message41.setMessage(desadv);
 
-        UNT41 unt41 = new UNT41();
-        unt41.setMessageRefNum("1");
-        unt41.setSegmentCount(50);
-        message41.setMessageTrailer(unt41);
         interchange.setMessages(Arrays.asList(message41));
 
         BGMBeginningOfMessage bgm = new BGMBeginningOfMessage();
+        segmentCount++;
         C002DocumentMessageName documentMessageName = new C002DocumentMessageName();
         documentMessageName.setE1001DocumentMessageNameCoded("351");
         bgm.setC002DocumentMessageName(documentMessageName);
@@ -135,6 +134,7 @@ public class DespatchAdvice implements Writable {
             ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
 
             if (this.orderDate != null) {
+                segmentCount++;
                 DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 DTMDateTimePeriod orderDate = new DTMDateTimePeriod();
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
@@ -145,6 +145,7 @@ public class DespatchAdvice implements Writable {
                 dtms.add(orderDate);
             }
             if (this.fixedDeliveryDate != null) {
+                segmentCount++;
                 DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 DTMDateTimePeriod deliveryDate = new DTMDateTimePeriod();
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
@@ -155,6 +156,7 @@ public class DespatchAdvice implements Writable {
                 dtms.add(deliveryDate);
             }
             if (this.deliveryDate != null) {
+                segmentCount++;
                 DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 DTMDateTimePeriod deliveryDate = new DTMDateTimePeriod();
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
@@ -172,6 +174,7 @@ public class DespatchAdvice implements Writable {
         {
             ArrayList<SegmentGroup1> sg1s = new ArrayList<>();
             if (notNullOrEmpty(this.deliveryNoteNumber)) {
+                segmentCount++;
                 SegmentGroup1 sg1 = new SegmentGroup1();
                 sg1s.add(sg1);
                 RFFReference rff = new RFFReference();
@@ -182,6 +185,7 @@ public class DespatchAdvice implements Writable {
                 sg1.setRFFReference(rff);
             }
             if (notNullOrEmpty(this.orderNumber)) {
+                segmentCount++;
                 SegmentGroup1 sg1 = new SegmentGroup1();
                 sg1s.add(sg1);
                 RFFReference rff = new RFFReference();
@@ -192,6 +196,7 @@ public class DespatchAdvice implements Writable {
                 sg1.setRFFReference(rff);
             }
             if (notNullOrEmpty(this.shipmentReferenceNumber)) {
+                segmentCount++;
                 SegmentGroup1 sg1 = new SegmentGroup1();
                 sg1s.add(sg1);
                 RFFReference rff = new RFFReference();
@@ -209,6 +214,7 @@ public class DespatchAdvice implements Writable {
             for (Party p : parties) {
                 SegmentGroup2 sg2 = new SegmentGroup2();
                 sg2s.add(sg2);
+                segmentCount++;
                 NADNameAndAddress nad = new NADNameAndAddress();
                 sg2.setNADNameAndAddress(nad);
 
@@ -252,6 +258,7 @@ public class DespatchAdvice implements Writable {
                 sg2.setSegmentGroup4(sg4s);
                 for (ContactDetail cd : p.contactDetails) {
                     SegmentGroup4 sg6 = new SegmentGroup4();
+                    segmentCount++;
                     CTAContactInformation contactInfo = new CTAContactInformation();
                     C056DepartmentOrEmployeeDetails c056 = new C056DepartmentOrEmployeeDetails();
                     c056.setE3412DepartmentOrEmployee(cd.name);
@@ -260,6 +267,7 @@ public class DespatchAdvice implements Writable {
                     sg6.setCTAContactInformation(contactInfo);
                     ArrayList<COMCommunicationContact> contacts = new ArrayList<>();
                     if (notNullOrEmpty(cd.phone)) {
+                        segmentCount++;
                         COMCommunicationContact contact = new COMCommunicationContact();
                         C076CommunicationContact c076 = new C076CommunicationContact();
                         c076.setE3155CommunicationChannelQualifier("TE");
@@ -268,6 +276,7 @@ public class DespatchAdvice implements Writable {
                         contacts.add(contact);
                     }
                     if (notNullOrEmpty(cd.email)) {
+                        segmentCount++;
                         COMCommunicationContact contact = new COMCommunicationContact();
                         C076CommunicationContact c076 = new C076CommunicationContact();
                         c076.setE3155CommunicationChannelQualifier("EM");
@@ -276,6 +285,7 @@ public class DespatchAdvice implements Writable {
                         contacts.add(contact);
                     }
                     if (notNullOrEmpty(cd.fax)) {
+                        segmentCount++;
                         COMCommunicationContact contact = new COMCommunicationContact();
                         C076CommunicationContact c076 = new C076CommunicationContact();
                         c076.setE3155CommunicationChannelQualifier("FX");
@@ -293,6 +303,7 @@ public class DespatchAdvice implements Writable {
             ArrayList<SegmentGroup10> sg10s = new ArrayList<>();
             SegmentGroup10 sg10 = new SegmentGroup10();
             sg10s.add(sg10);
+            segmentCount++;
             CPSConsignmentPackingSequence cps = new CPSConsignmentPackingSequence();
             cps.setE7164HierarchicalIdNumber("1");
             sg10.setCPSConsignmentPackingSequence(cps);
@@ -302,6 +313,7 @@ public class DespatchAdvice implements Writable {
                 SegmentGroup11 sg11 = new SegmentGroup11();
                 sg11s.add(sg11);
                 if (this.numberOfPackage != null) {
+                    segmentCount++;
                     PACPackage pac = new PACPackage();
                     pac.setE7224NumberOfPackages(this.numberOfPackage);
                     sg11.setPACPackage(pac);
@@ -311,6 +323,7 @@ public class DespatchAdvice implements Writable {
                 ArrayList<SegmentGroup13> sg13s = new ArrayList<>();
                 SegmentGroup13 sg13 = new SegmentGroup13();
                 sg13s.add(sg13);
+                segmentCount++;
                 PCIPackageIdentification pci = new PCIPackageIdentification();
                 pci.setE4233MarkingInstructionsCoded("ZZZ");
                 sg13.setPCIPackageIdentification(pci);
@@ -326,6 +339,7 @@ public class DespatchAdvice implements Writable {
 
                     ArrayList<GINGoodsIdentityNumber> gins = new ArrayList<>();
                     if (notNullOrEmpty(item.goodsIdentityNumberStart) && notNullOrEmpty(item.goodsIdentityNumberEnd)) {
+                        segmentCount++;
                         GINGoodsIdentityNumber gin = new GINGoodsIdentityNumber();
                         gins.add(gin);
                         gin.setE7405IdentityNumberQualifier("BJ");
@@ -336,6 +350,7 @@ public class DespatchAdvice implements Writable {
                     }
                     sg15.setGINGoodsIdentityNumber(gins);
 
+                    segmentCount++;
                     LINLineItem lin = new LINLineItem();
                     sg15.setLINLineItem(lin);
                     Utility.patchLineItem(lin);
@@ -350,6 +365,7 @@ public class DespatchAdvice implements Writable {
 
                     ArrayList<PIAAdditionalProductId> pias = new ArrayList<>();
                     if (notNullOrEmpty(item.buyerProductId)) {
+                        segmentCount++;
                         PIAAdditionalProductId pia = new PIAAdditionalProductId();
                         pias.add(pia);
                         pia.setE4347ProductIdFunctionQualifier("5");
@@ -359,6 +375,7 @@ public class DespatchAdvice implements Writable {
                         pia.setC2121ItemNumberIdentification(c212);
                     }
                     if (notNullOrEmpty(item.supplierProductId)) {
+                        segmentCount++;
                         PIAAdditionalProductId pia = new PIAAdditionalProductId();
                         pias.add(pia);
                         pia.setE4347ProductIdFunctionQualifier("5");
@@ -370,6 +387,7 @@ public class DespatchAdvice implements Writable {
 
                     ArrayList<IMDItemDescription> imds = new ArrayList<>();
                     if (notNullOrEmpty(item.shortDescription)) {
+                        segmentCount++;
                         IMDItemDescription imd = new IMDItemDescription();
                         imds.add(imd);
                         imd.setE7077ItemDescriptionTypeCoded("F");
@@ -380,6 +398,7 @@ public class DespatchAdvice implements Writable {
                         imd.setC273ItemDescription(c273);
                     }
                     if (notNullOrEmpty(item.longDescription)) {
+                        segmentCount++;
                         IMDItemDescription imd = new IMDItemDescription();
                         imds.add(imd);
                         imd.setE7077ItemDescriptionTypeCoded("F");
@@ -395,6 +414,7 @@ public class DespatchAdvice implements Writable {
 
                     ArrayList<MEAMeasurements> meas = new ArrayList<>();
                     if (item.length != null) {
+                        segmentCount++;
                         MEAMeasurements mea = new MEAMeasurements();
                         meas.add(mea);
                         mea.setE6311MeasurementApplicationQualifier("PD");
@@ -408,6 +428,7 @@ public class DespatchAdvice implements Writable {
                         mea.setC174ValueRange(c174);
                     }
                     if (item.width != null) {
+                        segmentCount++;
                         MEAMeasurements mea = new MEAMeasurements();
                         meas.add(mea);
                         mea.setE6311MeasurementApplicationQualifier("PD");
@@ -421,6 +442,7 @@ public class DespatchAdvice implements Writable {
                         mea.setC174ValueRange(c174);
                     }
                     if (item.depth != null) {
+                        segmentCount++;
                         MEAMeasurements mea = new MEAMeasurements();
                         meas.add(mea);
                         mea.setE6311MeasurementApplicationQualifier("PD");
@@ -434,6 +456,7 @@ public class DespatchAdvice implements Writable {
                         mea.setC174ValueRange(c174);
                     }
                     if (item.weight != null) {
+                        segmentCount++;
                         MEAMeasurements mea = new MEAMeasurements();
                         meas.add(mea);
                         mea.setE6311MeasurementApplicationQualifier("PD");
@@ -447,6 +470,7 @@ public class DespatchAdvice implements Writable {
                         mea.setC174ValueRange(c174);
                     }
                     if (item.volume != null) {
+                        segmentCount++;
                         MEAMeasurements mea = new MEAMeasurements();
                         meas.add(mea);
                         mea.setE6311MeasurementApplicationQualifier("PD");
@@ -464,6 +488,7 @@ public class DespatchAdvice implements Writable {
 
                     {
                         ArrayList<QTYQuantity> qtys = new ArrayList<>();
+                        segmentCount++;
                         QTYQuantity qty = new QTYQuantity();
                         qtys.add(qty);
                         C186QuantityDetails c186 = new C186QuantityDetails();
@@ -478,6 +503,7 @@ public class DespatchAdvice implements Writable {
                         if (notNullOrEmpty(this.deliveryNoteNumber)) {
                             SegmentGroup16 sg16 = new SegmentGroup16();
                             sg16s.add(sg16);
+                            segmentCount++;
                             RFFReference rff = new RFFReference();
                             C506Reference c506 = new C506Reference();
                             c506.setE1153ReferenceQualifier("DQ");
@@ -488,6 +514,7 @@ public class DespatchAdvice implements Writable {
                         if (notNullOrEmpty(item.orderId)) {
                             SegmentGroup16 sg16 = new SegmentGroup16();
                             sg16s.add(sg16);
+                            segmentCount++;
                             RFFReference rff = new RFFReference();
                             C506Reference c506 = new C506Reference();
                             c506.setE1153ReferenceQualifier("ON");
@@ -501,6 +528,7 @@ public class DespatchAdvice implements Writable {
                         if (notNullOrEmpty(item.supplierOrderId)) {
                             SegmentGroup16 sg16 = new SegmentGroup16();
                             sg16s.add(sg16);
+                            segmentCount++;
                             RFFReference rff = new RFFReference();
                             C506Reference c506 = new C506Reference();
                             c506.setE1153ReferenceQualifier("VN");
@@ -514,6 +542,7 @@ public class DespatchAdvice implements Writable {
                         if (notNullOrEmpty(item.tariffCustomsNumber)) {
                             SegmentGroup16 sg16 = new SegmentGroup16();
                             sg16s.add(sg16);
+                            segmentCount++;
                             RFFReference rff = new RFFReference();
                             C506Reference c506 = new C506Reference();
                             c506.setE1153ReferenceQualifier("ABD");
@@ -530,6 +559,11 @@ public class DespatchAdvice implements Writable {
 
             desadv.setSegmentGroup10(sg10s);
         }
+        UNT41 unt41 = new UNT41();
+        segmentCount++;
+        unt41.setMessageRefNum("1");
+        unt41.setSegmentCount(segmentCount);
+        message41.setMessageTrailer(unt41);
         factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream));
     }
 
