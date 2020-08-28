@@ -106,9 +106,11 @@ public class OrderResponse implements Writable {
         interchange.setInterchangeTrailer(unz41);
 
         Ordrsp ordrsp = new Ordrsp();
+        int segmentCount = 0;
 
         UNEdifactMessage41 message41 = new UNEdifactMessage41();
         UNH41 unh41 = new UNH41();
+        segmentCount++;
         unh41.setMessageRefNum("1");
         MessageIdentifier messageIdentifier = new MessageIdentifier();
         messageIdentifier.setControllingAgencyCode("UN");
@@ -119,13 +121,8 @@ public class OrderResponse implements Writable {
         message41.setMessageHeader(unh41);
         message41.setMessage(ordrsp);
 
-        UNT41 unt41 = new UNT41();
-        unt41.setMessageRefNum("1");
-        unt41.setSegmentCount(50);
-        message41.setMessageTrailer(unt41);
-        interchange.setMessages(Arrays.asList(message41));
-
         BGMBeginningOfMessage bgm = new BGMBeginningOfMessage();
+        segmentCount++;
         C002DocumentMessageName documentMessageName = new C002DocumentMessageName();
         documentMessageName.setE1001DocumentMessageNameCoded("231");
         bgm.setC002DocumentMessageName(documentMessageName);
@@ -138,6 +135,7 @@ public class OrderResponse implements Writable {
             if (this.orderDate != null) {
                 DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 DTMDateTimePeriod orderDate = new DTMDateTimePeriod();
+                segmentCount++;
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
                 orderC507.setE2005DateTimePeriodQualifier("137"); // order date Belegdatum
                 orderC507.setE2380DateTimePeriod(df.format(this.orderDate));
@@ -148,6 +146,7 @@ public class OrderResponse implements Writable {
             if (this.deliveryDate != null) {
                 DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 DTMDateTimePeriod deliveryDate = new DTMDateTimePeriod();
+                segmentCount++;
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
                 orderC507.setE2005DateTimePeriodQualifier("35"); // delivery date tatsächliches Lieferdatum
                 orderC507.setE2380DateTimePeriod(df.format(this.deliveryDate));
@@ -158,6 +157,7 @@ public class OrderResponse implements Writable {
             if (this.promisedDeliveryDate != null) {
                 DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 DTMDateTimePeriod deliveryDate = new DTMDateTimePeriod();
+                segmentCount++;
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
                 orderC507.setE2005DateTimePeriodQualifier("69"); // zugesagtes Lieferdatum
                 orderC507.setE2380DateTimePeriod(df.format(this.promisedDeliveryDate));
@@ -174,6 +174,7 @@ public class OrderResponse implements Writable {
         if (notNullOrEmpty(this.orderNumberFromBuyer)) {
             SegmentGroup1 sg1 = new SegmentGroup1();
             RFFReference r = new RFFReference();
+            segmentCount++;
             C506Reference r506 = new C506Reference();
             // ON = Order Number
             r506.setE1153ReferenceQualifier("ON");
@@ -186,6 +187,7 @@ public class OrderResponse implements Writable {
             SegmentGroup1 sg1 = new SegmentGroup1();
             ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
             DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+            segmentCount++;
             DateFormat df = new SimpleDateFormat("yyyyMMdd");
             C507DateTimePeriod c507 = new C507DateTimePeriod();
             c507.setE2005DateTimePeriodQualifier("171");
@@ -203,6 +205,7 @@ public class OrderResponse implements Writable {
             SegmentGroup3 sg3 = new SegmentGroup3();
             sg3s.add(sg3);
             NADNameAndAddress nad = new NADNameAndAddress();
+            segmentCount++;
             sg3.setNADNameAndAddress(nad);
             switch (p.role) {
                 case Buyer:
@@ -246,6 +249,7 @@ public class OrderResponse implements Writable {
             for (ContactDetail cd : p.contactDetails) {
                 SegmentGroup6 sg6 = new SegmentGroup6();
                 CTAContactInformation contactInfo = new CTAContactInformation();
+                segmentCount++;
                 C056DepartmentOrEmployeeDetails c056 = new C056DepartmentOrEmployeeDetails();
                 c056.setE3412DepartmentOrEmployee(cd.name);
                 contactInfo.setE3139ContactFunctionCoded("OC");
@@ -254,6 +258,7 @@ public class OrderResponse implements Writable {
                 ArrayList<COMCommunicationContact> contacts = new ArrayList<>();
                 if (notNullOrEmpty(cd.phone)) {
                     COMCommunicationContact contact = new COMCommunicationContact();
+                    segmentCount++;
                     C076CommunicationContact c076 = new C076CommunicationContact();
                     c076.setE3155CommunicationChannelQualifier("TE");
                     c076.setE3148CommunicationNumber(cd.phone);
@@ -262,6 +267,7 @@ public class OrderResponse implements Writable {
                 }
                 if (notNullOrEmpty(cd.email)) {
                     COMCommunicationContact contact = new COMCommunicationContact();
+                    segmentCount++;
                     C076CommunicationContact c076 = new C076CommunicationContact();
                     c076.setE3155CommunicationChannelQualifier("EM");
                     c076.setE3148CommunicationNumber(cd.email);
@@ -270,6 +276,7 @@ public class OrderResponse implements Writable {
                 }
                 if (notNullOrEmpty(cd.fax)) {
                     COMCommunicationContact contact = new COMCommunicationContact();
+                    segmentCount++;
                     C076CommunicationContact c076 = new C076CommunicationContact();
                     c076.setE3155CommunicationChannelQualifier("FX");
                     c076.setE3148CommunicationNumber(cd.fax);
@@ -287,6 +294,7 @@ public class OrderResponse implements Writable {
             ArrayList<SegmentGroup7> sg7s = new ArrayList<>();
             SegmentGroup7 sg7 = new SegmentGroup7();
             TAXDutyTaxFeeDetails taxDetails = new TAXDutyTaxFeeDetails();
+            segmentCount++;
             taxDetails.setE5283DutyTaxFeeFunctionQualifier("7"); // tax
             C241DutyTaxFeeType c241 = new C241DutyTaxFeeType();
             // TODO: need an enum for the list of codes?
@@ -306,6 +314,7 @@ public class OrderResponse implements Writable {
             SegmentGroup8 sg8 = new SegmentGroup8();
             sg8s.add(sg8);
             CUXCurrencies cux = new CUXCurrencies();
+            segmentCount++;
             sg8.setCUXCurrencies(cux);
             C5041CurrencyDetails c5041 = new C5041CurrencyDetails();
             c5041.setE6347CurrencyDetailsQualifier("2");
@@ -322,6 +331,7 @@ public class OrderResponse implements Writable {
 
             {
                 LINLineItem lineItem = new LINLineItem();
+                segmentCount++;
                 sg26.setLINLineItem(lineItem);
                 lineItem.setE1082LineItemNumber(item.lineItemId);
                 Utility.patchLineItem(lineItem);
@@ -335,6 +345,7 @@ public class OrderResponse implements Writable {
             ArrayList<PIAAdditionalProductId> pias = new ArrayList<>();
             if (notNullOrEmpty(item.supplierSpecificProductId)) {
                 PIAAdditionalProductId pia = new PIAAdditionalProductId();
+                segmentCount++;
                 pia.setE4347ProductIdFunctionQualifier("5");
                 C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
                 c212.setE7140ItemNumber(item.supplierSpecificProductId);
@@ -344,6 +355,7 @@ public class OrderResponse implements Writable {
             }
             if (notNullOrEmpty(item.buyerSpecificProductId)) {
                 PIAAdditionalProductId pia = new PIAAdditionalProductId();
+                segmentCount++;
                 pia.setE4347ProductIdFunctionQualifier("5");
                 C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
                 c212.setE7140ItemNumber(item.buyerSpecificProductId);
@@ -356,6 +368,7 @@ public class OrderResponse implements Writable {
             ArrayList<IMDItemDescription> imds = new ArrayList<>();
             if (notNullOrEmpty(item.shortDescription)) {
                 IMDItemDescription imd = new IMDItemDescription();
+                segmentCount++;
                 imd.setE7077ItemDescriptionTypeCoded("F");
                 C273ItemDescription c273 = new C273ItemDescription();
                 ArrayList<String> parts = splitStringIntoParts(item.shortDescription, 35, 2);
@@ -366,6 +379,7 @@ public class OrderResponse implements Writable {
             }
             if (notNullOrEmpty(item.longDescription)) {
                 IMDItemDescription imd = new IMDItemDescription();
+                segmentCount++;
                 imd.setE7077ItemDescriptionTypeCoded("F");
                 C273ItemDescription c273 = new C273ItemDescription();
                 ArrayList<String> parts = splitStringIntoParts(item.longDescription, 35, 2);
@@ -379,6 +393,7 @@ public class OrderResponse implements Writable {
             ArrayList<QTYQuantity> qtys = new ArrayList<>();
             if (item.orderQuantity != null) {
                 QTYQuantity qty = new QTYQuantity();
+                segmentCount++;
                 qtys.add(qty);
                 C186QuantityDetails c186 = new C186QuantityDetails();
                 c186.setE6063QuantityQualifier("21");
@@ -387,6 +402,7 @@ public class OrderResponse implements Writable {
             }
             if (item.deliveryQuantity != null) {
                 QTYQuantity qty = new QTYQuantity();
+                segmentCount++;
                 qtys.add(qty);
                 C186QuantityDetails c186 = new C186QuantityDetails();
                 c186.setE6063QuantityQualifier("113");
@@ -400,6 +416,7 @@ public class OrderResponse implements Writable {
                 if (item.requestedDeliveryDate != null) {
                     DateFormat df = new SimpleDateFormat("yyyyMMdd");
                     DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                    segmentCount++;
                     C507DateTimePeriod c507 = new C507DateTimePeriod();
                     c507.setE2005DateTimePeriodQualifier("2");
                     c507.setE2379DateTimePeriodFormatQualifier("102");
@@ -410,6 +427,7 @@ public class OrderResponse implements Writable {
                 if (item.promisedDeliveryDate != null) {
                     DateFormat df = new SimpleDateFormat("yyyyMMdd");
                     DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                    segmentCount++;
                     C507DateTimePeriod c507 = new C507DateTimePeriod();
                     c507.setE2005DateTimePeriodQualifier("69");
                     c507.setE2379DateTimePeriodFormatQualifier("102");
@@ -420,6 +438,7 @@ public class OrderResponse implements Writable {
                 if (item.actualDeliveryDate != null) {
                     DateFormat df = new SimpleDateFormat("yyyyMMdd");
                     DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                    segmentCount++;
                     C507DateTimePeriod c507 = new C507DateTimePeriod();
                     c507.setE2005DateTimePeriodQualifier("35");
                     c507.setE2379DateTimePeriodFormatQualifier("102");
@@ -433,6 +452,7 @@ public class OrderResponse implements Writable {
             if (item.priceLineAmount != null) {
                 ArrayList<MOAMonetaryAmount> moas = new ArrayList<>();
                 MOAMonetaryAmount moa = new MOAMonetaryAmount();
+                segmentCount++;
                 C516MonetaryAmount c516 = new C516MonetaryAmount();
                 c516.setE5025MonetaryAmountTypeQualifier("203");
                 c516.setE5004MonetaryAmount(item.priceLineAmount);
@@ -446,6 +466,7 @@ public class OrderResponse implements Writable {
                 ArrayList<SegmentGroup30> sg30s = new ArrayList<>();
                 SegmentGroup30 sg30 = new SegmentGroup30();
                 PRIPriceDetails pri = new PRIPriceDetails();
+                segmentCount++;
 
                 C509PriceInformation c509 = new C509PriceInformation();
                 c509.setE5125PriceQualifier("AAB");
@@ -462,6 +483,7 @@ public class OrderResponse implements Writable {
                 SegmentGroup31 sg31 = new SegmentGroup31();
                 sg31s.add(sg31);
                 RFFReference rff = new RFFReference();
+                segmentCount++;
                 C506Reference c506 = new C506Reference();
                 c506.setE1153ReferenceQualifier("ON");
                 c506.setE1154ReferenceNumber(item.buyerOrderId);
@@ -475,6 +497,7 @@ public class OrderResponse implements Writable {
                 SegmentGroup31 sg31 = new SegmentGroup31();
                 sg31s.add(sg31);
                 RFFReference rff = new RFFReference();
+                segmentCount++;
                 C506Reference c506 = new C506Reference();
                 c506.setE1153ReferenceQualifier("LI");
                 IntegerBigDecimalDecoder integerEncoder = new IntegerBigDecimalDecoder();
@@ -488,6 +511,7 @@ public class OrderResponse implements Writable {
                 sg31s.add(sg31);
                 ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
                 DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                segmentCount++;
                 dtms.add(dtm);
                 C507DateTimePeriod c507 = new C507DateTimePeriod();
                 c507.setE2005DateTimePeriodQualifier("171");
@@ -503,6 +527,7 @@ public class OrderResponse implements Writable {
                 SegmentGroup41 sg41 = new SegmentGroup41();
                 sg41s.add(sg41);
                 ALCAllowanceOrCharge alc = new ALCAllowanceOrCharge();
+                segmentCount++;
                 switch (aoc.type) {
                     case Charge:
                         alc.setE5463AllowanceOrChargeQualifier("C");
@@ -522,6 +547,7 @@ public class OrderResponse implements Writable {
                 if (aoc.percentage != null) {
                     SegmentGroup43 sg43 = new SegmentGroup43();
                     PCDPercentageDetails pcd = new PCDPercentageDetails();
+                    segmentCount++;
                     C501PercentageDetails c501 = new C501PercentageDetails();
                     c501.setE5245PercentageQualifier("3");
                     c501.setE5482Percentage(aoc.percentage);
@@ -533,6 +559,7 @@ public class OrderResponse implements Writable {
                 ArrayList<SegmentGroup44> sg44s = new ArrayList<>();
                 SegmentGroup44 sg44 = new SegmentGroup44();
                 MOAMonetaryAmount moa = new MOAMonetaryAmount();
+                segmentCount++;
                 C516MonetaryAmount c516 = new C516MonetaryAmount();
                 c516.setE5025MonetaryAmountTypeQualifier("8");
                 c516.setE5004MonetaryAmount(aoc.amount);
@@ -545,6 +572,13 @@ public class OrderResponse implements Writable {
             sg26.setSegmentGroup41(sg41s);
         }
         ordrsp.setSegmentGroup26(sg26s);
+
+        UNT41 unt41 = new UNT41();
+        segmentCount++;
+        unt41.setMessageRefNum("1");
+        unt41.setSegmentCount(segmentCount);
+        message41.setMessageTrailer(unt41);
+        interchange.setMessages(Arrays.asList(message41));
 
         Uns uns = new Uns();
         uns.setE0081("S");
