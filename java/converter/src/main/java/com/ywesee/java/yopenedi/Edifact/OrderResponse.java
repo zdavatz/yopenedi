@@ -362,6 +362,7 @@ public class OrderResponse implements Writable {
                 c273.setE70081ItemDescription(getIndexOrNull(parts, 0));
                 c273.setE70082ItemDescription(getIndexOrNull(parts, 1));
                 imd.setC273ItemDescription(c273);
+                imds.add(imd);
             }
             if (notNullOrEmpty(item.longDescription)) {
                 IMDItemDescription imd = new IMDItemDescription();
@@ -371,6 +372,7 @@ public class OrderResponse implements Writable {
                 c273.setE70081ItemDescription(getIndexOrNull(parts, 0));
                 c273.setE70082ItemDescription(getIndexOrNull(parts, 1));
                 imd.setC273ItemDescription(c273);
+                imds.add(imd);
             }
             sg26.setIMDItemDescription(imds);
 
