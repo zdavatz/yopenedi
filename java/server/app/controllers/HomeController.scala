@@ -158,6 +158,8 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     val otOrderResponsesPath = config.get[String]("opentrans-order-responses")
     val ediDespatchAdvicesPath = config.get[String]("edifact-despatch-advices")
     val otDispatchNotificationsPath = config.get[String]("opentrans-dispatch-notifications")
+    val ediInvoicesPath = config.get[String]("edifact-invoices")
+    val otInvoicesPath = config.get[String]("opentrans-invoices")
     val environment = config.getOptional[String]("environment")
 
     val ediOrderResponsesFolder = new File(ediOrderResponsesPath)
@@ -175,6 +177,14 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     val otDispatchNotificationsFolder = new File(otDispatchNotificationsPath)
     if (!otDispatchNotificationsFolder.exists()) {
       otDispatchNotificationsFolder.mkdirs()
+    }
+    val ediInvoicesFolder = new File(ediInvoicesPath)
+    if (!ediInvoicesFolder.exists()) {
+      ediInvoicesFolder.mkdirs()
+    }
+    val otInvoicesFolder = new File(otInvoicesPath)
+    if (!otInvoicesFolder.exists()) {
+      otInvoicesFolder.mkdirs()
     }
 
     def makeStream(): Either[Result, InputStream] = {
@@ -227,6 +237,16 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
           orderId = r.documentNumber
           ediFolder = ediDespatchAdvicesFolder
           otFolder = otDispatchNotificationsFolder
+          val recipient = r.getRecipient()
+          if (recipient != null) {
+            recipientGLN = recipient.id
+          }
+        } else if (writable.isInstanceOf[com.ywesee.java.yopenedi.Edifact.Invoice]) {
+          val r = writable.asInstanceOf[com.ywesee.java.yopenedi.Edifact.Invoice]
+          edifactType = "INVOIC"
+          orderId = r.documentNumber
+          ediFolder = ediInvoicesFolder
+          otFolder = otInvoicesFolder
           val recipient = r.getRecipient()
           if (recipient != null) {
             recipientGLN = recipient.id

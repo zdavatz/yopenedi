@@ -21,7 +21,7 @@
         "//OBETA",
         "4031271000006"
       ],
-      "edifact_types": ["ORDRSP", "DESADV"]
+      "edifact_types": ["ORDRSP", "DESADV", "INVOIC"]
     },
     "http": {
       "url": "https://eddy.vrg.de:4443",
@@ -52,9 +52,10 @@
         "4028684094012",
         "4028684002017",
         "4028684007012",
-        "4028684021018"
+        "4028684021018",
+        "4028684000006"
       ],
-      "edifact_types": ["ORDRSP", "DESADV"]
+      "edifact_types": ["ORDRSP", "DESADV", "INVOIC"]
     },
     "email": {
       "subject": "No subject",

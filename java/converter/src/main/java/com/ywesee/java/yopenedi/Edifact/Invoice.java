@@ -119,7 +119,6 @@ public class Invoice implements Writable {
 
         UNEdifactMessage41 message41 = new UNEdifactMessage41();
         UNH41 unh41 = new UNH41();
-        System.out.println("UNH41");
         segmentCount++;
         unh41.setMessageRefNum("1");
         MessageIdentifier messageIdentifier = new MessageIdentifier();
@@ -133,7 +132,6 @@ public class Invoice implements Writable {
         message41.setMessage(invoic);
 
         BGMBeginningOfMessage bgm = new BGMBeginningOfMessage();
-        System.out.println("BGMBeginningOfMessage");
         segmentCount++;
         C002DocumentMessageName documentMessageName = new C002DocumentMessageName();
         documentMessageName.setE1001DocumentMessageNameCoded("380");
@@ -147,7 +145,6 @@ public class Invoice implements Writable {
             if (this.orderDate != null) {
                 DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 DTMDateTimePeriod orderDate = new DTMDateTimePeriod();
-                System.out.println("DTMDateTimePeriod");
                 segmentCount++;
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
                 orderC507.setE2005DateTimePeriodQualifier("137"); // order date Belegdatum
@@ -159,7 +156,6 @@ public class Invoice implements Writable {
             if (this.deliveryDate != null) {
                 DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 DTMDateTimePeriod deliveryDate = new DTMDateTimePeriod();
-                System.out.println("DTMDateTimePeriod");
                 segmentCount++;
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
                 orderC507.setE2005DateTimePeriodQualifier("35"); // delivery date tatsächliches Lieferdatum
@@ -178,7 +174,6 @@ public class Invoice implements Writable {
         if (notNullOrEmpty(this.deliveryNoteNumber)) {
             SegmentGroup1 sg1 = new SegmentGroup1();
             RFFReference r = new RFFReference();
-            System.out.println("RFFReference");
             segmentCount++;
             C506Reference r506 = new C506Reference();
             // DQ = Lieferscheinnummer  delivery note number
@@ -192,7 +187,6 @@ public class Invoice implements Writable {
         if (notNullOrEmpty(this.orderNumberForCustomer)) {
             SegmentGroup1 sg1 = new SegmentGroup1();
             RFFReference r = new RFFReference();
-            System.out.println("RFFReference");
             segmentCount++;
             C506Reference r506 = new C506Reference();
             // ON = Bestellnummer des Kunden   Order number of the customer
@@ -206,7 +200,6 @@ public class Invoice implements Writable {
         if (notNullOrEmpty(this.orderNumberForSupplier)) {
             SegmentGroup1 sg1 = new SegmentGroup1();
             RFFReference r = new RFFReference();
-            System.out.println("RFFReference");
             segmentCount++;
             C506Reference r506 = new C506Reference();
             // VN = Auftragsnummer d. Lieferanten   supplier's order number
@@ -223,7 +216,6 @@ public class Invoice implements Writable {
         for (com.ywesee.java.yopenedi.Edifact.Party p : this.parties) {
             SegmentGroup2 sg2 = new SegmentGroup2();
             NADNameAndAddress nad = new NADNameAndAddress();
-            System.out.println("NADNameAndAddress");
             segmentCount++;
             switch (p.role) {
                 case Buyer:
@@ -268,7 +260,6 @@ public class Invoice implements Writable {
             if (notNullOrEmpty(p.vatId)) {
                 SegmentGroup3 sg3 = new SegmentGroup3();
                 RFFReference ref = new RFFReference();
-                System.out.println("RFFReference");
                 segmentCount++;
                 C506Reference c506 = new C506Reference();
                 c506.setE1153ReferenceQualifier("VA");
@@ -280,7 +271,6 @@ public class Invoice implements Writable {
             if (notNullOrEmpty(p.fiscalNumber)) {
                 SegmentGroup3 sg3 = new SegmentGroup3();
                 RFFReference ref = new RFFReference();
-                System.out.println("RFFReference");
                 segmentCount++;
                 C506Reference c506 = new C506Reference();
                 c506.setE1153ReferenceQualifier("FC");
@@ -295,7 +285,6 @@ public class Invoice implements Writable {
             for (ContactDetail cd : p.contactDetails) {
                 SegmentGroup5 sg5 = new SegmentGroup5();
                 CTAContactInformation contactInfo = new CTAContactInformation();
-                System.out.println("CTAContactInformation");
                 segmentCount++;
                 C056DepartmentOrEmployeeDetails c056 = new C056DepartmentOrEmployeeDetails();
                 c056.setE3412DepartmentOrEmployee(cd.name);
@@ -304,7 +293,6 @@ public class Invoice implements Writable {
                 ArrayList<COMCommunicationContact> contacts = new ArrayList<>();
                 if (notNullOrEmpty(cd.phone)) {
                     COMCommunicationContact contact = new COMCommunicationContact();
-                    System.out.println("COMCommunicationContact");
                     segmentCount++;
                     C076CommunicationContact c076 = new C076CommunicationContact();
                     c076.setE3155CommunicationChannelQualifier("TE");
@@ -314,7 +302,6 @@ public class Invoice implements Writable {
                 }
                 if (notNullOrEmpty(cd.email)) {
                     COMCommunicationContact contact = new COMCommunicationContact();
-                    System.out.println("COMCommunicationContact");
                     segmentCount++;
                     C076CommunicationContact c076 = new C076CommunicationContact();
                     c076.setE3155CommunicationChannelQualifier("EM");
@@ -324,7 +311,6 @@ public class Invoice implements Writable {
                 }
                 if (notNullOrEmpty(cd.fax)) {
                     COMCommunicationContact contact = new COMCommunicationContact();
-                    System.out.println("COMCommunicationContact");
                     segmentCount++;
                     C076CommunicationContact c076 = new C076CommunicationContact();
                     c076.setE3155CommunicationChannelQualifier("FX");
@@ -345,7 +331,6 @@ public class Invoice implements Writable {
             ArrayList<SegmentGroup6> sg6s = new ArrayList<>();
             SegmentGroup6 sg6 = new SegmentGroup6();
             TAXDutyTaxFeeDetails taxDetails = new TAXDutyTaxFeeDetails();
-            System.out.println("TAXDutyTaxFeeDetails");
             segmentCount++;
             taxDetails.setE5283DutyTaxFeeFunctionQualifier("7"); // tax
             C241DutyTaxFeeType c241 = new C241DutyTaxFeeType();
@@ -364,7 +349,6 @@ public class Invoice implements Writable {
         ArrayList<SegmentGroup7> sg7s = new ArrayList<>();
         SegmentGroup7 sg7 = new SegmentGroup7();
         CUXCurrencies cux = new CUXCurrencies();
-        System.out.println("CUXCurrencies");
         segmentCount++;
         C5041CurrencyDetails c5041 = new C5041CurrencyDetails();
         c5041.setE6347CurrencyDetailsQualifier("2");
@@ -378,7 +362,6 @@ public class Invoice implements Writable {
         ArrayList<SegmentGroup8> sg8s = new ArrayList<>();
         SegmentGroup8 sg8 = new SegmentGroup8();
         PATPaymentTermsBasis patPaymentTermsBasis = new PATPaymentTermsBasis();
-        System.out.println("PATPaymentTermsBasis");
         segmentCount++;
 
         // 1 = Basic, Payment conditions normally applied.
@@ -391,7 +374,6 @@ public class Invoice implements Writable {
             ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
             if (this.dateWithDiscount != null) {
                 DTMDateTimePeriod dtm = new DTMDateTimePeriod();
-                System.out.println("DTMDateTimePeriod");
                 segmentCount++;
                 C507DateTimePeriod c507 = new C507DateTimePeriod();
                 c507.setE2005DateTimePeriodQualifier("12"); // With discount
@@ -402,7 +384,6 @@ public class Invoice implements Writable {
             }
             if (this.dateWithoutDiscount != null) {
                 DTMDateTimePeriod dtm = new DTMDateTimePeriod();
-                System.out.println("DTMDateTimePeriod");
                 segmentCount++;
                 C507DateTimePeriod c507 = new C507DateTimePeriod();
                 c507.setE2005DateTimePeriodQualifier("13"); // Without discount
@@ -416,7 +397,6 @@ public class Invoice implements Writable {
 
         if (this.discountPercentage != null) {
             PCDPercentageDetails pcdPercentageDetails = new PCDPercentageDetails();
-            System.out.println("PCDPercentageDetails");
             segmentCount++;
             C501PercentageDetails c501 = new C501PercentageDetails();
             c501.setE5245PercentageQualifier("12"); // Discount
@@ -434,7 +414,6 @@ public class Invoice implements Writable {
             sg25s.add(sg25);
             {
                 LINLineItem lineItem = new LINLineItem();
-                System.out.println("LINLineItem");
                 segmentCount++;
                 lineItem.setE1082LineItemNumber(ii.lineItemId);
                 C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
@@ -447,7 +426,6 @@ public class Invoice implements Writable {
             ArrayList<PIAAdditionalProductId> pias = new ArrayList<>();
             if (notNullOrEmpty(ii.supplierSpecificProductId)) {
                 PIAAdditionalProductId pia = new PIAAdditionalProductId();
-                System.out.println("PIAAdditionalProductId");
                 segmentCount++;
                 pia.setE4347ProductIdFunctionQualifier("1");
                 C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
@@ -458,7 +436,6 @@ public class Invoice implements Writable {
             }
             if (notNullOrEmpty(ii.buyerSpecificProductId)) {
                 PIAAdditionalProductId pia = new PIAAdditionalProductId();
-                System.out.println("PIAAdditionalProductId");
                 segmentCount++;
                 pia.setE4347ProductIdFunctionQualifier("1");
                 C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
@@ -472,7 +449,6 @@ public class Invoice implements Writable {
             ArrayList<IMDItemDescription> imds = new ArrayList<>();
             if (notNullOrEmpty(ii.shortDescription)) {
                 IMDItemDescription imd = new IMDItemDescription();
-                System.out.println("IMDItemDescription");
                 segmentCount++;
                 imds.add(imd);
                 imd.setE7077ItemDescriptionTypeCoded("F");
@@ -484,7 +460,6 @@ public class Invoice implements Writable {
             }
             if (notNullOrEmpty(ii.longDescription)) {
                 IMDItemDescription imd = new IMDItemDescription();
-                System.out.println("IMDItemDescription");
                 segmentCount++;
                 imds.add(imd);
                 imd.setE7077ItemDescriptionTypeCoded("F");
@@ -499,7 +474,6 @@ public class Invoice implements Writable {
             ArrayList<MEAMeasurements> meas = new ArrayList<>();
             if (ii.volume != null) {
                 MEAMeasurements mea = new MEAMeasurements();
-                System.out.println("MEAMeasurements");
                 segmentCount++;
                 mea.setE6311MeasurementApplicationQualifier("PD");
                 C502MeasurementDetails c502 = new C502MeasurementDetails();
@@ -514,7 +488,6 @@ public class Invoice implements Writable {
             }
             if (ii.weight != null) {
                 MEAMeasurements mea = new MEAMeasurements();
-                System.out.println("MEAMeasurements");
                 segmentCount++;
                 mea.setE6311MeasurementApplicationQualifier("PD");
                 C502MeasurementDetails c502 = new C502MeasurementDetails();
@@ -529,7 +502,6 @@ public class Invoice implements Writable {
             }
             if (ii.length != null) {
                 MEAMeasurements mea = new MEAMeasurements();
-                System.out.println("MEAMeasurements");
                 segmentCount++;
                 mea.setE6311MeasurementApplicationQualifier("PD");
                 C502MeasurementDetails c502 = new C502MeasurementDetails();
@@ -544,7 +516,6 @@ public class Invoice implements Writable {
             }
             if (ii.width != null) {
                 MEAMeasurements mea = new MEAMeasurements();
-                System.out.println("MEAMeasurements");
                 segmentCount++;
                 mea.setE6311MeasurementApplicationQualifier("PD");
                 C502MeasurementDetails c502 = new C502MeasurementDetails();
@@ -559,7 +530,6 @@ public class Invoice implements Writable {
             }
             if (ii.depth != null) {
                 MEAMeasurements mea = new MEAMeasurements();
-                System.out.println("MEAMeasurements");
                 segmentCount++;
                 mea.setE6311MeasurementApplicationQualifier("PD");
                 C502MeasurementDetails c502 = new C502MeasurementDetails();
@@ -577,7 +547,6 @@ public class Invoice implements Writable {
             {
                 ArrayList<QTYQuantity> qtys = new ArrayList<>();
                 QTYQuantity qty = new QTYQuantity();
-                System.out.println("QTYQuantity");
                 segmentCount++;
                 qtys.add(qty);
                 C186QuantityDetails c186 = new C186QuantityDetails();
@@ -590,7 +559,6 @@ public class Invoice implements Writable {
             if (notNullOrEmpty(ii.countryOfOriginCoded)) {
                 ArrayList<ALIAdditionalInformation> alis = new ArrayList<>();
                 ALIAdditionalInformation ali = new ALIAdditionalInformation();
-                System.out.println("ALIAdditionalInformation");
                 segmentCount++;
                 ali.setE3239CountryOfOriginCoded(ii.countryOfOriginCoded);
                 alis.add(ali);
@@ -601,7 +569,6 @@ public class Invoice implements Writable {
                 DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
                 DTMDateTimePeriod dtm = new DTMDateTimePeriod();
-                System.out.println("DTMDateTimePeriod");
                 segmentCount++;
                 C507DateTimePeriod c507 = new C507DateTimePeriod();
                 c507.setE2005DateTimePeriodQualifier("37");
@@ -616,7 +583,6 @@ public class Invoice implements Writable {
                 ArrayList<SegmentGroup26> sg26s = new ArrayList<>();
                 SegmentGroup26 sg26 = new SegmentGroup26();
                 MOAMonetaryAmount moa = new MOAMonetaryAmount();
-                System.out.println("MOAMonetaryAmount");
                 segmentCount++;
                 C516MonetaryAmount c516 = new C516MonetaryAmount();
                 c516.setE5025MonetaryAmountTypeQualifier("203");
@@ -633,7 +599,6 @@ public class Invoice implements Writable {
                 ArrayList<SegmentGroup28> sg28s = new ArrayList<>();
                 SegmentGroup28 sg28 = new SegmentGroup28();
                 PRIPriceDetails pri = new PRIPriceDetails();
-                System.out.println("PRIPriceDetails");
                 segmentCount++;
                 C509PriceInformation c509 = new C509PriceInformation();
                 c509.setE5125PriceQualifier("AAB");
@@ -650,7 +615,6 @@ public class Invoice implements Writable {
                 if (notNullOrEmpty(ii.supplierOrderId)) {
                     SegmentGroup29 sg29 = new SegmentGroup29();
                     RFFReference rff = new RFFReference();
-                    System.out.println("RFFReference");
                     segmentCount++;
                     C506Reference c506 = new C506Reference();
                     c506.setE1153ReferenceQualifier("VN");
@@ -665,7 +629,6 @@ public class Invoice implements Writable {
                 if (notNullOrEmpty(ii.buyerOrderId)) {
                     SegmentGroup29 sg29 = new SegmentGroup29();
                     RFFReference rff = new RFFReference();
-                    System.out.println("RFFReference");
                     segmentCount++;
                     C506Reference c506 = new C506Reference();
                     c506.setE1153ReferenceQualifier("ON");
@@ -680,7 +643,6 @@ public class Invoice implements Writable {
                 if (notNullOrEmpty(ii.deliveryOrderId)) {
                     SegmentGroup29 sg29 = new SegmentGroup29();
                     RFFReference rff = new RFFReference();
-                    System.out.println("RFFReference");
                     segmentCount++;
                     C506Reference c506 = new C506Reference();
                     c506.setE1153ReferenceQualifier("DQ");
@@ -699,7 +661,6 @@ public class Invoice implements Writable {
                 ArrayList<SegmentGroup33> sg33s = new ArrayList<>();
                 SegmentGroup33 sg33 = new SegmentGroup33();
                 TAXDutyTaxFeeDetails tax = new TAXDutyTaxFeeDetails();
-                System.out.println("TAXDutyTaxFeeDetails");
                 segmentCount++;
                 tax.setE5283DutyTaxFeeFunctionQualifier("7");
                 C241DutyTaxFeeType c241 = new C241DutyTaxFeeType();
@@ -710,7 +671,6 @@ public class Invoice implements Writable {
                 tax.setC243DutyTaxFeeDetail(c243);
                 sg33.setTAXDutyTaxFeeDetails(tax);
                 MOAMonetaryAmount moa = new MOAMonetaryAmount();
-                System.out.println("MOAMonetaryAmount");
                 segmentCount++;
                 C516MonetaryAmount c516 = new C516MonetaryAmount();
                 c516.setE5025MonetaryAmountTypeQualifier("124");
@@ -729,7 +689,6 @@ public class Invoice implements Writable {
                     SegmentGroup38 sg38 = new SegmentGroup38();
                     sg38s.add(sg38);
                     ALCAllowanceOrCharge alc = new ALCAllowanceOrCharge();
-                    System.out.println("ALCAllowanceOrCharge");
                     segmentCount++;
                     switch (aoc.type) {
                         case Charge:
@@ -752,7 +711,6 @@ public class Invoice implements Writable {
                     if (aoc.percentage != null) {
                         SegmentGroup40 sg40 = new SegmentGroup40();
                         PCDPercentageDetails pcd = new PCDPercentageDetails();
-                        System.out.println("PCDPercentageDetails");
                         segmentCount++;
                         C501PercentageDetails c501 = new C501PercentageDetails();
                         c501.setE5245PercentageQualifier("3");
@@ -765,7 +723,6 @@ public class Invoice implements Writable {
                     ArrayList<SegmentGroup41> sg41s = new ArrayList<>();
                     SegmentGroup41 sg41 = new SegmentGroup41();
                     MOAMonetaryAmount moa = new MOAMonetaryAmount();
-                    System.out.println("MOAMonetaryAmount");
                     segmentCount++;
                     C516MonetaryAmount c516 = new C516MonetaryAmount();
                     c516.setE5025MonetaryAmountTypeQualifier("8");
@@ -788,7 +745,6 @@ public class Invoice implements Writable {
         if (this.totalAmount != null) {
             SegmentGroup48 sg48 = new SegmentGroup48();
             MOAMonetaryAmount moa = new MOAMonetaryAmount();
-            System.out.println("MOAMonetaryAmount");
             segmentCount++;
             C516MonetaryAmount c516 = new C516MonetaryAmount();
             c516.setE5025MonetaryAmountTypeQualifier("9");
@@ -800,7 +756,6 @@ public class Invoice implements Writable {
         if (this.netAmountOfItems != null) {
             SegmentGroup48 sg48 = new SegmentGroup48();
             MOAMonetaryAmount moa = new MOAMonetaryAmount();
-            System.out.println("MOAMonetaryAmount");
             segmentCount++;
             C516MonetaryAmount c516 = new C516MonetaryAmount();
             c516.setE5025MonetaryAmountTypeQualifier("79");
@@ -812,7 +767,6 @@ public class Invoice implements Writable {
         if (this.taxAmount != null) {
             SegmentGroup48 sg48 = new SegmentGroup48();
             MOAMonetaryAmount moa = new MOAMonetaryAmount();
-            System.out.println("MOAMonetaryAmount");
             segmentCount++;
             C516MonetaryAmount c516 = new C516MonetaryAmount();
             c516.setE5025MonetaryAmountTypeQualifier("124");
@@ -824,7 +778,6 @@ public class Invoice implements Writable {
         invoic.setSegmentGroup48(sg48s);
 
         UNT41 unt41 = new UNT41();
-        System.out.println("UNT41");
         segmentCount++;
         unt41.setMessageRefNum("1");
         unt41.setSegmentCount(segmentCount);
