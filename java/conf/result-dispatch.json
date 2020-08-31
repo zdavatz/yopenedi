@@ -19,7 +19,9 @@
         "//HARDY SCHMITZ",
         "4015828000008",
         "//OBETA",
-        "4031271000006"
+        "4031271000006",
+        "//ZAJADACZ",
+        "4251800100001"
       ],
       "edifact_types": ["ORDRSP", "DESADV", "INVOIC"]
     },
