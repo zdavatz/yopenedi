@@ -9,11 +9,20 @@ import java.util.Date;
 
 public class Utility {
     static String nextStringOrNull(XMLEventReader er) throws XMLStreamException {
-        XMLEvent event = er.nextEvent();
-        if (event.isCharacters()) {
-            return event.asCharacters().getData();
+        String str = "";
+        while (er.hasNext()) {
+            XMLEvent nextEvent = er.peek();
+            if (nextEvent.isCharacters()) {
+                XMLEvent event = er.nextEvent();
+                str += event.asCharacters().getData();
+            } else {
+                break;
+            }
         }
-        return null;
+        if (str.isEmpty()) {
+            return null;
+        }
+        return str;
     }
 
     static Date parseNextDateString(XMLEventReader er) {

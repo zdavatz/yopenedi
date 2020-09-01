@@ -60,7 +60,7 @@ public class Invoice {
 
     public Invoice(InputStream stream) throws XMLStreamException {
         XMLInputFactory factory = XMLInputFactory.newFactory();
-        XMLEventReader eventReader = factory.createXMLEventReader(stream);
+        XMLEventReader eventReader = factory.createXMLEventReader(stream, "UTF-8");
         while (eventReader.hasNext()) {
             XMLEvent event = eventReader.nextEvent();
             if (event.isStartDocument()) continue;
