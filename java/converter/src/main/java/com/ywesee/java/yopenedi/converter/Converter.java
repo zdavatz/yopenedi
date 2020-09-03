@@ -353,9 +353,6 @@ public class Converter {
             converted.referenceDate = orderResponse.orderResponseDate;
             or.items.add(converted);
         }
-        or.items = orderResponse.orderResponseItems.stream()
-                .map(this::orderResponseItemToEdifact)
-                .collect(Collectors.toCollection(ArrayList::new));
         or.parties = orderResponse.parties.stream()
                 .map(this::partyToEdifact)
                 .collect(Collectors.toCollection(ArrayList::new));
