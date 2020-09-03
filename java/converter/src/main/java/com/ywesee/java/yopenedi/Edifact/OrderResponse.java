@@ -493,6 +493,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 pri.setC509PriceInformation(c509);
 
                 sg30.setPRIPriceDetails(pri);
+                sg30s.add(sg30);
                 sg26.setSegmentGroup30(sg30s);
             }
 
@@ -591,16 +592,17 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
         }
         ordrsp.setSegmentGroup26(sg26s);
 
+        Uns uns = new Uns();
+        segmentCount++;
+        uns.setE0081("S");
+        ordrsp.setUNSSectionControl(uns);
+
         UNT41 unt41 = new UNT41();
         segmentCount++;
         unt41.setMessageRefNum("1");
         unt41.setSegmentCount(segmentCount);
         message41.setMessageTrailer(unt41);
         interchange.setMessages(Arrays.asList(message41));
-
-        Uns uns = new Uns();
-        uns.setE0081("S");
-        ordrsp.setUNSSectionControl(uns);
 
         factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream));
     }
