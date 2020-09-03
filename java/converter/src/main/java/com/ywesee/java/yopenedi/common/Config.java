@@ -96,30 +96,14 @@ public class Config {
         return new HashMap<String, String>();
     }
 
-    public void replaceGLN(DespatchAdvice despatchAdvice) {
-        for (Party p : despatchAdvice.parties) {
-            replaceGLN(p);
-        }
-    }
+    public <T> void replaceGLN(MessageExchange<T> exchange) {
+        String gln = exchange.getRecipientGLN();
 
-    public void replaceGLN(Invoice invoice) {
-        for (Party p : invoice.parties) {
-            replaceGLN(p);
-        }
-    }
-
-    public void replaceGLN(OrderResponse orderResponse) {
-        for (Party p : orderResponse.parties) {
-            replaceGLN(p);
-        }
-    }
-
-    public void replaceGLN(Party party){
-        String name = udxChannel().get(party.id);
+        String name = udxChannel().get(gln);
         if (name != null) {
             String replaced = getGlnOverrideMap().get(name);
             if (replaced != null) {
-                party.id = replaced;
+                exchange.setRecipientGLNOverride(replaced);
             }
         }
     }
