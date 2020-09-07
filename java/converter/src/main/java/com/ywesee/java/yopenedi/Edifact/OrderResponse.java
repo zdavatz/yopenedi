@@ -1,6 +1,7 @@
 package com.ywesee.java.yopenedi.Edifact;
 
 import com.ywesee.java.yopenedi.common.Config;
+import com.ywesee.java.yopenedi.common.MessageExchange;
 import com.ywesee.java.yopenedi.converter.Writable;
 import org.milyn.edi.unedifact.d96a.D96AInterchangeFactory;
 import org.milyn.edi.unedifact.d96a.ORDRSP.*;
@@ -23,7 +24,7 @@ import java.util.Date;
 import static com.ywesee.java.yopenedi.converter.Utility.*;
 import static com.ywesee.java.yopenedi.converter.Utility.getIndexOrNull;
 
-public class OrderResponse implements Writable {
+public class OrderResponse implements Writable, MessageExchange<Party> {
     public String referenceNumber;
     public String documentNumber;
     public Date orderDate;
@@ -38,6 +39,8 @@ public class OrderResponse implements Writable {
 
     public ArrayList<OrderResponseItem> items = new ArrayList<>();
     public ArrayList<Party> parties = new ArrayList<>();
+
+    public String recipientGLNOverride;
 
     public Party getSender() {
         for (Party p : this.parties) {
@@ -55,6 +58,21 @@ public class OrderResponse implements Writable {
             }
         }
         return null;
+    }
+
+    public String getRecipientGLN() {
+        if (recipientGLNOverride != null) {
+            return recipientGLNOverride;
+        }
+        Party p = this.getRecipient();
+        if (p != null) {
+            return p.id;
+        }
+        return null;
+    }
+
+    public void setRecipientGLNOverride(String replaced) {
+        this.recipientGLNOverride = replaced;
     }
 
     public void write(OutputStream outputStream) throws Exception {
@@ -82,10 +100,10 @@ public class OrderResponse implements Writable {
             unb41.setSender(sender);
         }
 
-        com.ywesee.java.yopenedi.Edifact.Party jrecipient = this.getRecipient();
-        if (jrecipient != null) {
+        String recipientGLN = this.getRecipientGLN();
+        if (recipientGLN != null) {
             org.milyn.smooks.edi.unedifact.model.r41.types.Party recipient = new org.milyn.smooks.edi.unedifact.model.r41.types.Party();
-            recipient.setId(jrecipient.id);
+            recipient.setId(recipientGLN);
             recipient.setCodeQualifier("14");
             unb41.setRecipient(recipient);
         }
@@ -475,6 +493,7 @@ public class OrderResponse implements Writable {
                 pri.setC509PriceInformation(c509);
 
                 sg30.setPRIPriceDetails(pri);
+                sg30s.add(sg30);
                 sg26.setSegmentGroup30(sg30s);
             }
 
@@ -573,16 +592,17 @@ public class OrderResponse implements Writable {
         }
         ordrsp.setSegmentGroup26(sg26s);
 
+        Uns uns = new Uns();
+        segmentCount++;
+        uns.setE0081("S");
+        ordrsp.setUNSSectionControl(uns);
+
         UNT41 unt41 = new UNT41();
         segmentCount++;
         unt41.setMessageRefNum("1");
         unt41.setSegmentCount(segmentCount);
         message41.setMessageTrailer(unt41);
         interchange.setMessages(Arrays.asList(message41));
-
-        Uns uns = new Uns();
-        uns.setE0081("S");
-        ordrsp.setUNSSectionControl(uns);
 
         factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream));
     }

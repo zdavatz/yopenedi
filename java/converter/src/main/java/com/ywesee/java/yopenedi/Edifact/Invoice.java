@@ -1,6 +1,7 @@
 package com.ywesee.java.yopenedi.Edifact;
 
 import com.ywesee.java.yopenedi.common.Config;
+import com.ywesee.java.yopenedi.common.MessageExchange;
 import com.ywesee.java.yopenedi.converter.Writable;
 import org.milyn.edi.unedifact.d96a.D96AInterchangeFactory;
 import org.milyn.edi.unedifact.d96a.INVOIC.*;
@@ -23,7 +24,7 @@ import java.util.Date;
 
 import static com.ywesee.java.yopenedi.converter.Utility.*;
 
-public class Invoice implements Writable {
+public class Invoice implements Writable, MessageExchange<Party> {
     public String referenceNumber;
     public String documentNumber;
     public Date orderDate;
@@ -48,6 +49,8 @@ public class Invoice implements Writable {
     public BigDecimal netAmountOfItems;
     public BigDecimal taxAmount;
 
+    public String recipientGLNOverride;
+
     public Party getSender() {
         for (Party p : this.parties) {
             if (p.role == Party.Role.Supplier) {
@@ -64,6 +67,21 @@ public class Invoice implements Writable {
             }
         }
         return null;
+    }
+
+    public String getRecipientGLN() {
+        if (recipientGLNOverride != null) {
+            return recipientGLNOverride;
+        }
+        Party p = this.getRecipient();
+        if (p != null) {
+            return p.id;
+        }
+        return null;
+    }
+
+    public void setRecipientGLNOverride(String replaced) {
+        this.recipientGLNOverride = replaced;
     }
 
     public void write(OutputStream outputStream) throws Exception {
@@ -91,10 +109,10 @@ public class Invoice implements Writable {
             unb41.setSender(sender);
         }
 
-        com.ywesee.java.yopenedi.Edifact.Party jrecipient = this.getRecipient();
-        if (jrecipient != null) {
+        String recipientGLN = this.getRecipientGLN();
+        if (recipientGLN != null) {
             org.milyn.smooks.edi.unedifact.model.r41.types.Party recipient = new org.milyn.smooks.edi.unedifact.model.r41.types.Party();
-            recipient.setId(jrecipient.id);
+            recipient.setId(recipientGLN);
             recipient.setCodeQualifier("14");
             unb41.setRecipient(recipient);
         }

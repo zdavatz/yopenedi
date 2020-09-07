@@ -251,6 +251,8 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
           if (recipient != null) {
             recipientGLN = recipient.id
           }
+        } else {
+          return BadRequest("Invalid file type")
         }
 
         outFile = new File(ediFolder, filename)
