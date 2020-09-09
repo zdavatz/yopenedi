@@ -15,6 +15,7 @@ import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 
 import javax.mail.*;
+import javax.mail.search.FlagTerm;
 import java.io.*;
 import java.util.Properties;
 
@@ -160,20 +161,16 @@ public class App {
 
         inbox.open(Folder.READ_WRITE);
 
-        Message[] ms = inbox.getMessages();
+        Message[] ms = skipSeenMessage
+                ? inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))
+                : inbox.getMessages();
         System.out.println("Found " + ms.length + " messages");
 
         for (Message message : ms) {
             long uid = inbox.getUID(message);
             System.out.println("Found message. UID=" + uid);
 
-            boolean seen = message.isSet(Flags.Flag.SEEN);
-            if (seen && skipSeenMessage) {
-                System.out.println("Message is seen, skipping.");
-                continue;
-            } else {
-                System.out.println("Getting attachment");
-            }
+            System.out.println("Getting attachment");
             Object content = message.getContent();
             if (!(content instanceof BASE64DecoderStream)) {
                 // handle multipart?
