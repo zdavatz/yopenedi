@@ -333,7 +333,7 @@ public class Converter {
     public com.ywesee.java.yopenedi.Edifact.OrderResponse orderResponseToEdifact(OrderResponse orderResponse) {
         com.ywesee.java.yopenedi.Edifact.OrderResponse or = new com.ywesee.java.yopenedi.Edifact.OrderResponse();
         or.referenceNumber = orderResponse.orderId;
-        or.documentNumber = orderResponse.orderId;
+        or.documentNumber = orderResponse.supplierOrderId;
         or.orderDate = orderResponse.orderResponseDate;
         or.deliveryDate = orderResponse.deliveryEndDate;
         or.orderNumberFromBuyer = orderResponse.orderId;
