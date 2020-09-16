@@ -512,6 +512,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                         c186.setE6063QuantityQualifier("12");
                         c186.setE6060Quantity(item.quantity);
                         c186.setE6411MeasureUnitQualifier(item.quantityUnit);
+                        qty.setC186QuantityDetails(c186);
                         sg15.setQTYQuantity(qtys);
                     }
 
