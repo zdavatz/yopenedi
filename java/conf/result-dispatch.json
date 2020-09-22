@@ -31,7 +31,7 @@
     "http": {
       "url": "https://eddy.vrg.de:4443",
       "headers": {
-        "AS2-From": "janico",
+        "AS2-From": "janico_ch",
         "AS2-To": "NOWISCC_AS2"
       }
     }
