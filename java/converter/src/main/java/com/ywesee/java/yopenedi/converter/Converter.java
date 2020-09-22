@@ -400,7 +400,7 @@ public class Converter {
         despatchAdvice.deliveryNoteNumber = dispatchNotification.id;
         despatchAdvice.orderNumber = dispatchNotification.getOrderId();
 //        despatchAdvice.shipmentReferenceNumber;
-//        despatchAdvice.numberOfPackage;
+        despatchAdvice.numberOfPackage = new BigDecimal(1);
 
         despatchAdvice.parties = dispatchNotification.parties.stream()
                 .map(this::partyToEdifact)
