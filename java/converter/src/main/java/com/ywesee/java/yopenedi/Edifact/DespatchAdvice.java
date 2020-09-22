@@ -335,16 +335,17 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                     pac.setE7224NumberOfPackages(this.numberOfPackage);
                     sg11.setPACPackage(pac);
                 }
+// Removing PCI
+// https://github.com/zdavatz/yopenedi/issues/150
+//                ArrayList<SegmentGroup13> sg13s = new ArrayList<>();
+//                SegmentGroup13 sg13 = new SegmentGroup13();
+//                sg13s.add(sg13);
+//                segmentCount++;
+//                PCIPackageIdentification pci = new PCIPackageIdentification();
+//                pci.setE4233MarkingInstructionsCoded("ZZZ");
+//                sg13.setPCIPackageIdentification(pci);
+//                sg11.setSegmentGroup13(sg13s);
                 sg10.setSegmentGroup11(sg11s);
-
-                ArrayList<SegmentGroup13> sg13s = new ArrayList<>();
-                SegmentGroup13 sg13 = new SegmentGroup13();
-                sg13s.add(sg13);
-                segmentCount++;
-                PCIPackageIdentification pci = new PCIPackageIdentification();
-                pci.setE4233MarkingInstructionsCoded("ZZZ");
-                sg13.setPCIPackageIdentification(pci);
-                sg11.setSegmentGroup13(sg13s);
             }
 
             {
