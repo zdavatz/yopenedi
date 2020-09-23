@@ -178,12 +178,19 @@ public class Order implements Writable {
         streamWriter.writeStartElement("TOTAL_ITEM_NUM");
         streamWriter.writeCharacters("" + this.orderItems.size());
         streamWriter.writeEndElement(); // TOTAL_ITEM_NUM
-        streamWriter.writeStartElement("TOTAL_AMOUNT");
-        BigDecimal totalPrice = this.orderItems.stream()
-                .map(OrderItem::totalPrice)
-                .reduce(new BigDecimal(0), BigDecimal::add);
-        streamWriter.writeCharacters(totalPrice.toString());
-        streamWriter.writeEndElement(); // TOTAL_AMOUNT
+
+        try {
+            BigDecimal totalPrice = this.orderItems.stream()
+                    .map(OrderItem::totalPrice)
+                    .reduce(new BigDecimal(0), BigDecimal::add);
+            streamWriter.writeStartElement("TOTAL_AMOUNT");
+            streamWriter.writeCharacters(totalPrice.toString());
+            streamWriter.writeEndElement(); // TOTAL_AMOUNT
+        } catch (NullPointerException e) {
+            // There's case which price can be null. A NullPointerException will be thrown.
+            // Do nothing here
+        }
+
         streamWriter.writeEndElement(); // ORDER_SUMMARY
     }
 
