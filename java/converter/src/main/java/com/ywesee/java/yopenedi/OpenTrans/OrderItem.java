@@ -35,6 +35,9 @@ public class OrderItem {
     }
 
     public BigDecimal totalPrice() {
+        if (this.price == null || this.quantity == null || this.priceQuantity == null) {
+            return null;
+        }
         return this.price.multiply(this.quantity).divide(this.priceQuantity, BigDecimal.ROUND_HALF_UP);
     }
 
@@ -77,33 +80,37 @@ public class OrderItem {
         s.writeCharacters(this.quantityUnit);
         s.writeEndElement(); // ORDER_UNIT
 
-        s.writeStartElement("PRODUCT_PRICE_FIX");
-        s.writeStartElement("bmecat:PRICE_AMOUNT");
-        s.writeCharacters(this.price.toString());
-        s.writeEndElement(); // PRICE_AMOUNT
-        s.writeStartElement("bmecat:PRICE_QUANTITY");
-        s.writeCharacters(this.priceQuantity.toString());
-        s.writeEndElement(); // PRICE_QUANTITY
-        s.writeEndElement(); // PRODUCT_PRICE_FIX
+        if (this.price != null) {
+            s.writeStartElement("PRODUCT_PRICE_FIX");
+            s.writeStartElement("bmecat:PRICE_AMOUNT");
+            s.writeCharacters(this.price.toString());
+            s.writeEndElement(); // PRICE_AMOUNT
+            if (this.priceQuantity != null) {
+                s.writeStartElement("bmecat:PRICE_QUANTITY");
+                s.writeCharacters(this.priceQuantity.toString());
+                s.writeEndElement(); // PRICE_QUANTITY
+            }
+            s.writeEndElement(); // PRODUCT_PRICE_FIX
+        }
+        BigDecimal totalPrice = this.totalPrice();
+        if (totalPrice != null) {
+            s.writeStartElement("PRICE_LINE_AMOUNT");
+            s.writeCharacters(totalPrice.toString());
+            s.writeEndElement(); // PRICE_LINE_AMOUNT
+        }
 
-        s.writeStartElement("PRICE_LINE_AMOUNT");
-        s.writeCharacters(this.totalPrice().toString());
-        s.writeEndElement(); // PRICE_LINE_AMOUNT
-
-        s.writeStartElement("DELIVERY_DATE");
         String startDateString = getDeliveryStartDateOrFallback();
-        if (startDateString != null) {
+        String endDateString = getDeliveryEndDateOrFallback();
+        if (startDateString != null && endDateString != null) {
+            s.writeStartElement("DELIVERY_DATE");
             s.writeStartElement("DELIVERY_START_DATE");
             s.writeCharacters(startDateString);
             s.writeEndElement(); // DELIVERY_START_DATE
-        }
-        String endDateString = getDeliveryEndDateOrFallback();
-        if (endDateString != null) {
             s.writeStartElement("DELIVERY_END_DATE");
             s.writeCharacters(endDateString);
             s.writeEndElement(); // DELIVERY_END_DATE
+            s.writeEndElement(); // DELIVERY_DATE
         }
-        s.writeEndElement(); // DELIVERY_DATE
 
         s.writeEndElement(); // ORDER_ITEM
     }
