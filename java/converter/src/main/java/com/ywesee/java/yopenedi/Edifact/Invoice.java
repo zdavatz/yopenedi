@@ -466,26 +466,30 @@ public class Invoice implements Writable, MessageExchange<Party> {
 
             ArrayList<IMDItemDescription> imds = new ArrayList<>();
             if (notNullOrEmpty(ii.shortDescription)) {
-                IMDItemDescription imd = new IMDItemDescription();
-                segmentCount++;
-                imds.add(imd);
-                imd.setE7077ItemDescriptionTypeCoded("F");
-                C273ItemDescription c273 = new C273ItemDescription();
-                ArrayList<String> parts = splitStringIntoParts(ii.shortDescription, 35, 2);
-                c273.setE70081ItemDescription(getIndexOrNull(parts, 0));
-                c273.setE70082ItemDescription(getIndexOrNull(parts, 1));
-                imd.setC273ItemDescription(c273);
+                ArrayList<String> parts = splitStringIntoParts(ii.shortDescription, 35, 10);
+                for (int i = 0; i < parts.size(); i += 2) {
+                    IMDItemDescription imd = new IMDItemDescription();
+                    segmentCount++;
+                    imds.add(imd);
+                    imd.setE7077ItemDescriptionTypeCoded("F");
+                    C273ItemDescription c273 = new C273ItemDescription();
+                    c273.setE70081ItemDescription(getIndexOrNull(parts, i));
+                    c273.setE70082ItemDescription(getIndexOrNull(parts, i + 1));
+                    imd.setC273ItemDescription(c273);
+                }
             }
             if (notNullOrEmpty(ii.longDescription)) {
-                IMDItemDescription imd = new IMDItemDescription();
-                segmentCount++;
-                imds.add(imd);
-                imd.setE7077ItemDescriptionTypeCoded("F");
-                C273ItemDescription c273 = new C273ItemDescription();
-                ArrayList<String> parts = splitStringIntoParts(ii.longDescription, 35, 2);
-                c273.setE70081ItemDescription(getIndexOrNull(parts, 0));
-                c273.setE70082ItemDescription(getIndexOrNull(parts, 1));
-                imd.setC273ItemDescription(c273);
+                ArrayList<String> parts = splitStringIntoParts(ii.longDescription, 35, 10);
+                for (int i = 0; i < parts.size(); i += 2) {
+                    IMDItemDescription imd = new IMDItemDescription();
+                    segmentCount++;
+                    imds.add(imd);
+                    imd.setE7077ItemDescriptionTypeCoded("F");
+                    C273ItemDescription c273 = new C273ItemDescription();
+                    c273.setE70081ItemDescription(getIndexOrNull(parts, i));
+                    c273.setE70082ItemDescription(getIndexOrNull(parts, i + 1));
+                    imd.setC273ItemDescription(c273);
+                }
             }
             sg25.setIMDItemDescription(imds);
 
