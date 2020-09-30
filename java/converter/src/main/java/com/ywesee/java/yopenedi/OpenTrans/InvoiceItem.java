@@ -6,7 +6,6 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
-import java.math.BigDecimal;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -29,6 +28,7 @@ public class InvoiceItem {
     public Float depth;  // m
 
     public Integer quantity;
+    public String orderUnit;
     public String countryOfOriginCoded;
 
     public Date deliveryStartDate;
@@ -94,7 +94,10 @@ public class InvoiceItem {
                 } else if (name.equals("QUANTITY")) {
                     try {
                         this.quantity = Integer.parseInt(nextStringOrNull(er));
-                    } catch (Exception e) {}
+                    } catch (Exception e) {
+                    }
+                } else if (name.equals("ORDER_UNIT")) {
+                    this.orderUnit = nextStringOrNull(er);
                 } else if (name.equals("COUNTRY_OF_ORIGIN")) {
                     this.countryOfOriginCoded = nextStringOrNull(er);
                 } else if (name.equals("DELIVERY_START_DATE")) {

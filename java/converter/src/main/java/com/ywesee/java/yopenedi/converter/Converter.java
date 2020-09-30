@@ -235,6 +235,7 @@ public class Converter {
         if (invoiceItem.quantity != null) {
             ii.quantity = BigDecimal.valueOf(invoiceItem.quantity);
         }
+        ii.orderUnit = invoiceItem.orderUnit;
         ii.countryOfOriginCoded = invoiceItem.countryOfOriginCoded;
 
         ii.deliveryDate = invoiceItem.deliveryEndDate;
@@ -378,6 +379,7 @@ public class Converter {
 
         ori.priceLineAmount = new BigDecimal(orderResponseItem.priceLineAmount);
         ori.priceQuantity = new BigDecimal(orderResponseItem.priceQuantity);
+        ori.orderUnit = orderResponseItem.orderUnit;
         ori.price = new BigDecimal(orderResponseItem.priceAmount);
         ori.buyerOrderId = orderResponseItem.lineItemId;
         ori.buyerOrderItemId = orderResponseItem.buyerLineItemId;
