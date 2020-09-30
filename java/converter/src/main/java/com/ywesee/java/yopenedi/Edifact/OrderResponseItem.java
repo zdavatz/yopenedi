@@ -14,6 +14,7 @@ public class OrderResponseItem {
     public String longDescription;
 
     public BigDecimal orderQuantity;
+    public String orderUnit;
     public BigDecimal deliveryQuantity;
 
     public Date requestedDeliveryDate;

@@ -574,6 +574,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 C186QuantityDetails c186 = new C186QuantityDetails();
                 c186.setE6063QuantityQualifier("47");
                 c186.setE6060Quantity(ii.quantity);
+                c186.setE6411MeasureUnitQualifier(ii.orderUnit);
                 qty.setC186QuantityDetails(c186);
                 sg25.setQTYQuantity(qtys);
             }

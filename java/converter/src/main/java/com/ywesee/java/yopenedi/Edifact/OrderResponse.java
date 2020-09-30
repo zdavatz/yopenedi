@@ -420,6 +420,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 C186QuantityDetails c186 = new C186QuantityDetails();
                 c186.setE6063QuantityQualifier("21");
                 c186.setE6060Quantity(item.orderQuantity);
+                c186.setE6411MeasureUnitQualifier(item.orderUnit);
                 qty.setC186QuantityDetails(c186);
             }
             if (item.deliveryQuantity != null) {
@@ -429,6 +430,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 C186QuantityDetails c186 = new C186QuantityDetails();
                 c186.setE6063QuantityQualifier("113");
                 c186.setE6060Quantity(item.deliveryQuantity);
+                c186.setE6411MeasureUnitQualifier(item.orderUnit);
                 qty.setC186QuantityDetails(c186);
             }
             sg26.setQTYQuantity(qtys);
