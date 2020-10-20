@@ -46,4 +46,5 @@ To configure server:
   - `opentrans-orders`
   
 # Requirements
-1. Activator: wget https://downloads.typesafe.com/typesafe-activator/1.3.9/typesafe-activator-1.3.9-minimal.zip
+1. Activator: `wget https://downloads.typesafe.com/typesafe-activator/1.3.9/typesafe-activator-1.3.9-minimal.zip`
+2. Make: `apt install make`
