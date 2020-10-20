@@ -47,7 +47,9 @@ To configure server:
   
 # Requirements
 1. openjdk-8-jre: `apt install openjdk-8-jre`
-2. openjdk-8-jdk: `apt install openjdk-8-jre`
+2. openjdk-8-jdk: `apt install openjdk-8-jdk`
 3. Activator: `wget https://downloads.typesafe.com/typesafe-activator/1.3.9/typesafe-activator-1.3.9-minimal.zip`
 4. Make: `apt install make`
 5. deamontools: `apt install daemontools` and `apt install daemontools-run`
+# Setup
+1. Link Daemontools: `sudo ln -s /var/www/yopenedi.ch/svc/ /etc/service/yopenedi.ch`
