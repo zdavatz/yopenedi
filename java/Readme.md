@@ -55,4 +55,4 @@ To configure server:
 1. Link Daemontools: `sudo ln -s /var/www/yopenedi.ch/svc/ /etc/service/yopenedi.ch`
 2. Setup up log `mkdir /var/www/yopenedi.ch/svc/`
 3. make `run` executable `chmod +x run` (also for `log`)
-4. Enable Proxy for Apache2: `sudo a2enmod proxy` and `sudo a2enmod proxy_http`
+4. Enable Proxy for Apache2: `sudo a2enmod proxy`, `sudo a2enmod proxy_http` and `sudo a2enmod ssl`
