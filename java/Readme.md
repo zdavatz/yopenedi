@@ -53,3 +53,5 @@ To configure server:
 5. deamontools: `apt install daemontools` and `apt install daemontools-run`
 # Setup
 1. Link Daemontools: `sudo ln -s /var/www/yopenedi.ch/svc/ /etc/service/yopenedi.ch`
+2. Setup up log `mkdir /var/www/yopenedi.ch/svc/`
+3. make `run` executable `chmod +c run` (also for `log`)
