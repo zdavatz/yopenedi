@@ -44,3 +44,6 @@ To configure server:
 - In `server/conf/application.conf`, you can set where to save the files
   - `edifact-orders`
   - `opentrans-orders`
+  
+# Requirements
+1. Activator: wget https://downloads.typesafe.com/typesafe-activator/1.3.9/typesafe-activator-1.3.9-minimal.zip
