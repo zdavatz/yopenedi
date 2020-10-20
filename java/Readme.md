@@ -46,5 +46,7 @@ To configure server:
   - `opentrans-orders`
   
 # Requirements
-1. Activator: `wget https://downloads.typesafe.com/typesafe-activator/1.3.9/typesafe-activator-1.3.9-minimal.zip`
-2. Make: `apt install make`
+1. openjdk-8-jre: `apt-get install openjdk-8-jre`
+2. openjdk-8-jdk: `apt-get install openjdk-8-jre`
+3. Activator: `wget https://downloads.typesafe.com/typesafe-activator/1.3.9/typesafe-activator-1.3.9-minimal.zip`
+4. Make: `apt install make`
