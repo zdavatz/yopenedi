@@ -140,6 +140,7 @@ public class Converter {
 
     public OrderItem orderItemToOpenTrans(com.ywesee.java.yopenedi.Edifact.OrderItem orderItem) {
         OrderItem oi = new OrderItem();
+        oi.lineItemId = orderItem.lineItemNumber;
         oi.ean = orderItem.ean;
         oi.descriptionShort = orderItem.descriptionShort;
         oi.descriptionLong = orderItem.descriptionLong;

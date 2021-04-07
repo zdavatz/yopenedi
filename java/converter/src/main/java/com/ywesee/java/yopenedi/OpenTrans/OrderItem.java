@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import static com.ywesee.java.yopenedi.converter.Utility.notNullOrEmpty;
 
 public class OrderItem {
+    public BigDecimal lineItemId;
     public String ean;
     public String descriptionShort;
     public String descriptionLong;
@@ -41,11 +42,11 @@ public class OrderItem {
         return this.price.multiply(this.quantity).divide(this.priceQuantity, BigDecimal.ROUND_HALF_UP);
     }
 
-    public void write(XMLStreamWriter s, int index) throws XMLStreamException {
+    public void write(XMLStreamWriter s) throws XMLStreamException {
         s.writeStartElement("ORDER_ITEM");
 
         s.writeStartElement("LINE_ITEM_ID");
-        s.writeCharacters("" + index);
+        s.writeCharacters(this.lineItemId.toString());
         s.writeEndElement(); // LINE_ITEM_ID
 
         s.writeStartElement("PRODUCT_ID");

@@ -138,6 +138,7 @@ public class EdifactReader {
                     OrderItem orderItem = new OrderItem();
                     LINLineItem lineItem = segmentGroup25.getLINLineItem();
                     if (lineItem != null) {
+                        orderItem.lineItemNumber = lineItem.getE1082LineItemNumber();
                         C212ItemNumberIdentification c212id = lineItem.getC212ItemNumberIdentification();
                         if (c212id != null) {
                             if ("EN".equals(c212id.getE7143ItemNumberTypeCoded())) {
