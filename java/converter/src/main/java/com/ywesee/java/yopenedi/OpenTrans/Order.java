@@ -165,10 +165,8 @@ public class Order implements Writable {
 
     private void writeOrderItemList(XMLStreamWriter streamWriter) throws XMLStreamException {
         streamWriter.writeStartElement("ORDER_ITEM_LIST");
-        int index = 1;
         for (OrderItem orderItem : this.orderItems) {
-            orderItem.write(streamWriter, index);
-            index++;
+            orderItem.write(streamWriter);
         }
         streamWriter.writeEndElement(); // ORDER_ITEM_LIST
     }
