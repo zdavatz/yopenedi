@@ -3,6 +3,7 @@ package com.ywesee.java.yopenedi.Edifact;
 import java.math.BigDecimal;
 
 public class OrderItem {
+    public BigDecimal lineItemNumber;
     public String ean;
     public String descriptionShort;
     public String descriptionLong;
