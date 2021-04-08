@@ -248,6 +248,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                 }
 
                 C082PartyIdentificationDetails c082 = new C082PartyIdentificationDetails();
+                c082.setE1131CodeListQualifier("GLN");
                 c082.setE3039PartyIdIdentification(p.id);
                 c082.setE3055CodeListResponsibleAgencyCoded("9");
                 nad.setC082PartyIdentificationDetails(c082);
