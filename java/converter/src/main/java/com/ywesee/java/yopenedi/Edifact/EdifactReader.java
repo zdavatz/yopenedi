@@ -73,28 +73,28 @@ public class EdifactReader {
                     if (partyDetails != null) {
                         party.id = partyDetails.getE3039PartyIdIdentification();
                         party.supplierSpecificPartyId = partyDetails.getE3055CodeListResponsibleAgencyCoded();
-                        C080PartyName partyName = nad.getC080PartyName();
-                        if (partyName != null) {
-                            party.name = concatStrings(" ",
-                                    partyName.getE30361PartyName(),
-                                    partyName.getE30362PartyName(),
-                                    partyName.getE30363PartyName(),
-                                    partyName.getE30364PartyName(),
-                                    partyName.getE30365PartyName()
-                            );
-                        }
-                        C059Street street = nad.getC059Street();
-                        if (street != null) {
-                            party.street = concatStrings(" ",
-                                    street.getE30421StreetAndNumberPOBox(),
-                                    street.getE30422StreetAndNumberPOBox(),
-                                    street.getE30423StreetAndNumberPOBox()
-                            );
-                        }
-                        party.city = nad.getE3164CityName();
-                        party.zip = nad.getE3251PostcodeIdentification();
-                        party.countryCoded = nad.getE3207CountryCoded();
                     }
+                    C080PartyName partyName = nad.getC080PartyName();
+                    if (partyName != null) {
+                        party.name = concatStrings(" ",
+                                partyName.getE30361PartyName(),
+                                partyName.getE30362PartyName(),
+                                partyName.getE30363PartyName(),
+                                partyName.getE30364PartyName(),
+                                partyName.getE30365PartyName()
+                        );
+                    }
+                    C059Street street = nad.getC059Street();
+                    if (street != null) {
+                        party.street = concatStrings(" ",
+                                street.getE30421StreetAndNumberPOBox(),
+                                street.getE30422StreetAndNumberPOBox(),
+                                street.getE30423StreetAndNumberPOBox()
+                        );
+                    }
+                    party.city = nad.getE3164CityName();
+                    party.zip = nad.getE3251PostcodeIdentification();
+                    party.countryCoded = nad.getE3207CountryCoded();
 
                     for (SegmentGroup5 segmentGroup5 : segmentGroup2.getSegmentGroup5()) {
                         ContactDetail contactDetail = new ContactDetail();
