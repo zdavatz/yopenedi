@@ -66,6 +66,8 @@ public class EdifactReader {
                         party.role = Party.Role.Supplier;
                     } else if (nad.getE3035PartyQualifier().equals("DP")) {
                         party.role = Party.Role.Delivery;
+                    } else if (nad.getE3035PartyQualifier().equals("IV")) {
+                        party.role = Party.Role.Invoicee;
                     }
                     C082PartyIdentificationDetails partyDetails = nad.getC082PartyIdentificationDetails();
                     if (partyDetails != null) {
