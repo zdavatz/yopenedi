@@ -129,7 +129,6 @@ public class Party {
         s.writeStartElement("PARTY");
 
         s.writeStartElement("bmecat:PARTY_ID");
-        s.writeAttribute("type", "iln");
         s.writeCharacters(this.id);
         s.writeEndElement(); // PARTY_ID
         
@@ -145,6 +144,9 @@ public class Party {
                 case Delivery:
                     s.writeCharacters("delivery");
                     break; // TODO: or deliverer?
+                case InvoiceRecipient:
+                    s.writeCharacters("invoice_recipient");
+                    break;
             }
             s.writeEndElement(); // PARTY_ROLE
         }
