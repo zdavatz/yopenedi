@@ -25,6 +25,8 @@ public class DispatchNotification {
     public String buyerIdRef;
     public String supplierIdRef;
     public String totalItemNum;
+    public String deliveryIdRef;
+    public String finalDeliveryIdRef;
 
     public ArrayList<Party> parties = new ArrayList<>();
     public ArrayList<DispatchNotificationItem> items = new ArrayList<>();
@@ -100,6 +102,10 @@ public class DispatchNotification {
                     this.buyerIdRef = nextStringOrNull(er);
                 } else if (name.equals("SUPPLIER_IDREF")) {
                     this.supplierIdRef = nextStringOrNull(er);
+                } else if (name.equals("DELIVERY_IDREF")) {
+                    this.deliveryIdRef = nextStringOrNull(er);
+                } else if (name.equals("FINAL_DELIVERY_IDREF")) {
+                    this.finalDeliveryIdRef = nextStringOrNull(er);
                 }
             }
             if (event.isEndElement()) {
