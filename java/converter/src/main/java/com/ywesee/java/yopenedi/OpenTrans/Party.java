@@ -129,6 +129,7 @@ public class Party {
         s.writeStartElement("PARTY");
 
         s.writeStartElement("bmecat:PARTY_ID");
+        s.writeAttribute("type", "iln");
         s.writeCharacters(this.id);
         s.writeEndElement(); // PARTY_ID
         
