@@ -129,8 +129,14 @@ public class Party {
         s.writeStartElement("PARTY");
 
         s.writeStartElement("bmecat:PARTY_ID");
-        s.writeAttribute("type", "iln");
-        s.writeCharacters(this.id);
+        if (this.id != null && this.id.equals("ADHOC")) {
+            s.writeAttribute("type", "party_specific");
+            s.writeCharacters(this.id);
+        } else {
+            s.writeAttribute("type", "iln");
+            s.writeCharacters(this.id);
+        }
+
         s.writeEndElement(); // PARTY_ID
         
         if (this.role != null) {

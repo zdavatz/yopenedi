@@ -32,11 +32,11 @@ public class Order {
 
     public void patchEmptyDeliveryID() {
         // It's possible that the delivery party does not have an ID.
-        // In that case we'll take the ID from the buyer.
-        // https://github.com/zdavatz/yopenedi/issues/162
+        // In that case we'll set it to ADHOC
+        // https://github.com/zdavatz/yopenedi/issues/176
         for (Party p : this.parties) {
             if (p.role == Party.Role.Delivery && (p.id == null || p.id.isEmpty())) {
-                p.id = this.getBuyerId();
+                p.id = "ADHOC";
                 break;
             }
         }
