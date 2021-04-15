@@ -72,7 +72,6 @@ public class EdifactReader {
                     C082PartyIdentificationDetails partyDetails = nad.getC082PartyIdentificationDetails();
                     if (partyDetails != null) {
                         party.id = partyDetails.getE3039PartyIdIdentification();
-                        party.supplierSpecificPartyId = partyDetails.getE3055CodeListResponsibleAgencyCoded();
                     }
                     C080PartyName partyName = nad.getC080PartyName();
                     if (partyName != null) {
