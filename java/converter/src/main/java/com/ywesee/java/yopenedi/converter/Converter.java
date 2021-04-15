@@ -299,6 +299,23 @@ public class Converter {
         p.contactDetails = party.contactDetails.stream()
                 .map(this::contactDetailToEdifact)
                 .collect(Collectors.toCollection(ArrayList::new));
+        boolean needToAddEmail = party.email != null && !party.contactDetails.stream().anyMatch(cd -> cd.email == party.email);
+        boolean needToAddPhone = party.phone != null && !party.contactDetails.stream().anyMatch(cd -> cd.phone == party.phone);
+        boolean needToAddFax = party.fax != null && !party.contactDetails.stream().anyMatch(cd -> cd.fax == party.fax);
+        if (needToAddEmail || needToAddPhone || needToAddFax) {
+            com.ywesee.java.yopenedi.Edifact.ContactDetail cd = new com.ywesee.java.yopenedi.Edifact.ContactDetail();
+            if (needToAddEmail) {
+                cd.email = party.email;
+            }
+            if (needToAddPhone) {
+                cd.phone = party.phone;
+            }
+            if (needToAddFax) {
+                cd.fax = party.fax;
+            }
+            p.contactDetails.add(cd);
+        }
+
         return p;
     }
 

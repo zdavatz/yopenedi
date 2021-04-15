@@ -28,6 +28,9 @@ public class Party {
     public String city;
     public String zip;
     public String countryCoded;
+    public String email;
+    public String phone;
+    public String fax;
     public ArrayList<ContactDetail> contactDetails = new ArrayList<>();
 
     public String vatId;
@@ -78,9 +81,13 @@ public class Party {
                     this.vatId = nextStringOrNull(er);
                 } else if (name.equals("TAX_NUMBER")) {
                     this.taxNumber = nextStringOrNull(er);
+                } else if (name.equals("EMAIL")) {
+                    this.email = nextStringOrNull(er);
+                } else if (name.equals("PHONE")) {
+                    this.phone = nextStringOrNull(er);
+                } else if (name.equals("FAX")) {
+                    this.fax = nextStringOrNull(er);
                 }
-                // TODO, more info e.g. PHONE / FAX / EMAIL in <PARTY><ADDRESS>
-                // or put into contact details?
             }
 
             if (event.isEndElement()) {

@@ -250,8 +250,13 @@ public class Invoice implements Writable, MessageExchange<Party> {
                     break;
             }
             C082PartyIdentificationDetails c082 = new C082PartyIdentificationDetails();
-            c082.setE3039PartyIdIdentification(p.id);
-            c082.setE3055CodeListResponsibleAgencyCoded("9");
+            if (p.id != null) {
+                c082.setE3039PartyIdIdentification(p.id);
+                c082.setE3055CodeListResponsibleAgencyCoded("9");
+            } else if (p.supplierSpecificPartyId != null) {
+                c082.setE3039PartyIdIdentification(p.supplierSpecificPartyId);
+                c082.setE3055CodeListResponsibleAgencyCoded("90");
+            }
             nad.setC082PartyIdentificationDetails(c082);
             C080PartyName c080 = new C080PartyName();
             ArrayList<String> nameParts = splitStringIntoParts(p.name, 35, 5);
@@ -438,6 +443,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 c212.setE7140ItemNumber(ii.ean);
                 c212.setE7143ItemNumberTypeCoded("EN");
                 lineItem.setC212ItemNumberIdentification(c212);
+                Utility.patchLineItem(lineItem);
                 sg25.setLINLineItem(lineItem);
             }
 
