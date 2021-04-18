@@ -18,6 +18,7 @@ public class Party {
         Supplier,
         Delivery,
         InvoiceRecipient,
+        Other,
     }
 
     public String id;
@@ -35,6 +36,7 @@ public class Party {
 
     public String vatId;
     public String taxNumber;
+    public String addressRemarks;
 
     public Party() {
     }
@@ -161,6 +163,9 @@ public class Party {
                 case InvoiceRecipient:
                     s.writeCharacters("invoice_recipient");
                     break;
+                case Other:
+                    s.writeCharacters("other");
+                    break;
             }
             s.writeEndElement(); // PARTY_ROLE
         }
@@ -212,6 +217,12 @@ public class Party {
             s.writeStartElement("bmecat:COUNTRY_CODED");
             s.writeCharacters(this.countryCoded);
             s.writeEndElement(); // COUNTRY_CODED
+        }
+
+        if (notNullOrEmpty(this.addressRemarks)) {
+            s.writeStartElement("bmecat:ADDRESS_REMARKS");
+            s.writeCharacters(this.addressRemarks);
+            s.writeEndElement(); // ADDRESS_REMARKS
         }
 
         s.writeEndElement(); // ADDRESS
