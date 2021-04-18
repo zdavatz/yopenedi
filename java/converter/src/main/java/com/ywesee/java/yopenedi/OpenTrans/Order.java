@@ -51,8 +51,31 @@ public class Order implements Writable {
         return null;
     }
 
-    public void write(XMLStreamWriter streamWriter, Config config) throws XMLStreamException {
+    public void patchEmptyDeliveryID() {
+        String extraConditionalAddressPartyId = null;
+        for (Party p : this.parties) {
+            if (p.role == Party.Role.Delivery) {
+                // It's possible that the delivery party does not have an ID.
+                // In that case we'll set it to ADHOC
+                // https://github.com/zdavatz/yopenedi/issues/176
+                if (p.id == null || p.id.isEmpty()) {
+                    p.id = "ADHOC";
+                } else {
+                    extraConditionalAddressPartyId = p.id;
+                }
+                break;
+            }
+        }
+        if (extraConditionalAddressPartyId != null) {
+            Party p = new Party();
+            p.id = extraConditionalAddressPartyId;
+            p.role = Party.Role.Other;
+            p.addressRemarks = "Konditionsadresse";
+            this.parties.add(p);
+        }
+    }
 
+    public void write(XMLStreamWriter streamWriter, Config config) throws XMLStreamException {
         streamWriter.writeStartElement("ORDER");
         streamWriter.writeAttribute("xmlns", "http://www.opentrans.org/XMLSchema/2.1");
         streamWriter.writeAttribute("xmlns:bmecat", "http://www.bmecat.org/bmecat/2005");

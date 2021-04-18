@@ -129,7 +129,6 @@ public class EdifactReader {
                     }
                     order.addParty(party);
                 }
-                order.patchEmptyDeliveryID();
                 for (SegmentGroup7 segmentGroup7 : orders.getSegmentGroup7()) {
                     try {
                         order.currencyCoded = segmentGroup7.getCUXCurrencies().getC5041CurrencyDetails().getE6345CurrencyCoded();
