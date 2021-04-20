@@ -109,11 +109,9 @@ public class App {
     }
 
     public static void main(String[] args) throws Exception {
-
         if (!setupCliFromArgs(args)) {
             return;
         }
-
         if (!edifactFolder.exists()) {
             edifactFolder.mkdirs();
         }
@@ -121,7 +119,7 @@ public class App {
             openTransFolder.mkdirs();
         }
 
-        Config config = new Config(confPath);
+        Config config = new Config(confPath, isTestEnvironment);
         EmailCredential emailCreds = config.getEmailCredential();
 
         final Properties properties = new Properties();
@@ -146,7 +144,7 @@ public class App {
 
         IMAPFolder inbox = null;
         for (Folder f : folders) {
-            if (f.getFullName().toLowerCase().equals(mailboxName.toLowerCase())) {
+            if (f.getFullName().equalsIgnoreCase(mailboxName)) {
                 inbox = (IMAPFolder)f;
                 break;
             }
