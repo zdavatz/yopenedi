@@ -10,3 +10,4 @@ converter/out
 email-fetcher/out
 .DS_Store
 conf/email-credential.json
+conf/test-email-credential.json
