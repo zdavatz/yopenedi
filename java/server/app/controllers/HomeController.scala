@@ -47,11 +47,12 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     val now = LocalDateTime.now()
     val filename = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"))
 
+    val environment = config.getOptional[String]("environment")
+    val isTestEnvironment = environment.equals(Some("test"))
     val configPath = config.getOptional[String]("conversion-config").getOrElse("./conf")
-    val converterConfig = new Config(configPath)
+    val converterConfig = new Config(configPath, isTestEnvironment)
     val ediOrdersPath = config.get[String]("edifact-orders")
     val otOrdersPath = config.get[String]("opentrans-orders")
-    val environment = config.getOptional[String]("environment")
 
     val ediOrdersFolder = new File(ediOrdersPath)
     if (!ediOrdersFolder.exists()) {
@@ -111,7 +112,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
         println(ediOrders.get(0).parties.get(0).contactDetails.get(0).name)
         val otOrder = converter.orderToOpenTrans(ediOrders.get(0))
         println(otOrder.parties.get(0).contactDetails.get(0).name)
-        otOrder.isTestEnvironment = environment.equals(Some("test"))
+        otOrder.isTestEnvironment = isTestEnvironment
         Logger.debug("Opentrans order: " + otOrder.toString())
 
         val recipient = otOrder.getRecipient()
@@ -152,15 +153,16 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     val now = LocalDateTime.now()
     val filename = now.format(DateTimeFormatter.ofPattern("yyyy-MM-dd_HHmmss"))
 
+    val environment = config.getOptional[String]("environment")
+    val isTestEnvironment = environment.equals(Some("test"))
     val configPath = config.getOptional[String]("conversion-config").getOrElse("./conf")
-    val converterConfig = new Config(configPath)
+    val converterConfig = new Config(configPath, isTestEnvironment)
     val ediOrderResponsesPath = config.get[String]("edifact-order-responses")
     val otOrderResponsesPath = config.get[String]("opentrans-order-responses")
     val ediDespatchAdvicesPath = config.get[String]("edifact-despatch-advices")
     val otDispatchNotificationsPath = config.get[String]("opentrans-dispatch-notifications")
     val ediInvoicesPath = config.get[String]("edifact-invoices")
     val otInvoicesPath = config.get[String]("opentrans-invoices")
-    val environment = config.getOptional[String]("environment")
 
     val ediOrderResponsesFolder = new File(ediOrderResponsesPath)
     if (!ediOrderResponsesFolder.exists()) {

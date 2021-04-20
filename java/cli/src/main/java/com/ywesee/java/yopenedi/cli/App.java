@@ -88,6 +88,9 @@ public class App {
         conf.setType(String.class);
         options.addOption(conf);
 
+        Option test = new Option(null, "test", true, "Add test environment message to OpenTrans file");
+        options.addOption(test);
+
         CommandLineParser parser = new DefaultParser();
         CommandLine cmd = parser.parse(options, args);
         boolean showHelp = false;
@@ -140,24 +143,26 @@ public class App {
             }
         }
 
+        boolean isTestEnvironment = cmd.hasOption("test");
+
         String confPath = cmd.getOptionValue("conf");
         if (confPath == null) {
             confPath = "./conf";
         }
-        Config config = new Config(confPath);
+        Config config = new Config(confPath, isTestEnvironment);
 
         switch (detected.snd) {
             case OpenTrans:
                 openTransToEdifact(detected.fst, outFile, cmd, config);
                 break;
             case Edifact:
-                edifactToOpenTrans(detected.fst, outFile, cmd, config);
+                edifactToOpenTrans(detected.fst, outFile, cmd, config, isTestEnvironment);
                 break;
         }
         sendEmail(cmd, outFile);
     }
 
-    static void edifactToOpenTrans(InputStream in, File outFile, CommandLine cmd, Config config) throws Exception {
+    static void edifactToOpenTrans(InputStream in, File outFile, CommandLine cmd, Config config, boolean isTestEnvironment) throws Exception {
         boolean isMultiple = cmd.hasOption("m");
         EdifactReader edifactReader = new EdifactReader();
         ArrayList<com.ywesee.java.yopenedi.Edifact.Order> ediOrders = edifactReader.run(in);
@@ -172,6 +177,9 @@ public class App {
         converter.shouldMergeContactDetails = !cmd.hasOption("no-merge-contact-details");
         for (com.ywesee.java.yopenedi.Edifact.Order edi : ediOrders) {
             Order otOrder = converter.orderToOpenTrans(edi);
+            if (isTestEnvironment) {
+                otOrder.isTestEnvironment = true;
+            }
             OutputStream out;
             if (outFile != null) {
                 File targetFile;

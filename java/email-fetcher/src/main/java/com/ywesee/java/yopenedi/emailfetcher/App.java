@@ -15,6 +15,7 @@ import org.apache.commons.cli.*;
 import org.apache.commons.io.IOUtils;
 
 import javax.mail.*;
+import javax.mail.internet.MimeMultipart;
 import javax.mail.search.FlagTerm;
 import java.io.*;
 import java.util.Properties;
@@ -109,11 +110,9 @@ public class App {
     }
 
     public static void main(String[] args) throws Exception {
-
         if (!setupCliFromArgs(args)) {
             return;
         }
-
         if (!edifactFolder.exists()) {
             edifactFolder.mkdirs();
         }
@@ -121,7 +120,7 @@ public class App {
             openTransFolder.mkdirs();
         }
 
-        Config config = new Config(confPath);
+        Config config = new Config(confPath, isTestEnvironment);
         EmailCredential emailCreds = config.getEmailCredential();
 
         final Properties properties = new Properties();
@@ -146,7 +145,7 @@ public class App {
 
         IMAPFolder inbox = null;
         for (Folder f : folders) {
-            if (f.getFullName().toLowerCase().equals(mailboxName.toLowerCase())) {
+            if (f.getFullName().equalsIgnoreCase(mailboxName)) {
                 inbox = (IMAPFolder)f;
                 break;
             }
@@ -169,15 +168,18 @@ public class App {
         for (Message message : ms) {
             long uid = inbox.getUID(message);
             System.out.println("Found message. UID=" + uid);
+            System.out.println("Subject: " + message.getSubject());
 
             System.out.println("Getting attachment");
             Object content = message.getContent();
-            if (!(content instanceof BASE64DecoderStream)) {
-                // handle multipart?
-                System.err.println("Attachment is not base64, skipping");
+            BASE64DecoderStream stream = null;
+            if (content instanceof  BASE64DecoderStream) {
+                stream = (BASE64DecoderStream) content;
+            } else {
+                System.err.println("Attachment is not base64: " + content.toString());
+                System.err.println("Skipping");
                 continue;
             }
-            BASE64DecoderStream stream = (BASE64DecoderStream) content;
 
             Pair<InputStream, Converter.FileType> detected = Converter.detectFileType(stream);
             File inFolder;

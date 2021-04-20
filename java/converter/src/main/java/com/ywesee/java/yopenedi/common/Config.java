@@ -17,8 +17,11 @@ import org.json.simple.parser.JSONParser;
 
 public class Config {
     String path;
-    public Config(String path) {
+    boolean isTest;
+
+    public Config(String path, boolean isTest) {
         this.path = path;
+        this.isTest = isTest;
     }
 
     public Map<String, String> udxChannel() {
@@ -43,7 +46,17 @@ public class Config {
     }
 
     public EmailCredential getEmailCredential() {
+        if (isTest) {
+            File f = new File(this.path, "test-email-credential.json");
+            System.out.println("Reading from" + f.getAbsolutePath());
+            try {
+                return new EmailCredential(f);
+            } catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+        }
         File f = new File(this.path, "email-credential.json");
+        System.out.println("Reading from" + f.getAbsolutePath());
         try {
             return new EmailCredential(f);
         } catch (Exception e) {
@@ -55,8 +68,21 @@ public class Config {
     public ArrayList<ResultDispatch> getResultDispatches() {
         try {
             ArrayList<ResultDispatch> resultDispatches = new ArrayList<>();
-            File f = new File(this.path, "result-dispatch.json");
-            String str = FileUtils.readFileToString(f, "UTF-8");
+            String str = null;
+            if (isTest) {
+                try {
+                    File f = new File(this.path, "test-result-dispatch.json");
+                    System.out.println("Reading from " + f.getAbsolutePath());
+                    str = FileUtils.readFileToString(f, "UTF-8");
+                } catch (Exception e) {
+                    System.err.println(e.getMessage());
+                }
+            }
+            if (str == null) {
+                File f = new File(this.path, "result-dispatch.json");
+                System.out.println("Reading from " + f.getAbsolutePath());
+                str = FileUtils.readFileToString(f, "UTF-8");
+            }
             JSONParser parser = new JSONParser();
             JSONArray arr = (JSONArray) parser.parse(str);
             for (int i = 0; i < arr.size(); i++) {
