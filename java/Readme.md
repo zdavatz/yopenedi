@@ -26,6 +26,8 @@ Update the config in `java/conf/result-dispatch.json`
 
 To run email-fetcher:
 
+You should first setup email credentials by copying `conf/email-credential.json.sample` to `conf/email-credential.json`.
+
 ```
 java -jar ./email-fetcher/build/libs/email-fetcher-1.0-all.jar \
 	--edifact="./edifact_files" \
@@ -34,17 +36,34 @@ java -jar ./email-fetcher/build/libs/email-fetcher-1.0-all.jar \
 	--mark-as-seen
 ```
 
+You can enable test mode by `--test`.
+
 To run server:
 
 ```
 make run-server
 ```
 
+You can enable test mode via environment variable:
+```
+ENVIRONMENT=test make run-server
+```
+
 To configure server:
 - In `server/conf/application.conf`, you can set where to save the files
   - `edifact-orders`
   - `opentrans-orders`
-  
+
+## Test mode
+
+When test mode is enabled:
+- it reads from `conf/test-email-credential.json`.
+  - You should create such file by copying it from `conf/email-credential.json.sample`
+  - If this file is not found, it reads from `conf/email-credential.json`
+- it reads from `conf/test-result-dispatch.json`.
+  - If this file is not found, it reads from `conf/result-dispatch.json`
+- it exports OpenTrans files with test environment message.
+
 # Requirements
 1. openjdk-8-jre: `apt install openjdk-8-jre`
 2. openjdk-8-jdk: `apt install openjdk-8-jdk`
