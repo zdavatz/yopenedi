@@ -20,6 +20,7 @@ public class InvoiceItem {
     public String buyerSpecificProductId;
     public String shortDescription;
     public String longDescription;
+    public String deliveryNoteId;
 
     public Float volume; // m^3
     public Float weight; // KG
@@ -186,6 +187,8 @@ public class InvoiceItem {
                     this.deliveryOrderId = nextStringOrNull(er);
                 } else if (name.equals("LINE_ITEM_ID")) {
                     this.deliveryOrderItemId = nextStringOrNull(er);
+                } else if (name.equals("DELIVERYNOTE_ID")) {
+                    this.deliveryNoteId = nextStringOrNull(er);
                 }
             }
             if (event.isEndElement()) {

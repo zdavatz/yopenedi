@@ -669,13 +669,13 @@ public class Invoice implements Writable, MessageExchange<Party> {
                     sg29.setRFFReference(rff);
                     sg29s.add(sg29);
                 }
-                if (notNullOrEmpty(ii.deliveryOrderId)) {
+                if (notNullOrEmpty(ii.deliveryNoteId)) {
                     SegmentGroup29 sg29 = new SegmentGroup29();
                     RFFReference rff = new RFFReference();
                     segmentCount++;
                     C506Reference c506 = new C506Reference();
                     c506.setE1153ReferenceQualifier("DQ");
-                    c506.setE1154ReferenceNumber(ii.deliveryOrderId);
+                    c506.setE1154ReferenceNumber(ii.deliveryNoteId);
                     if (notNullOrEmpty(ii.deliveryOrderItemId)) {
                         c506.setE1156LineNumber(ii.deliveryOrderItemId);
                     }
