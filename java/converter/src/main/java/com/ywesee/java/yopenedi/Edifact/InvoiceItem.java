@@ -34,6 +34,7 @@ public class InvoiceItem {
     public String buyerOrderItemId; // Like line number, e.g. 1
     public String deliveryOrderId;
     public String deliveryOrderItemId; // Like line number, e.g. 1
+    public String deliveryNoteId;
 
     public String taxType;
     public String taxRate; // e.g. "19"

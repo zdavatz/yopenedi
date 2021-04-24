@@ -216,6 +216,7 @@ public class Converter {
         ii.buyerSpecificProductId = invoiceItem.buyerSpecificProductId;
         ii.shortDescription = invoiceItem.shortDescription;
         ii.longDescription = invoiceItem.longDescription;
+        ii.deliveryNoteId = invoiceItem.deliveryNoteId;
 
         if (invoiceItem.volume != null) {
             ii.volume = BigDecimal.valueOf(invoiceItem.volume);
