@@ -26,7 +26,7 @@ public class Invoice {
     public Date deliveryStartDate;
     public Date deliveryEndDate;
 
-    public String deliveryNoteNumber;
+    public String deliveryIdRef;
     public String invoiceIssuerIdRef;
     public String invoiceRecipientIdRef;
     public String buyerIdRef;
@@ -54,6 +54,33 @@ public class Invoice {
         }
         if (invoiceDate != null && pt.days != null) {
             return Date.from(invoiceDate.toInstant().plus(pt.days, ChronoUnit.DAYS));
+        }
+        return null;
+    }
+
+    public String getDeliveryNoteId() {
+        for (InvoiceItem ii : this.invoiceItems) {
+            if (ii.deliveryNoteId != null && !ii.deliveryNoteId.isEmpty()) {
+                return ii.deliveryNoteId;
+            }
+        }
+        return null;
+    }
+
+    public String getBuyerOrderId() {
+        for (InvoiceItem ii : this.invoiceItems) {
+            if (ii.buyerOrderId != null && !ii.buyerOrderId.isEmpty()) {
+                return ii.buyerOrderId;
+            }
+        }
+        return null;
+    }
+
+    public String getSupplierOrderId() {
+        for (InvoiceItem ii : this.invoiceItems) {
+            if (ii.supplierOrderId != null && !ii.supplierOrderId.isEmpty()) {
+                return ii.supplierOrderId;
+            }
         }
         return null;
     }
@@ -120,7 +147,7 @@ public class Invoice {
                 } else if (name.equals("DELIVERY_END_DATE")) {
                     this.deliveryEndDate = Utility.dateFromISOString(nextStringOrNull(er));
                 } else if (name.equals("DELIVERY_IDREF")) {
-                    this.deliveryNoteNumber = nextStringOrNull(er);
+                    this.deliveryIdRef = nextStringOrNull(er);
                 } else if (name.equals("INVOICE_ISSUER_IDREF")) {
                     this.invoiceIssuerIdRef = nextStringOrNull(er);
                 } else if (name.equals("INVOICE_RECIPIENT_IDREF")) {
