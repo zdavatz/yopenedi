@@ -169,9 +169,9 @@ public class Converter {
         i.documentNumber = invoice.documentNumber;
         i.orderDate = invoice.invoiceDate;
         i.deliveryDate = invoice.deliveryEndDate;
-        i.deliveryNoteNumber = invoice.deliveryNoteNumber;
-        i.orderNumberForCustomer = invoice.buyerIdRef;
-        i.orderNumberForSupplier = invoice.supplierIdRef;
+        i.deliveryNoteNumber = invoice.getDeliveryNoteId();
+        i.orderNumberForCustomer = invoice.getBuyerOrderId();
+        i.orderNumberForSupplier = invoice.getSupplierOrderId();
         i.taxType = invoice.taxType;
         i.taxRate = String.valueOf(Float.parseFloat(invoice.taxRate) * 100);
         i.currencyCode = invoice.currencyCode;

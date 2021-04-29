@@ -40,7 +40,7 @@ public class Config {
             }
             return map;
         } catch (Exception e) {
-            System.err.println("Cannot get file: " + f.getAbsolutePath());
+            System.out.println("Cannot get file: " + f.getAbsolutePath());
         }
         return new HashMap<>();
     }
@@ -48,19 +48,19 @@ public class Config {
     public EmailCredential getEmailCredential() {
         if (isTest) {
             File f = new File(this.path, "test-email-credential.json");
-            System.out.println("Reading from" + f.getAbsolutePath());
+            System.out.println("Reading from " + f.getAbsolutePath());
             try {
                 return new EmailCredential(f);
             } catch (Exception e) {
-                System.err.println(e.getMessage());
+                System.out.println(e.getMessage());
             }
         }
         File f = new File(this.path, "email-credential.json");
-        System.out.println("Reading from" + f.getAbsolutePath());
+        System.out.println("Reading from " + f.getAbsolutePath());
         try {
             return new EmailCredential(f);
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage());
             return null;
         }
     }
@@ -75,7 +75,7 @@ public class Config {
                     System.out.println("Reading from " + f.getAbsolutePath());
                     str = FileUtils.readFileToString(f, "UTF-8");
                 } catch (Exception e) {
-                    System.err.println(e.getMessage());
+                    System.out.println(e.getMessage());
                 }
             }
             if (str == null) {
@@ -92,7 +92,7 @@ public class Config {
             }
             return resultDispatches;
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage());
         }
         return new ArrayList<>();
     }
@@ -117,7 +117,7 @@ public class Config {
             }
             return result;
         } catch (Exception e) {
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage());
         }
         return new HashMap<String, String>();
     }
