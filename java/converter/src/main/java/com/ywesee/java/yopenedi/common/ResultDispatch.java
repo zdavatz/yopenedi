@@ -182,7 +182,8 @@ public class ResultDispatch {
             System.out.println("Finished sending email");
 
         } catch (MessagingException e) {
-            e.printStackTrace();
+            System.out.println(e.toString());
+            e.printStackTrace(System.out);
         }
     }
 }
