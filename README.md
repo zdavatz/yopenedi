@@ -37,32 +37,7 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
 ### Input and Output files
 * Input files: `yopenedi/edifact_orders`
 * Output files: `yopenedi/opentrans_orders`
-### Meteor setup
-* `curl https://install.meteor.com/ | sh`
-* `meteor npm i`
-* `meteor --settings settings.json`
 
-### settings
-
-1. "resetDB": true, remove all records from the database. It requires to change the value after the first reset run into, "resetDB": false.
-2. "imap": imap connection configuration.
-
-```json
-{
-    "public":{
-    },
-    "private":{
-        "resetDB":false,
-        "imap":{
-            "username":"email",
-            "password":"pass",
-            "host": "imap locatio.....",
-            "post": "port",
-            "secure": true
-        }
-    }
-}
-```
 ### Apache setup
 ```
 <VirtualHost *:80>
@@ -82,25 +57,3 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
   SSLCertificateChainFile /etc/letsencrypt/live/test.yopenedi.ch/chain.pem
 </VirtualHost>
 ```
-## settings.json
-```
-{
-    "public":{
-    },
-    "private":{
-        "isDev":false,
-        "checkEmail":false,
-        "resetDB":false,
-        "imap":{
-            "username":"user@domain.com",
-            "password":"password",
-            "host": "imap.gmail.com",
-            "post": "993",
-            "secure": true
-        }
-    }
-```
-1. `meteor reset` removes all sqlite files and recreates an empty DB, which is not friendly at all if you have files bigger then 100MB on a slow testing machine.
-2. `resetDB` in `settings.json` is removing the DB entries as `Items.remove({})`. It will remove all DB records related to the choosen collection.
-3. `checkEmail` disable/enable IMAP polling, every 5 minutes.
-4. `isDev` is for developers.
