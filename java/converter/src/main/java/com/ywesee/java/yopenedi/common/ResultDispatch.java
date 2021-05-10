@@ -158,7 +158,7 @@ public class ResultDispatch {
                 });
         try {
 
-            System.out.println("Sending email to " + emailDest.to);
+            System.out.println("Sending email from " + emailCreds.user + " to " + emailDest.to);
 
             MimeMessage message = new MimeMessage(session);
             message.setFrom(new InternetAddress(emailCreds.user));
@@ -182,7 +182,8 @@ public class ResultDispatch {
             System.out.println("Finished sending email");
 
         } catch (MessagingException e) {
-            e.printStackTrace();
+            System.out.println(e.toString());
+            e.printStackTrace(System.out);
         }
     }
 }

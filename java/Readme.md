@@ -74,4 +74,5 @@ When test mode is enabled:
 1. Link Daemontools: `sudo ln -s /var/www/yopenedi.ch/svc/ /etc/service/yopenedi.ch`
 2. Setup up log `mkdir /var/www/yopenedi.ch/svc/`
 3. make `run` executable `chmod +x run` (also for `log`)
-4. Enable Proxy for Apache2: `sudo a2enmod proxy`, `sudo a2enmod proxy_http` and `sudo a2enmod ssl`
+4. make sure to restart `systemctl restart daemontools` so the supervise process starts the logging.
+5. Enable Proxy for Apache2: `sudo a2enmod proxy`, `sudo a2enmod proxy_http` and `sudo a2enmod ssl`
