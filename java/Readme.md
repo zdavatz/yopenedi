@@ -65,8 +65,8 @@ When test mode is enabled:
 - it exports OpenTrans files with test environment message.
 
 # Requirements
-1. openjdk-8-jre: `apt install openjdk-14-jre` - see issue #194
-2. openjdk-8-jdk: `apt install openjdk-14-jdk`
+1. openjdk-14-jre: `apt install openjdk-14-jre` - see issue #194
+2. openjdk-14-jdk: `apt install openjdk-14-jdk`
 3. Activator: `wget https://downloads.typesafe.com/typesafe-activator/1.3.9/typesafe-activator-1.3.9-minimal.zip`
 4. Make: `apt install make`
 5. deamontools: `apt install daemontools` and `apt install daemontools-run`
