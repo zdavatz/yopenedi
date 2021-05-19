@@ -305,6 +305,7 @@ public class Converter {
         boolean needToAddFax = party.fax != null && !party.contactDetails.stream().anyMatch(cd -> cd.fax == party.fax);
         if (needToAddEmail || needToAddPhone || needToAddFax) {
             com.ywesee.java.yopenedi.Edifact.ContactDetail cd = new com.ywesee.java.yopenedi.Edifact.ContactDetail();
+            cd.name = p.name;
             if (needToAddEmail) {
                 cd.email = party.email;
             }
