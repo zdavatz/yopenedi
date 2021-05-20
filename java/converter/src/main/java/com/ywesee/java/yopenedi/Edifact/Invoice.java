@@ -48,6 +48,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
     public BigDecimal totalAmount;
     public BigDecimal netAmountOfItems;
     public BigDecimal taxAmount;
+    public ArrayList<AllowanceOrCharge> allowanceOrCharges = new ArrayList<>();
 
     public String recipientGLNOverride;
 
@@ -816,6 +817,46 @@ public class Invoice implements Writable, MessageExchange<Party> {
             sg48s.add(sg48);
         }
         invoic.setSegmentGroup48(sg48s);
+
+        {
+            ArrayList<SegmentGroup51> sg51s = new ArrayList<>();
+            for (AllowanceOrCharge aoc : this.allowanceOrCharges) {
+                SegmentGroup51 sg51 = new SegmentGroup51();
+                sg51s.add(sg51);
+                ALCAllowanceOrCharge alc = new ALCAllowanceOrCharge();
+                segmentCount++;
+                switch (aoc.type) {
+                    case Charge:
+                        alc.setE5463AllowanceOrChargeQualifier("C");
+                    case Allowance:
+                        alc.setE5463AllowanceOrChargeQualifier("A");
+                }
+                if (notNullOrEmpty(aoc.name)) {
+                    C552AllowanceChargeInformation c552 = new C552AllowanceChargeInformation();
+                    c552.setE5189ChargeAllowanceDescriptionCoded(aoc.name);
+                    alc.setC552AllowanceChargeInformation(c552);
+                }
+                if (notNullOrEmpty(aoc.sequence)) {
+                    alc.setE1227CalculationSequenceIndicatorCoded(aoc.sequence);
+                }
+                C214SpecialServicesIdentification c214 = new C214SpecialServicesIdentification();
+                c214.setE7161SpecialServicesCoded("FC");
+                alc.setC214SpecialServicesIdentification(c214);
+
+                ArrayList<MOAMonetaryAmount> moas = new ArrayList<>();
+                MOAMonetaryAmount moa = new MOAMonetaryAmount();
+                segmentCount++;
+                C516MonetaryAmount c516 = new C516MonetaryAmount();
+                c516.setE5025MonetaryAmountTypeQualifier("8");
+                c516.setE5004MonetaryAmount(aoc.amount);
+                moa.setC516MonetaryAmount(c516);
+                moas.add(moa);
+                sg51.setMOAMonetaryAmount(moas);
+                sg51.setALCAllowanceOrCharge(alc);
+
+            }
+            invoic.setSegmentGroup51(sg51s);
+        }
 
         UNT41 unt41 = new UNT41();
         segmentCount++;
