@@ -47,6 +47,7 @@ public class Invoice {
     public String totalAmount;
     public String netAmountOfItems;
     public String taxAmount;
+    public ArrayList<AllowanceOrCharge> allowanceOrCharges = new ArrayList<>();
 
     public Date dateForPaymentTerm(PaymentTerm pt) {
         if (pt.date != null) {
@@ -257,7 +258,9 @@ public class Invoice {
                 StartElement se = event.asStartElement();
                 String name = se.getName().getLocalPart();
                 String prefix = se.getName().getPrefix();
-                if (prefix.equals("bmecat") && name.equals("TAX_TYPE")) {
+                if (name.equals("ALLOW_OR_CHARGE")) {
+                    this.allowanceOrCharges.add(new AllowanceOrCharge(er, se));
+                } else if (prefix.equals("bmecat") && name.equals("TAX_TYPE")) {
                     this.taxType = nextStringOrNull(er);
                 } else if (prefix.equals("bmecat") && name.equals("TAX")) {
                     this.taxRate = nextStringOrNull(er);

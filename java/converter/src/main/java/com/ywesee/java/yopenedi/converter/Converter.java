@@ -198,6 +198,9 @@ public class Converter {
         if (invoice.taxAmount != null) {
             i.taxAmount = new BigDecimal(invoice.taxAmount);
         }
+        i.allowanceOrCharges = invoice.allowanceOrCharges.stream()
+                .map(this::allowanceOrChargesToEdifact)
+                .collect(Collectors.toCollection(ArrayList::new));
 
         i.parties = invoice.parties.stream()
                 .map(this::partyToEdifact)
