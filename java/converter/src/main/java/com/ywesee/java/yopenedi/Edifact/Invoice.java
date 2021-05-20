@@ -810,7 +810,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
             MOAMonetaryAmount moa = new MOAMonetaryAmount();
             segmentCount++;
             C516MonetaryAmount c516 = new C516MonetaryAmount();
-            c516.setE5025MonetaryAmountTypeQualifier("124");
+            c516.setE5025MonetaryAmountTypeQualifier("125");
             c516.setE5004MonetaryAmount(this.taxAmount);
             moa.setC516MonetaryAmount(c516);
             sg48.setMOAMonetaryAmount(moa);
