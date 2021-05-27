@@ -726,16 +726,13 @@ public class Invoice implements Writable, MessageExchange<Party> {
                         case Allowance:
                             alc.setE5463AllowanceOrChargeQualifier("A");
                     }
-                    if (notNullOrEmpty(aoc.name)) {
-                        C552AllowanceChargeInformation c552 = new C552AllowanceChargeInformation();
-                        c552.setE5189ChargeAllowanceDescriptionCoded(aoc.name);
-                        alc.setC552AllowanceChargeInformation(c552);
-                    }
                     if (notNullOrEmpty(aoc.sequence)) {
                         alc.setE1227CalculationSequenceIndicatorCoded(aoc.sequence);
                     }
                     C214SpecialServicesIdentification c214 = new C214SpecialServicesIdentification();
-                    c214.setE7161SpecialServicesCoded("FC");
+                    if (notNullOrEmpty(aoc.name)) {
+                        c214.setE71601SpecialService(aoc.name);
+                    }
                     alc.setC214SpecialServicesIdentification(c214);
 
                     if (aoc.percentage != null) {
@@ -762,7 +759,6 @@ public class Invoice implements Writable, MessageExchange<Party> {
                     sg41s.add(sg41);
                     sg38.setSegmentGroup41(sg41s);
                     sg38.setALCAllowanceOrCharge(alc);
-
                 }
                 sg25.setSegmentGroup38(sg38s);
             }
@@ -831,16 +827,13 @@ public class Invoice implements Writable, MessageExchange<Party> {
                     case Allowance:
                         alc.setE5463AllowanceOrChargeQualifier("A");
                 }
-                if (notNullOrEmpty(aoc.name)) {
-                    C552AllowanceChargeInformation c552 = new C552AllowanceChargeInformation();
-                    c552.setE5189ChargeAllowanceDescriptionCoded(aoc.name);
-                    alc.setC552AllowanceChargeInformation(c552);
-                }
                 if (notNullOrEmpty(aoc.sequence)) {
                     alc.setE1227CalculationSequenceIndicatorCoded(aoc.sequence);
                 }
                 C214SpecialServicesIdentification c214 = new C214SpecialServicesIdentification();
-                c214.setE7161SpecialServicesCoded("FC");
+                if (notNullOrEmpty(aoc.name)) {
+                    c214.setE71601SpecialService(aoc.name);
+                }
                 alc.setC214SpecialServicesIdentification(c214);
 
                 ArrayList<MOAMonetaryAmount> moas = new ArrayList<>();
@@ -853,7 +846,6 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 moas.add(moa);
                 sg51.setMOAMonetaryAmount(moas);
                 sg51.setALCAllowanceOrCharge(alc);
-
             }
             invoic.setSegmentGroup51(sg51s);
         }
