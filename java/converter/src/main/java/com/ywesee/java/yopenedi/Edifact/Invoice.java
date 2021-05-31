@@ -765,7 +765,9 @@ public class Invoice implements Writable, MessageExchange<Party> {
         }
         invoic.setSegmentGroup25(sg25s);
         segmentCount++;
-        invoic.setUNSSectionControl(new Uns());
+        Uns uns = new Uns();
+        uns.setE0081("S");
+        invoic.setUNSSectionControl(uns);
 
         ArrayList<SegmentGroup48> sg48s = new ArrayList<>();
         if (this.totalAmount != null) {
