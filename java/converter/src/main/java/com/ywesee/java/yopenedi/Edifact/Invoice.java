@@ -803,12 +803,23 @@ public class Invoice implements Writable, MessageExchange<Party> {
             sg48.setMOAMonetaryAmount(moa);
             sg48s.add(sg48);
         }
-        if (this.taxAmount != null) {
+        if (this.netAmountOfItems != null) {
             SegmentGroup48 sg48 = new SegmentGroup48();
             MOAMonetaryAmount moa = new MOAMonetaryAmount();
             segmentCount++;
             C516MonetaryAmount c516 = new C516MonetaryAmount();
             c516.setE5025MonetaryAmountTypeQualifier("125");
+            c516.setE5004MonetaryAmount(this.netAmountOfItems);
+            moa.setC516MonetaryAmount(c516);
+            sg48.setMOAMonetaryAmount(moa);
+            sg48s.add(sg48);
+        }
+        if (this.taxAmount != null) {
+            SegmentGroup48 sg48 = new SegmentGroup48();
+            MOAMonetaryAmount moa = new MOAMonetaryAmount();
+            segmentCount++;
+            C516MonetaryAmount c516 = new C516MonetaryAmount();
+            c516.setE5025MonetaryAmountTypeQualifier("124");
             c516.setE5004MonetaryAmount(this.taxAmount);
             moa.setC516MonetaryAmount(c516);
             sg48.setMOAMonetaryAmount(moa);
