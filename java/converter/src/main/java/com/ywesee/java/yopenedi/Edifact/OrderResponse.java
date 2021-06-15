@@ -240,8 +240,10 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                     break;
             }
             C082PartyIdentificationDetails c082 = new C082PartyIdentificationDetails();
-            c082.setE3039PartyIdIdentification(p.id);
-            c082.setE3055CodeListResponsibleAgencyCoded("9");
+            if (p.id != null) {
+                c082.setE3039PartyIdIdentification(p.id);
+                c082.setE3055CodeListResponsibleAgencyCoded("9");
+            }
             nad.setC082PartyIdentificationDetails(c082);
             C080PartyName c080 = new C080PartyName();
             ArrayList<String> nameParts = splitStringIntoParts(p.name, 35, 5);
