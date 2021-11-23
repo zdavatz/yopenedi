@@ -146,6 +146,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
         documentMessageName.setE1001DocumentMessageNameCoded("351");
         bgm.setC002DocumentMessageName(documentMessageName);
         bgm.setE1004DocumentMessageNumber(this.documentNumber);
+        bgm.setE1225MessageFunctionCoded("47");
         desadv.setBGMBeginningOfMessage(bgm);
 
         {

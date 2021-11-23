@@ -157,6 +157,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
         documentMessageName.setE1001DocumentMessageNameCoded("380");
         bgm.setC002DocumentMessageName(documentMessageName);
         bgm.setE1004DocumentMessageNumber(StringUtils.left(this.documentNumber, 35));
+        bgm.setE1225MessageFunctionCoded("47");
         invoic.setBGMBeginningOfMessage(bgm);
 
         {
