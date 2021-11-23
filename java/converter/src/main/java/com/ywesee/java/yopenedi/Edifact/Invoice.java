@@ -99,7 +99,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
 
         UNB41 unb41 = new UNB41();
         SyntaxIdentifier syntaxIdentifier = new SyntaxIdentifier();
-        syntaxIdentifier.setId("UNOB");
+        syntaxIdentifier.setId("UNOC");
         syntaxIdentifier.setVersionNum("3");
         unb41.setSyntaxIdentifier(syntaxIdentifier);
 
