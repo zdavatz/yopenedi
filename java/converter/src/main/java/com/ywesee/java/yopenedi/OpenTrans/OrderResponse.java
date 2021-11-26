@@ -52,6 +52,12 @@ public class OrderResponse {
         return null;
     }
 
+    public String getRecipientGLN() {
+        Party p = this.getRecipient();
+        if (p == null) return null;
+        return p.id;
+    }
+
     public OrderResponse(InputStream stream) throws XMLStreamException {
         XMLInputFactory factory = XMLInputFactory.newFactory();
         XMLEventReader eventReader = factory.createXMLEventReader(stream, "UTF-8");

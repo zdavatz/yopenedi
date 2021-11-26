@@ -563,13 +563,23 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                     case Allowance:
                         alc.setE5463AllowanceOrChargeQualifier("A");
                 }
+                C552AllowanceChargeInformation c552 = new C552AllowanceChargeInformation();
+                if (aoc.allowanceOrChargeNumber != null) {
+                    c552.setE1230AllowanceOrChargeNumber(aoc.allowanceOrChargeNumber);
+                }
+                c552.setE5189ChargeAllowanceDescriptionCoded("1");
+                alc.setC552AllowanceChargeInformation(c552);
                 if (notNullOrEmpty(aoc.sequence)) {
                     alc.setE1227CalculationSequenceIndicatorCoded(StringUtils.left(aoc.sequence, 3));
                 }
                 C214SpecialServicesIdentification c214 = new C214SpecialServicesIdentification();
-                c214.setE7161SpecialServicesCoded("FC");
+                if (aoc.serviceCoded != null) {
+                    c214.setE7161SpecialServicesCoded(aoc.serviceCoded);
+                } else {
+                    c214.setE7161SpecialServicesCoded("FC");
+                }
                 if (notNullOrEmpty(aoc.name)) {
-                    c214.setE71601SpecialService(StringUtils.left(aoc.name, 3));
+                    c214.setE71601SpecialService(StringUtils.left(aoc.name, 35));
                 }
                 alc.setC214SpecialServicesIdentification(c214);
 

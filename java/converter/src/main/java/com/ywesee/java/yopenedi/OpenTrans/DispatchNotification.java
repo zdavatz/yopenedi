@@ -40,6 +40,21 @@ public class DispatchNotification {
         return null;
     }
 
+    public Party getRecipient() {
+        for (Party party : parties) {
+            if (party.role == Party.Role.Buyer) {
+                return party;
+            }
+        }
+        return null;
+    }
+
+    public String getRecipientGLN() {
+        Party p = this.getRecipient();
+        if (p == null) return null;
+        return p.id;
+    }
+
     public DispatchNotification(InputStream stream) throws XMLStreamException {
         XMLInputFactory factory = XMLInputFactory.newFactory();
         XMLEventReader eventReader = factory.createXMLEventReader(stream, "UTF-8");
