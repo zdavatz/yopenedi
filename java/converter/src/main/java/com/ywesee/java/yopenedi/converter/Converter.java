@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 public class Converter {
     public boolean shouldMergeContactDetails;
     public Config config;
+    public String gln;
 
     public Converter(Config config) {
         this.config = config;
@@ -33,16 +34,19 @@ public class Converter {
                     Object otObject = reader.run(pair.fst);
                     if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.Invoice) {
                         com.ywesee.java.yopenedi.OpenTrans.Invoice otInvoice = (com.ywesee.java.yopenedi.OpenTrans.Invoice) otObject;
+                        this.gln = otInvoice.getRecipientGLN();
                         com.ywesee.java.yopenedi.Edifact.Invoice invoice = this.invoiceToEdifact(otInvoice);
                         config.replaceGLN(invoice);
                         return new Pair<>(pair.snd, invoice);
                     } else if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.OrderResponse) {
                         com.ywesee.java.yopenedi.OpenTrans.OrderResponse or = (com.ywesee.java.yopenedi.OpenTrans.OrderResponse) otObject;
+                        this.gln = or.getRecipientGLN();
                         com.ywesee.java.yopenedi.Edifact.OrderResponse orderResponse = this.orderResponseToEdifact(or);
                         config.replaceGLN(orderResponse);
                         return new Pair<>(pair.snd, orderResponse);
                     } else if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.DispatchNotification) {
                         com.ywesee.java.yopenedi.OpenTrans.DispatchNotification od = (com.ywesee.java.yopenedi.OpenTrans.DispatchNotification) otObject;
+                        this.gln = od.getRecipientGLN();
                         com.ywesee.java.yopenedi.Edifact.DespatchAdvice despatchAdvice = this.dispatchNotificationToEdifact(od);
                         config.replaceGLN(despatchAdvice);
                         return new Pair<>(pair.snd, despatchAdvice);
@@ -343,7 +347,29 @@ public class Converter {
                     aoc.type = com.ywesee.java.yopenedi.Edifact.AllowanceOrCharge.Type.Allowance;
             }
         }
-        aoc.name = allowanceOrCharge.name;
+        String[] nameParts = allowanceOrCharge.name.split(":");
+        if (nameParts.length == 2) {
+            aoc.name = nameParts[1].trim();
+            String allowanceOrChargeNumber = nameParts[0];
+            aoc.allowanceOrChargeNumber = allowanceOrChargeNumber;
+            String recipientName = this.config.getNameOfGLN(this.gln);
+            // https://github.com/zdavatz/yopenedi/issues/217
+            // Map ALC code according to the recipient
+            if (recipientName.equals("REXEL")) {
+                String code = ALCMappingTable.getInstance().getRexel(allowanceOrChargeNumber);
+                aoc.serviceCoded = code;
+            } else if (recipientName.equals("DEHA") ||
+                    recipientName.equals("OBETA") ||
+                    recipientName.equals("BÜRKLE") ||
+                    recipientName.equals("ZAJADACZ") ||
+                    recipientName.equals("LOEFFELHARDT")
+            ) {
+                String code = ALCMappingTable.getInstance().getVrg(allowanceOrChargeNumber);
+                aoc.serviceCoded = code;
+            }
+        } else {
+            aoc.name = allowanceOrCharge.name;
+        }
         aoc.sequence = allowanceOrCharge.sequence;
         if (allowanceOrCharge.percentage != null) {
             aoc.percentage = BigDecimal.valueOf(allowanceOrCharge.percentage);

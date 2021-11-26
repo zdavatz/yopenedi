@@ -133,4 +133,8 @@ public class Config {
             }
         }
     }
+
+    public String getNameOfGLN(String gln) {
+        return udxChannel().getOrDefault(gln, null);
+    }
 }
