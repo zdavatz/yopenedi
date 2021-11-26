@@ -10,6 +10,8 @@ public class AllowanceOrCharge {
     public Type type;
     public String name;
     public String sequence;
+    public String allowanceOrChargeNumber;
+    public String serviceCoded;
 
     public BigDecimal percentage; // e.g. 0.75
     public BigDecimal amount;
