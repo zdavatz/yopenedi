@@ -109,9 +109,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       } else if (ediOrders.size() > 1) {
         Left(BadRequest("More than 1 order in EDIFACT file."))
       } else {
-        println(ediOrders.get(0).parties.get(0).contactDetails.get(0).name)
         val otOrder = converter.orderToOpenTrans(ediOrders.get(0))
-        println(otOrder.parties.get(0).contactDetails.get(0).name)
         otOrder.isTestEnvironment = isTestEnvironment
         Logger.debug("Opentrans order: " + otOrder.toString())
 
