@@ -1,6 +1,8 @@
 package com.ywesee.java.yopenedi.Edifact;
 
 import com.ywesee.java.yopenedi.converter.Utility;
+import org.apache.commons.io.IOUtils;
+import org.milyn.SmooksException;
 import org.milyn.edi.unedifact.d96a.D96AInterchangeFactory;
 import org.milyn.edi.unedifact.d96a.ORDERS.*;
 import org.milyn.edi.unedifact.d96a.common.*;
@@ -8,16 +10,123 @@ import org.milyn.edi.unedifact.d96a.common.field.*;
 import org.milyn.smooks.edi.unedifact.model.UNEdifactInterchange;
 import org.milyn.smooks.edi.unedifact.model.r41.UNEdifactInterchange41;
 import org.milyn.smooks.edi.unedifact.model.r41.UNEdifactMessage41;
+import org.xml.sax.SAXException;
 
-import java.io.InputStream;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import static com.ywesee.java.yopenedi.converter.Utility.*;
 
 public class EdifactReader {
 
     public ArrayList<Order> run(InputStream stream) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        String ediString = reader.lines().collect(Collectors.joining("\n"));
+
+        try {
+            return this.convert(IOUtils.toInputStream(ediString, StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            // We had an issue with the MVEL runtime
+            // https://github.com/zdavatz/yopenedi/issues/223
+            // Sometimes it fails to read the edifact because of some Java runtime bug.
+            // After some trial and error, it seems like the problem can be avoided
+            // if we reduce the number of line items in an order.
+            // Here is the workaround implemented:
+            // 1. Find out the line items by regex
+            // 2. Create EDIFact text for multiple small orders (e.g. 10 orders with 10 items instead of 1 with 100 items)
+            // 3. Parse those orders
+            // 4. Join the orderItems together to make a big order.
+            //
+            // However there are problems:
+            // - Problem1: We are not sure how to find the end of a line item without parsing according to the EDIFact spec,
+            //   because user can insert any segments after the line items and before the UNS segment.
+            //   The workaround is to treat the last line item as a part of the suffix. For example:
+            //   [Prefix]-[Item1]-[Item2]-[Item3]-[Item4]-[Suffix]
+            //   Will be split into multiple small orders like:
+            //     Order 1. [Prefix]-[Item1]-[Item4]-[Suffix]
+            //     Order 2. [Prefix]-[Item2]-[Item4]-[Suffix]
+            //     Order 3. [Prefix]-[Item3]-[Item4]-[Suffix]
+            //   We then take Order 1 as is, insert Item2 from Order2, insert Item3 and Item4 from Order3.
+            // - Problem2: Parsing has a slow start up time.
+            //   To be exact, this line is slow: factory.fromUNEdifact(stream);
+            //   It seems like it's slow to start parsing, but it's not really related to the number of item.
+            //   Splitting into 100 orders (of 1 item each) is much slower than splitting into 2 orders of (50 items each).
+            //   But splitting with large number of items risks the above runtime error again.
+            //   The workaround is to try the batch number from large to small, until it works.
+            //   The above issue has a problematic order attached, containing 100 items.
+            //   100x1, 50x2, 30x4 all results in error while 10x10 is fine.
+            e.printStackTrace();
+            System.out.println("Recovering...");
+            if (e instanceof SmooksException) {
+                Pattern p = Pattern.compile("LIN\\+[0-9]+.*'");
+                Matcher m = p.matcher(ediString);
+                boolean match = false;
+                ArrayList<Integer> starts = new ArrayList<>();
+                while (match = m.find()) {
+                    starts.add(m.start());
+                }
+                ArrayList<String> itemStrings = new ArrayList<>();
+                if (starts.size() > 2) {
+                    String prefix = ediString.substring(0, starts.get(0) - 1);
+                    String suffix = ediString.substring(starts.get(starts.size()-1) - 1);
+
+                    for (int i = 0; i < starts.size()-1; i++) {
+                        Integer start = starts.get(i);
+                        Integer end = starts.get(i+1)-1;
+                        itemStrings.add(ediString.substring(start, end));
+                    }
+                    Order o = null;
+                    o = this.tryWithBatchSize(prefix, suffix, itemStrings, 50);
+                    if (o == null) o = this.tryWithBatchSize(prefix, suffix, itemStrings, 30);
+                    if (o == null) o = this.tryWithBatchSize(prefix, suffix, itemStrings, 15);
+                    if (o == null) o = this.tryWithBatchSize(prefix, suffix, itemStrings, 10);
+                    if (o == null) o = this.tryWithBatchSize(prefix, suffix, itemStrings, 5);
+                    if (o == null) o = this.tryWithBatchSize(prefix, suffix, itemStrings, 1);
+                    ArrayList<Order> result = new ArrayList<>();
+                    result.add(o);
+                    return result;
+                }
+            }
+        }
+        return new ArrayList<>();
+    }
+
+    private Order tryWithBatchSize(String prefix, String suffix, List<String> itemStrings, int batchSize) {
+        Order order = null;
+        try {
+            for (int i = 0; i < itemStrings.size(); i += batchSize) {
+                String thisEdiString = prefix;
+                for (int j = 0; j < batchSize; j++) {
+                    if (i + j < itemStrings.size()) {
+                        thisEdiString += itemStrings.get(i + j);
+                    }
+                }
+                thisEdiString += suffix;
+                ArrayList<Order> orders = convert(IOUtils.toInputStream(thisEdiString, StandardCharsets.UTF_8));
+                Order thisOrder = orders.get(0);
+                if (order == null) {
+                    order = thisOrder;
+                } else {
+                    for (int j = 0; j < thisOrder.orderItems.size() - 1; j++) {
+                        order.orderItems.add(thisOrder.orderItems.get(0));
+                    }
+                }
+                if (i + batchSize >= itemStrings.size()) {
+                    order.orderItems.add(thisOrder.orderItems.get(thisOrder.orderItems.size() - 1));
+                }
+            }
+        } catch (Exception e) {
+            // Ignore the exception because it's already printed when the first trial failed
+        }
+        return order;
+    }
+
+    public ArrayList<Order> convert(InputStream stream) throws IOException, SAXException {
         ArrayList<Order> orderList = new ArrayList<>();
         try {
             D96AInterchangeFactory factory = D96AInterchangeFactory.getInstance();
@@ -213,11 +322,11 @@ public class EdifactReader {
                     }
                     order.addOrderItem(orderItem);
                 }
-                //System.out.println(new ReflectionToStringBuilder(order, new MultilineRecursiveToStringStyle()).toString());
                 orderList.add(order);
             }
         } catch (Exception e) {
-            System.out.println("error: " + e.getMessage());
+            System.err.println("error: " + e.getMessage());
+            throw e;
         }
         return orderList;
     }
