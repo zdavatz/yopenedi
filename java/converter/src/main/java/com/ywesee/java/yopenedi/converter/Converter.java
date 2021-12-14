@@ -63,7 +63,9 @@ public class Converter {
                     Order otOrder = orderToOpenTrans(ediOrder);
                     return new Pair<>(pair.snd, otOrder);
             }
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return null;
     }
 
