@@ -121,95 +121,24 @@ public class App {
         }
 
         Config config = new Config(confPath, isTestEnvironment);
-        EmailCredential emailCreds = config.getEmailCredential();
-
-        final Properties properties = new Properties();
-        if (emailCreds.secure) {
-            properties.put("mail.imap.ssl.enable", "true");
-        }
-        properties.setProperty("mail.imap.host", emailCreds.imapHost);
-        properties.setProperty("mail.imap.port", emailCreds.imapPort);
-        properties.setProperty("mail.imap.connectiontimeout", "5000");
-        properties.setProperty("mail.imap.timeout", "5000");
-
-        Session imapSession = Session.getInstance(properties, null);
-        if (showDebugMessages) {
-            imapSession.setDebug(true);
-        }
-        Store imapStore = imapSession.getStore("imap");
-
-        imapStore.connect(emailCreds.imapHost, emailCreds.user, emailCreds.password);
-
-        Folder defaultFolder = imapStore.getDefaultFolder();
-        Folder[] folders = defaultFolder.list();
-
-        IMAPFolder inbox = null;
-        for (Folder f : folders) {
-            if (f.getFullName().equalsIgnoreCase(mailboxName)) {
-                inbox = (IMAPFolder)f;
-                break;
-            }
-        }
-        if (inbox == null) {
-            System.err.println("Cannot find mailbox named " + mailboxName + ". Available folders are:");
-            for (Folder f : folders) {
-                System.err.println(f.getFullName());
-            }
-            throw new Exception("Cannot find mailbox.");
-        }
-
-        inbox.open(Folder.READ_WRITE);
-
-        Message[] ms = skipSeenMessage
-                ? inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))
-                : inbox.getMessages();
-        System.out.println("Found " + ms.length + " messages");
-
-        for (Message message : ms) {
-            long uid = inbox.getUID(message);
-            System.out.println("Found message. UID=" + uid);
-            System.out.println("Subject: " + message.getSubject());
-
-            System.out.println("Getting attachment");
-            Object content = message.getContent();
-            BASE64DecoderStream stream = null;
-            if (content instanceof  BASE64DecoderStream) {
-                stream = (BASE64DecoderStream) content;
-            } else {
-                System.err.println("Attachment is not base64: " + content.toString());
-                System.err.println("Skipping");
-                continue;
-            }
-
-            Pair<InputStream, Converter.FileType> detected = Converter.detectFileType(stream);
-            File inFolder;
+        ArrayList<File> filesFromEmail = fetchEmail(config);
+        ArrayList<File> files = new ArrayList<>(filesFromEmail);
+        for (File file : files) {
             File outFolder;
-            switch (detected.snd) {
-                case OpenTrans:
-                    // Detected OpenTrans
-                    inFolder = openTransFolder;
-                    outFolder = edifactFolder;
-                    break;
-                case Edifact:
-                default:
-                    // Detected Edifact
-                    inFolder = edifactFolder;
-                    outFolder = openTransFolder;
-                    break;
+            String inFilePath = file.getAbsolutePath();
+            String inFileName = FilenameUtils.getName(inFilePath);
+            if (inFilePath.startsWith(openTransFolder.getAbsolutePath())) {
+                outFolder = edifactFolder;
+            } else {
+                outFolder = openTransFolder;
             }
-
-            File f = new File(inFolder, "" + uid);
-            FileOutputStream fos = new FileOutputStream(f);
-            IOUtils.copy(detected.fst, fos);
-
-            System.out.println("Saved file to " + f.getAbsolutePath());
 
             Converter converter = new Converter(config);
             converter.shouldMergeContactDetails = true;
 
-            Pair<Converter.FileType, Writable> converted = converter.run(new FileInputStream(f));
+            Pair<Converter.FileType, Writable> converted = converter.run(new FileInputStream(file));
 
-            File targetFile = new File(outFolder, uid + ".xml");
+            File targetFile = new File(outFolder, inFileName + ".xml");
             FileOutputStream outputStream = new FileOutputStream(targetFile);
 
             String recipientGLN = null;
@@ -250,13 +179,109 @@ public class App {
             converted.snd.write(outputStream, config);
             outputStream.close();
 
+            config.dispatchResult(recipientGLN, edifactType, targetFile, orderId);
+        }
+        System.out.println("Done");
+    }
+
+    static ArrayList<File> fetchEmail(Config config) throws Exception {
+        EmailCredential emailCreds = config.getEmailCredential();
+
+        final Properties properties = new Properties();
+        if (emailCreds.secure) {
+            properties.put("mail.imap.ssl.enable", "true");
+        }
+        properties.setProperty("mail.imap.host", emailCreds.imapHost);
+        properties.setProperty("mail.imap.port", emailCreds.imapPort);
+        properties.setProperty("mail.imap.connectiontimeout", "5000");
+        properties.setProperty("mail.imap.timeout", "5000");
+
+        Session imapSession = Session.getInstance(properties, null);
+        if (showDebugMessages) {
+            imapSession.setDebug(true);
+        }
+        Store imapStore = imapSession.getStore("imap");
+
+        imapStore.connect(emailCreds.imapHost, emailCreds.user, emailCreds.password);
+
+        Folder defaultFolder = imapStore.getDefaultFolder();
+        Folder[] folders = defaultFolder.list();
+
+        IMAPFolder inbox = null;
+        for (Folder f : folders) {
+            if (f.getFullName().equalsIgnoreCase(mailboxName)) {
+                inbox = (IMAPFolder) f;
+                break;
+            }
+        }
+        if (inbox == null) {
+            System.err.println("Cannot find mailbox named " + mailboxName + ". Available folders are:");
+            for (Folder f : folders) {
+                System.err.println(f.getFullName());
+            }
+            throw new Exception("Cannot find mailbox.");
+        }
+
+        inbox.open(Folder.READ_WRITE);
+
+        Message[] ms = skipSeenMessage
+                ? inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))
+                : inbox.getMessages();
+        System.out.println("Found " + ms.length + " messages");
+
+        ArrayList<File> files = new ArrayList<>();
+
+        for (Message message : ms) {
+            long uid = inbox.getUID(message);
+            System.out.println("Found message. UID=" + uid);
+            System.out.println("Subject: " + message.getSubject());
+
+            System.out.println("Getting attachment");
+            Object content = message.getContent();
+            BASE64DecoderStream stream = null;
+            if (content instanceof BASE64DecoderStream) {
+                stream = (BASE64DecoderStream) content;
+            } else {
+                System.err.println("Attachment is not base64: " + content.toString());
+                System.err.println("Skipping");
+                continue;
+            }
+            files.add(saveStream(stream, "" + uid));
+
             if (markMessageAsSeen) {
                 System.out.println("Marking message as seen.");
                 message.setFlag(Flags.Flag.SEEN, true);
             }
-            config.dispatchResult(recipientGLN, edifactType, targetFile, orderId);
         }
         inbox.close(false);
-        System.out.println("Done");
+        return files;
+    }
+
+    static File saveStream(InputStream stream, String filename) throws Exception {
+        Pair<InputStream, Converter.FileType> detected = Converter.detectFileType(stream);
+        File inFolder;
+        switch (detected.snd) {
+            case OpenTrans:
+                // Detected OpenTrans
+                inFolder = openTransFolder;
+                break;
+            case Edifact:
+            default:
+                // Detected Edifact
+                inFolder = edifactFolder;
+                break;
+        }
+
+        File f = new File(inFolder, filename);
+        FileOutputStream fos = new FileOutputStream(f);
+        IOUtils.copy(detected.fst, fos);
+
+        System.out.println("Saved file to " + f.getAbsolutePath());
+        return f;
+    }
+
+                }
+            }
+        }
     }
 }
