@@ -28,6 +28,7 @@ dependencies {
     // https://mvnrepository.com/artifact/commons-io/commons-io
     compile group: 'commons-io', name: 'commons-io', version: '2.7'
     implementation 'commons-cli:commons-cli:1.4'
+    implementation 'com.jcraft:jsch:0.1.55'
 
     compile project(':converter')
     // Use JUnit test framework
