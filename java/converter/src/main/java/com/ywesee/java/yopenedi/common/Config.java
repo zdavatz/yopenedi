@@ -6,10 +6,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import com.ywesee.java.yopenedi.Edifact.DespatchAdvice;
-import com.ywesee.java.yopenedi.Edifact.Invoice;
-import com.ywesee.java.yopenedi.Edifact.OrderResponse;
-import com.ywesee.java.yopenedi.Edifact.Party;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -59,6 +55,26 @@ public class Config {
         System.out.println("Reading from " + f.getAbsolutePath());
         try {
             return new EmailCredential(f);
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
+    }
+
+    public SFTPX400 getSFTPX400Credential() {
+        if (isTest) {
+            File f = new File(this.path, "test-sftpx400-credential.json");
+            System.out.println("Reading from " + f.getAbsolutePath());
+            try {
+                return new SFTPX400(f);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        File f = new File(this.path, "sftpx400-credential.json");
+        System.out.println("Reading from " + f.getAbsolutePath());
+        try {
+            return new SFTPX400(f);
         } catch (Exception e) {
             System.out.println(e.getMessage());
             return null;

@@ -56,6 +56,10 @@ public class ResultDispatch {
         // e.g. "cn=xxxxx; s=yyyyy; o=zzzzzz-gmbh; p=AAAAA; a=VIAT; c=DE"
         String toAddress;
         String toUserId;
+        SFTPX400(JSONObject obj) {
+            this.toAddress = (String)obj.getOrDefault("to", null);
+            this.toUserId = (String)obj.getOrDefault("toUserId", null);
+        }
     }
     class Filter {
         ArrayList<String> glns = null;
@@ -110,6 +114,9 @@ public class ResultDispatch {
         }
         if (obj.containsKey("email")) {
             this.emailDest = new EmailDest((JSONObject)obj.get("email"));
+        }
+        if (obj.containsKey("sftp-x400")) {
+            this.sftpx400 = new SFTPX400((JSONObject) obj.get("sftp-x400"));
         }
     }
 
