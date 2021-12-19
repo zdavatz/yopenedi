@@ -3,8 +3,11 @@
  */
 package com.ywesee.java.yopenedi.emailfetcher;
 
+import com.jcraft.jsch.ChannelSftp;
+import com.jcraft.jsch.JSch;
 import com.ywesee.java.yopenedi.common.Config;
 import com.ywesee.java.yopenedi.common.EmailCredential;
+import com.ywesee.java.yopenedi.common.SFTPX400;
 import com.ywesee.java.yopenedi.converter.Converter;
 
 import com.sun.mail.imap.IMAPFolder;
@@ -12,13 +15,19 @@ import com.sun.mail.util.BASE64DecoderStream;
 import com.ywesee.java.yopenedi.converter.Pair;
 import com.ywesee.java.yopenedi.converter.Writable;
 import org.apache.commons.cli.*;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 
 import javax.mail.*;
-import javax.mail.internet.MimeMultipart;
 import javax.mail.search.FlagTerm;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Properties;
+import java.util.Vector;
+import java.util.stream.Collectors;
 
 public class App {
     static File edifactFolder;
@@ -122,7 +131,10 @@ public class App {
 
         Config config = new Config(confPath, isTestEnvironment);
         ArrayList<File> filesFromEmail = fetchEmail(config);
+        ArrayList<File> filesFromSFTP = fetchSTPX400(config);
         ArrayList<File> files = new ArrayList<>(filesFromEmail);
+        files.addAll(filesFromSFTP);
+
         for (File file : files) {
             File outFolder;
             String inFilePath = file.getAbsolutePath();
@@ -281,8 +293,67 @@ public class App {
         return f;
     }
 
+    static ArrayList<File> fetchSTPX400(Config config) throws Exception {
+        try {
+            JSch jsch = new JSch();
+            SFTPX400 sftpConfig = config.getSFTPX400Credential();
+            String privateKeyPath = new File(sftpConfig.privateKeyPath).getAbsolutePath();
+            System.out.println("SFTP X.400 privateKeyPath: " + privateKeyPath);
+            jsch.addIdentity(privateKeyPath);
+
+            jsch.setKnownHosts(IOUtils.toInputStream(sftpConfig.knownHosts, StandardCharsets.UTF_8));
+
+            com.jcraft.jsch.Session session = jsch.getSession(sftpConfig.username, sftpConfig.host);
+            session.connect();
+            ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
+            sftp.connect();
+
+            String pwd = sftp.pwd();
+            Vector<ChannelSftp.LsEntry> remoteFiles = sftp.ls(pwd);
+
+            Path tempFolderPath = Files.createTempDirectory("temp");
+            String messageOutFolder = sftpConfig.messageFolder != null ? sftpConfig.messageFolder : tempFolderPath.toString();
+            if (sftpConfig.messageFolder != null) {
+                File messageFolder = new File(sftpConfig.messageFolder);
+                if (!messageFolder.exists()) {
+                    messageFolder.mkdirs();
                 }
             }
+
+            ArrayList<File> outFiles = new ArrayList<>();
+
+            for (ChannelSftp.LsEntry lsEntry : remoteFiles) {
+                String[] partsBySemicolon = lsEntry.getFilename().split(";");
+                String remoteFileName = partsBySemicolon[0];
+                String[] filenameParts = remoteFileName.split("\\.");
+                String extension = filenameParts[filenameParts.length-1];
+                String outPath = messageOutFolder + File.separator + remoteFileName;
+                if (extension.equals("OUT")) {
+                    System.out.println("Downloading from SFTP X.400: " + remoteFileName);
+                    sftp.get(remoteFileName, outPath);
+                    System.out.println("Downloaded to: " + outPath);
+                    sftp.rm(remoteFileName);
+
+                    FileInputStream inputStream = new FileInputStream(outPath);
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    String fileContent = reader.lines().collect(Collectors.joining("\n"));
+
+                    int fileContentIndex = fileContent.indexOf("\n\n");
+                    if (fileContentIndex > -1) {
+                        String edifactString = fileContent.substring(fileContentIndex + 2);
+                        File outFile = saveStream(IOUtils.toInputStream(edifactString, StandardCharsets.UTF_8), remoteFileName);
+                        outFiles.add(outFile);
+                    } else {
+                        System.err.println("Cannot find file content: " + outPath);
+                    }
+                }
+            }
+            sftp.exit();
+            session.disconnect();
+            return outFiles;
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+        return new ArrayList<>();
     }
 }

@@ -209,6 +209,9 @@ public class ResultDispatch {
     void sendSFPTX400(File file, String messageId) {
         try {
             com.ywesee.java.yopenedi.common.SFTPX400 sftpConfig = this.config.getSFTPX400Credential();
+            if (sftpConfig == null) {
+                System.out.println("Credential for SFTP X.400 not found, skipping");
+            }
             JSch jsch = new JSch();
             String privateKeyPath = new File(sftpConfig.privateKeyPath).getAbsolutePath();
             System.out.println("SFTP X.400 privateKeyPath: " + privateKeyPath);
