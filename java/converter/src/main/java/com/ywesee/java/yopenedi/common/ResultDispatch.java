@@ -1,5 +1,6 @@
 package com.ywesee.java.yopenedi.common;
 
+import com.jcraft.jsch.*;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.json.simple.JSONArray;
@@ -206,6 +207,30 @@ public class ResultDispatch {
     }
 
     void sendSFPTX400(File file, String messageId) {
+        try {
+            com.ywesee.java.yopenedi.common.SFTPX400 sftpConfig = this.config.getSFTPX400Credential();
+            JSch jsch = new JSch();
+            String privateKeyPath = new File(sftpConfig.privateKeyPath).getAbsolutePath();
+            System.out.println("SFTP X.400 privateKeyPath: " + privateKeyPath);
+            jsch.addIdentity(privateKeyPath);
+            jsch.setKnownHosts(IOUtils.toInputStream(sftpConfig.knownHosts, StandardCharsets.UTF_8));
+
+            com.jcraft.jsch.Session session = jsch.getSession(sftpConfig.username, sftpConfig.host);
+            session.connect();
+            ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
+            sftp.connect();
+
+            String pwd = sftp.pwd();
+            File messageFile = this.tempFileForX400Message(file);
+            sftp.put(messageFile.getAbsolutePath(), pwd + "/M_" + messageId + ".TMP");
+            System.out.println("Uploaded as: " + pwd + "/M_" + messageId + ".TMP");
+
+            sftp.rename(pwd + "/M_" + messageId + ".TMP", pwd + "/M_" + messageId + ".IN");
+            sftp.exit();
+            session.disconnect();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     File tempFileForX400Message(File file) throws IOException {
@@ -236,7 +261,6 @@ public class ResultDispatch {
             inStream.close();
         }
         tempFile.deleteOnExit();
-        System.out.println("temp file:" + tempFile.getAbsolutePath());
         return tempFile;
     }
 }
