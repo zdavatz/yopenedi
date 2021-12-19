@@ -156,6 +156,7 @@ public class ResultDispatch {
         prop.put("mail.smtp.host", emailCreds.smtpHost);
         prop.put("mail.smtp.port", emailCreds.smtpPort);
         prop.put("mail.smtp.auth", "true");
+        prop.put("mail.smtp.protocols", "TLSv1.2 TLSv1.3");
         if (emailCreds.secure) {
             prop.put("mail.smtp.starttls.enable", "true"); //TLS
         }

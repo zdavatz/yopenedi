@@ -195,6 +195,7 @@ public class App {
         properties.setProperty("mail.imap.port", emailCreds.imapPort);
         properties.setProperty("mail.imap.connectiontimeout", "5000");
         properties.setProperty("mail.imap.timeout", "5000");
+        properties.setProperty("mail.imap.ssl.protocols", "TLSv1.2 TLSv1.3");
 
         Session imapSession = Session.getInstance(properties, null);
         if (showDebugMessages) {
