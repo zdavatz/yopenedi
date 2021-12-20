@@ -58,6 +58,9 @@
     "email": {
       "subject": "No subject",
       "to": "DEJFROE2.DEFJC@ieeur.gxs.com"
+    },
+    "sftp-x400": {
+      "toAddress": "s=DEFJC; g=DEJFROE2; p=IEEUR; a=MARK400; c=DE",
     }
   }
 ]
