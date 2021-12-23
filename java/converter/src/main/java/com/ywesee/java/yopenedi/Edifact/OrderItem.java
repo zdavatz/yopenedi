@@ -13,4 +13,5 @@ public class OrderItem {
     public BigDecimal priceQuantity;
     public String deliveryDate;
     public String supplierSpecificProductId;
+    public String buyerSpecificProductId;
 }

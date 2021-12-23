@@ -12,6 +12,7 @@ public class OrderItem {
     public String descriptionShort;
     public String descriptionLong;
     public String supplierSpecificProductId;
+    public String buyerSpecificProductId;
     public String quantityUnit;
     public BigDecimal quantity; // How many unit is ordered
     public BigDecimal priceQuantity; // The quantity that (this.price) can buy.
@@ -56,10 +57,18 @@ public class OrderItem {
             s.writeCharacters(this.supplierSpecificProductId);
             s.writeEndElement(); // SUPPLIER_PID
         }
-        s.writeStartElement("bmecat:INTERNATIONAL_PID");
-        s.writeAttribute("type", "ean");
-        s.writeCharacters(this.ean);
-        s.writeEndElement(); // INTERNATIONAL_PID
+        if (notNullOrEmpty(this.ean)) {
+            s.writeStartElement("bmecat:INTERNATIONAL_PID");
+            s.writeAttribute("type", "ean");
+            s.writeCharacters(this.ean);
+            s.writeEndElement(); // INTERNATIONAL_PID
+        }
+        if (notNullOrEmpty(this.buyerSpecificProductId)) {
+            s.writeStartElement("bmecat:BUYER_PID");
+            s.writeAttribute("type" ,"buyer_specific");
+            s.writeCharacters(this.buyerSpecificProductId);
+            s.writeEndElement(); // BUYER_PID
+        }
         if (notNullOrEmpty(this.descriptionShort)) {
             s.writeStartElement("bmecat:DESCRIPTION_SHORT");
             s.writeCharacters(this.descriptionShort);
