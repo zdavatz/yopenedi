@@ -262,6 +262,10 @@ public class EdifactReader {
                                 C212ItemNumberIdentification numberId = productId.getC2121ItemNumberIdentification();
                                 if (numberId.getE7143ItemNumberTypeCoded().equals("EN")) { // EN means this is EAN
                                     orderItem.ean = numberId.getE7140ItemNumber();
+                                } else if (numberId.getE7143ItemNumberTypeCoded().equals("SA")) {
+                                    orderItem.supplierSpecificProductId = numberId.getE7140ItemNumber();
+                                } else if (numberId.getE7143ItemNumberTypeCoded().equals("BP")) {
+                                    orderItem.buyerSpecificProductId = numberId.getE7140ItemNumber();
                                 }
                             }
                         }
