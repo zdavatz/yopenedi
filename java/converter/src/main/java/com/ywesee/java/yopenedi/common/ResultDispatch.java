@@ -232,7 +232,7 @@ public class ResultDispatch {
             sftp.exit();
             session.disconnect();
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 

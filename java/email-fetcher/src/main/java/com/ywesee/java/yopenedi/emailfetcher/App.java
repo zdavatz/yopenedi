@@ -322,6 +322,7 @@ public class App {
 
             ArrayList<File> outFiles = new ArrayList<>();
 
+            int foundCount = 0;
             for (ChannelSftp.LsEntry lsEntry : remoteFiles) {
                 String[] partsBySemicolon = lsEntry.getFilename().split(";");
                 String remoteFileName = partsBySemicolon[0];
@@ -329,6 +330,7 @@ public class App {
                 String extension = filenameParts[filenameParts.length-1];
                 String outPath = messageOutFolder + File.separator + remoteFileName;
                 if (extension.equals("OUT")) {
+                    foundCount++;
                     System.out.println("Downloading from SFTP X.400: " + remoteFileName);
                     sftp.get(remoteFileName, outPath);
                     System.out.println("Downloaded to: " + outPath);
@@ -348,11 +350,14 @@ public class App {
                     }
                 }
             }
+            if (foundCount == 0) {
+                System.out.println("No message found in SFTP X.400 mailbox");
+            }
             sftp.exit();
             session.disconnect();
             return outFiles;
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return new ArrayList<>();
     }
