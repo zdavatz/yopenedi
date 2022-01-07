@@ -1,3 +1,4 @@
+## Introduction
 This repository has multiple Gradle projects.
 
 - openedi-converter - A library that parse EDIFACT D.96A and output Opentrans 2.1 XML
@@ -53,6 +54,9 @@ To configure server:
 - In `server/conf/application.conf`, you can set where to save the files
   - `edifact-orders`
   - `opentrans-orders`
+
+## For X400 you need to do
+- `ssh-keygen -p -f ~/.ssh/dt_telekom -m pem -P "" -N ""`
 
 ## Test mode
 
