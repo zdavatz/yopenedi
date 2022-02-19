@@ -58,7 +58,7 @@ public class ResultDispatch {
         String toAddress;
         String toUserId;
         SFTPX400(JSONObject obj) {
-            this.toAddress = (String)obj.getOrDefault("to", null);
+            this.toAddress = (String)obj.getOrDefault("toAddress", null);
             this.toUserId = (String)obj.getOrDefault("toUserId", null);
         }
     }
