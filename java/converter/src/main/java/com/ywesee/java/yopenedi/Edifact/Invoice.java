@@ -17,6 +17,7 @@ import org.milyn.smooks.edi.unedifact.model.r41.types.SyntaxIdentifier;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -894,7 +895,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
         message41.setMessageTrailer(unt41);
         interchange.setMessages(Arrays.asList(message41));
 
-        factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream));
+        factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
     }
 
     public void write(OutputStream s, Config _config) throws Exception {
