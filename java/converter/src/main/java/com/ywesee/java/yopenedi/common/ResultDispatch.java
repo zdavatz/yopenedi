@@ -223,12 +223,14 @@ public class ResultDispatch {
             ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
             sftp.connect();
 
+            String randomMessageFilename = RandomStringUtils.randomNumeric(9);
             String pwd = sftp.pwd();
-            File messageFile = this.tempFileForX400Message(file);
-            sftp.put(messageFile.getAbsolutePath(), pwd + "/M_" + messageId + ".TMP");
-            System.out.println("Uploaded as: " + pwd + "/M_" + messageId + ".TMP");
+            File messageFile = this.tempFileForX400Message(file, messageId);
+            sftp.put(messageFile.getAbsolutePath(), pwd + "/M_" + randomMessageFilename + ".TMP");
+            System.out.println("Uploaded as: " + pwd + "/M_" + randomMessageFilename + ".TMP");
 
-            sftp.rename(pwd + "/M_" + messageId + ".TMP", pwd + "/M_" + messageId + ".IN");
+            sftp.rename(pwd + "/M_" + randomMessageFilename + ".TMP", pwd + "/M_" + randomMessageFilename + ".IN");
+            System.out.println("Renamed to: " + pwd + "/M_" + randomMessageFilename + ".IN");
             sftp.exit();
             session.disconnect();
         } catch (Exception e) {
@@ -236,7 +238,7 @@ public class ResultDispatch {
         }
     }
 
-    File tempFileForX400Message(File file) throws IOException {
+    public File tempFileForX400Message(File file, String messageId) throws IOException {
         File tempFile = File.createTempFile("temp", null);
         FileOutputStream outStream = new FileOutputStream(tempFile);
         FileInputStream inStream = new FileInputStream(file);
@@ -244,6 +246,9 @@ public class ResultDispatch {
         try {
             outStream.write(("To: \"" + (this.sftpx400.toAddress == null ? "" : this.sftpx400.toAddress) + "\" ").getBytes(StandardCharsets.UTF_8));
             outStream.write(("<" + (this.sftpx400.toUserId == null ? "x" : this.sftpx400.toUserId) + "@viat.de>\n").getBytes(StandardCharsets.UTF_8));
+            if (messageId != null) {
+                outStream.write(("Message-ID: " + messageId + "\n").getBytes(StandardCharsets.UTF_8));
+            }
             outStream.write("Disposition-Notification-To: \"\"\n".getBytes(StandardCharsets.UTF_8));
             outStream.write(("Content-Type: multipart/mixed; boundary=\"boundary"+ boundaryString +"\"\n\n\n").getBytes(StandardCharsets.UTF_8));
             outStream.write(("--boundary"+ boundaryString +"\n").getBytes(StandardCharsets.UTF_8));
@@ -258,7 +263,7 @@ public class ResultDispatch {
             while ((length = inStream.read(buffer)) > 0) {
                 outStream.write(buffer, 0, length);
             }
-            outStream.write(("\n\n--boundary"+ boundaryString +"—").getBytes(StandardCharsets.UTF_8));
+            outStream.write(("\n--boundary"+ boundaryString +"—").getBytes(StandardCharsets.UTF_8));
         } finally {
             outStream.close();
             inStream.close();
