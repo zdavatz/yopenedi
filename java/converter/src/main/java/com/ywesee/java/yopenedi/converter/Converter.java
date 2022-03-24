@@ -346,8 +346,10 @@ public class Converter {
             switch (allowanceOrCharge.type) {
                 case Charge:
                     aoc.type = com.ywesee.java.yopenedi.Edifact.AllowanceOrCharge.Type.Charge;
+                    break;
                 case Allowance:
                     aoc.type = com.ywesee.java.yopenedi.Edifact.AllowanceOrCharge.Type.Allowance;
+                    break;
             }
         }
         String[] nameParts = allowanceOrCharge.name.split(":");
@@ -358,17 +360,19 @@ public class Converter {
             String recipientName = this.config.getNameOfGLN(this.gln);
             // https://github.com/zdavatz/yopenedi/issues/217
             // Map ALC code according to the recipient
-            if (recipientName.equals("REXEL")) {
-                String code = ALCMappingTable.getInstance().getRexel(allowanceOrChargeNumber);
-                aoc.serviceCoded = code;
-            } else if (recipientName.equals("DEHA") ||
-                    recipientName.equals("OBETA") ||
-                    recipientName.equals("BÜRKLE") ||
-                    recipientName.equals("ZAJADACZ") ||
-                    recipientName.equals("LOEFFELHARDT")
-            ) {
-                String code = ALCMappingTable.getInstance().getVrg(allowanceOrChargeNumber);
-                aoc.serviceCoded = code;
+            if (recipientName != null) {
+                if (recipientName.equals("REXEL")) {
+                    String code = ALCMappingTable.getInstance().getRexel(allowanceOrChargeNumber);
+                    aoc.serviceCoded = code;
+                } else if (recipientName.equals("DEHA") ||
+                        recipientName.equals("OBETA") ||
+                        recipientName.equals("BÜRKLE") ||
+                        recipientName.equals("ZAJADACZ") ||
+                        recipientName.equals("LOEFFELHARDT")
+                ) {
+                    String code = ALCMappingTable.getInstance().getVrg(allowanceOrChargeNumber);
+                    aoc.serviceCoded = code;
+                }
             }
         } else {
             aoc.name = allowanceOrCharge.name;

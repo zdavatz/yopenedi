@@ -561,8 +561,10 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 switch (aoc.type) {
                     case Charge:
                         alc.setE5463AllowanceOrChargeQualifier("C");
+                        break;
                     case Allowance:
                         alc.setE5463AllowanceOrChargeQualifier("A");
+                        break;
                 }
                 C552AllowanceChargeInformation c552 = new C552AllowanceChargeInformation();
                 if (aoc.allowanceOrChargeNumber != null) {
