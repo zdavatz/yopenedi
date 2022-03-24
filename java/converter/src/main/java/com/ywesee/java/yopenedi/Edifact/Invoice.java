@@ -435,6 +435,56 @@ public class Invoice implements Writable, MessageExchange<Party> {
         sg8s.add(sg8);
         invoic.setSegmentGroup8(sg8s);
 
+        {
+            ArrayList<SegmentGroup15> sg15s = new ArrayList<>();
+            for (AllowanceOrCharge aoc : this.allowanceOrCharges) {
+                SegmentGroup15 sg15 = new SegmentGroup15();
+                sg15s.add(sg15);
+                ALCAllowanceOrCharge alc = new ALCAllowanceOrCharge();
+                segmentCount++;
+                switch (aoc.type) {
+                    case Charge:
+                        alc.setE5463AllowanceOrChargeQualifier("C");
+                        break;
+                    case Allowance:
+                        alc.setE5463AllowanceOrChargeQualifier("A");
+                        break;
+                }
+                C552AllowanceChargeInformation c552 = new C552AllowanceChargeInformation();
+                if (aoc.allowanceOrChargeNumber != null) {
+                    c552.setE1230AllowanceOrChargeNumber(aoc.allowanceOrChargeNumber);
+                }
+                c552.setE5189ChargeAllowanceDescriptionCoded("1");
+                alc.setC552AllowanceChargeInformation(c552);
+                if (notNullOrEmpty(aoc.sequence)) {
+                    alc.setE1227CalculationSequenceIndicatorCoded(StringUtils.left(aoc.sequence, 3));
+                }
+                C214SpecialServicesIdentification c214 = new C214SpecialServicesIdentification();
+                if (aoc.serviceCoded != null) {
+                    c214.setE7161SpecialServicesCoded(aoc.serviceCoded);
+                } else {
+                    c214.setE7161SpecialServicesCoded("FC");
+                }
+                if (notNullOrEmpty(aoc.name)) {
+                    c214.setE71601SpecialService(StringUtils.left(aoc.name, 35));
+                }
+                alc.setC214SpecialServicesIdentification(c214);
+                sg15.setALCAllowanceOrCharge(alc);
+
+                ArrayList<SegmentGroup19> sg19s = new ArrayList<>();
+                SegmentGroup19 sg19 = new SegmentGroup19();
+                MOAMonetaryAmount moa = new MOAMonetaryAmount();
+                segmentCount++;
+                C516MonetaryAmount c516 = new C516MonetaryAmount();
+                c516.setE5025MonetaryAmountTypeQualifier("8");
+                c516.setE5004MonetaryAmount(aoc.amount);
+                moa.setC516MonetaryAmount(c516);
+                sg19.setMOAMonetaryAmount(moa);
+                sg15.setSegmentGroup19(sg19s);
+            }
+            invoic.setSegmentGroup15(sg15s);
+        }
+
         ArrayList<SegmentGroup25> sg25s = new ArrayList<>();
         for (InvoiceItem ii : this.invoiceItems) {
             SegmentGroup25 sg25 = new SegmentGroup25();
@@ -842,55 +892,6 @@ public class Invoice implements Writable, MessageExchange<Party> {
             sg48s.add(sg48);
         }
         invoic.setSegmentGroup48(sg48s);
-
-        {
-            ArrayList<SegmentGroup51> sg51s = new ArrayList<>();
-            for (AllowanceOrCharge aoc : this.allowanceOrCharges) {
-                SegmentGroup51 sg51 = new SegmentGroup51();
-                sg51s.add(sg51);
-                ALCAllowanceOrCharge alc = new ALCAllowanceOrCharge();
-                segmentCount++;
-                switch (aoc.type) {
-                    case Charge:
-                        alc.setE5463AllowanceOrChargeQualifier("C");
-                        break;
-                    case Allowance:
-                        alc.setE5463AllowanceOrChargeQualifier("A");
-                        break;
-                }
-                C552AllowanceChargeInformation c552 = new C552AllowanceChargeInformation();
-                if (aoc.allowanceOrChargeNumber != null) {
-                    c552.setE1230AllowanceOrChargeNumber(aoc.allowanceOrChargeNumber);
-                }
-                c552.setE5189ChargeAllowanceDescriptionCoded("1");
-                alc.setC552AllowanceChargeInformation(c552);
-                if (notNullOrEmpty(aoc.sequence)) {
-                    alc.setE1227CalculationSequenceIndicatorCoded(StringUtils.left(aoc.sequence, 3));
-                }
-                C214SpecialServicesIdentification c214 = new C214SpecialServicesIdentification();
-                if (aoc.serviceCoded != null) {
-                    c214.setE7161SpecialServicesCoded(aoc.serviceCoded);
-                } else {
-                    c214.setE7161SpecialServicesCoded("FC");
-                }
-                if (notNullOrEmpty(aoc.name)) {
-                    c214.setE71601SpecialService(StringUtils.left(aoc.name, 35));
-                }
-                alc.setC214SpecialServicesIdentification(c214);
-
-                ArrayList<MOAMonetaryAmount> moas = new ArrayList<>();
-                MOAMonetaryAmount moa = new MOAMonetaryAmount();
-                segmentCount++;
-                C516MonetaryAmount c516 = new C516MonetaryAmount();
-                c516.setE5025MonetaryAmountTypeQualifier("8");
-                c516.setE5004MonetaryAmount(aoc.amount);
-                moa.setC516MonetaryAmount(c516);
-                moas.add(moa);
-                sg51.setMOAMonetaryAmount(moas);
-                sg51.setALCAllowanceOrCharge(alc);
-            }
-            invoic.setSegmentGroup51(sg51s);
-        }
 
         UNT41 unt41 = new UNT41();
         segmentCount++;
