@@ -473,6 +473,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
 
                 ArrayList<SegmentGroup19> sg19s = new ArrayList<>();
                 SegmentGroup19 sg19 = new SegmentGroup19();
+                sg19s.add(sg19);
                 MOAMonetaryAmount moa = new MOAMonetaryAmount();
                 segmentCount++;
                 C516MonetaryAmount c516 = new C516MonetaryAmount();
