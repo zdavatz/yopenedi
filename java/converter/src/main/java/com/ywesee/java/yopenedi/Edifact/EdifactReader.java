@@ -25,11 +25,20 @@ import static com.ywesee.java.yopenedi.converter.Utility.*;
 public class EdifactReader {
 
     public ArrayList<Order> run(InputStream stream) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
         String ediString = reader.lines().collect(Collectors.joining("\n"));
 
         try {
-            return this.convert(IOUtils.toInputStream(ediString, StandardCharsets.UTF_8));
+            // There's a problem with encoding:
+            // https://github.com/zdavatz/yopenedi/issues/242
+            // When the input contains Umlaut, the parser can't handle it correctly.
+            // It seems like the parser cannot handle multi-byte characters,
+            // but it has the function of guessing the encoding of the input by the first few characters[1],
+            // so a workaround would be using ISO_8859_1 when feeding into the parser.
+            // This encoding has nothing to do with the input and the output file, it's only
+            // for the parser.
+            // [1]: https://github.com/smooks/smooks/issues/79
+            return this.convert(IOUtils.toInputStream(ediString, StandardCharsets.ISO_8859_1));
         } catch (Exception e) {
             // We had an issue with the MVEL runtime
             // https://github.com/zdavatz/yopenedi/issues/223
@@ -107,7 +116,7 @@ public class EdifactReader {
                     }
                 }
                 thisEdiString += suffix;
-                ArrayList<Order> orders = convert(IOUtils.toInputStream(thisEdiString, StandardCharsets.UTF_8));
+                ArrayList<Order> orders = convert(IOUtils.toInputStream(thisEdiString, StandardCharsets.ISO_8859_1));
                 Order thisOrder = orders.get(0);
                 if (order == null) {
                     order = thisOrder;
