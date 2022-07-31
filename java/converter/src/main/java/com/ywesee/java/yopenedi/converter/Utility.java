@@ -1,5 +1,6 @@
 package com.ywesee.java.yopenedi.converter;
 
+import java.text.Normalizer;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -91,6 +92,7 @@ public class Utility {
     }
 
     public static ArrayList<String> splitStringIntoParts(String input, int lengthLimit, int maxNumOfParts) {
+        input = Normalizer.normalize(input, Normalizer.Form.NFC);
         ArrayList<String> arr = new ArrayList<>();
         String[] parts = input.split(" ");
         for (String part : parts) {
@@ -103,11 +105,14 @@ public class Utility {
                 cur = "";
                 createNew = true;
             }
-            if (cur.length() + part.length() + 1 > lengthLimit && arr.size() < maxNumOfParts) {
+            String newStr;
+            if (arr.size() == 0 || (cur.length() + part.length() + 1 > lengthLimit && arr.size() < maxNumOfParts)) {
                 cur = "";
                 createNew = true;
+                newStr = part;
+            } else {
+                newStr = cur + " " + part;
             }
-            String newStr = cur + " " + part;
             if (createNew) {
                 arr.add(newStr);
             } else {
