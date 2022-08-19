@@ -199,7 +199,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
             C506Reference r506 = new C506Reference();
             // ON = Order Number
             r506.setE1153ReferenceQualifier("ON");
-            r506.setE1154ReferenceNumber(StringUtils.left(this.orderNumberFromBuyer, 35));
+            r506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.orderNumberFromBuyer, 35));
             r.setC506Reference(r506);
             sg1.setRFFReference(r);
             sg1s.add(sg1);
@@ -250,23 +250,23 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
             nad.setC082PartyIdentificationDetails(c082);
             C080PartyName c080 = new C080PartyName();
             ArrayList<String> nameParts = splitStringIntoParts(p.name, 35, 5);
-            c080.setE30361PartyName(StringUtils.left(getIndexOrNull(nameParts,0), 35));
-            c080.setE30362PartyName(StringUtils.left(getIndexOrNull(nameParts,1), 35));
-            c080.setE30363PartyName(StringUtils.left(getIndexOrNull(nameParts,2), 35));
-            c080.setE30364PartyName(StringUtils.left(getIndexOrNull(nameParts,3), 35));
-            c080.setE30365PartyName(StringUtils.left(getIndexOrNull(nameParts,4), 35));
+            c080.setE30361PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,0), 35));
+            c080.setE30362PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,1), 35));
+            c080.setE30363PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,2), 35));
+            c080.setE30364PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,3), 35));
+            c080.setE30365PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,4), 35));
             nad.setC080PartyName(c080);
 
             C059Street c059 = new C059Street();
             ArrayList<String> streetParts = splitStringIntoParts(p.street, 35, 4);
-            c059.setE30421StreetAndNumberPOBox(StringUtils.left(getIndexOrNull(streetParts, 0), 35));
-            c059.setE30422StreetAndNumberPOBox(StringUtils.left(getIndexOrNull(streetParts, 1), 35));
-            c059.setE30423StreetAndNumberPOBox(StringUtils.left(getIndexOrNull(streetParts, 2), 35));
-            c059.setE30424StreetAndNumberPOBox(StringUtils.left(getIndexOrNull(streetParts, 3), 35));
+            c059.setE30421StreetAndNumberPOBox(leftWithUmlautAsDouble(getIndexOrNull(streetParts, 0), 35));
+            c059.setE30422StreetAndNumberPOBox(leftWithUmlautAsDouble(getIndexOrNull(streetParts, 1), 35));
+            c059.setE30423StreetAndNumberPOBox(leftWithUmlautAsDouble(getIndexOrNull(streetParts, 2), 35));
+            c059.setE30424StreetAndNumberPOBox(leftWithUmlautAsDouble(getIndexOrNull(streetParts, 3), 35));
             nad.setC059Street(c059);
-            nad.setE3164CityName(StringUtils.left(p.city, 35));
-            nad.setE3251PostcodeIdentification(StringUtils.left(p.zip, 9));
-            nad.setE3207CountryCoded(StringUtils.left(p.countryCoded, 3));
+            nad.setE3164CityName(leftWithUmlautAsDouble(p.city, 35));
+            nad.setE3251PostcodeIdentification(leftWithUmlautAsDouble(p.zip, 9));
+            nad.setE3207CountryCoded(leftWithUmlautAsDouble(p.countryCoded, 3));
 
             ArrayList<SegmentGroup6> sg6s = new ArrayList<>();
             for (ContactDetail cd : p.contactDetails) {
@@ -274,7 +274,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 CTAContactInformation contactInfo = new CTAContactInformation();
                 segmentCount++;
                 C056DepartmentOrEmployeeDetails c056 = new C056DepartmentOrEmployeeDetails();
-                c056.setE3412DepartmentOrEmployee(StringUtils.left(cd.name, 35));
+                c056.setE3412DepartmentOrEmployee(leftWithUmlautAsDouble(cd.name, 35));
                 contactInfo.setE3139ContactFunctionCoded("OC");
                 contactInfo.setC056DepartmentOrEmployeeDetails(c056);
                 sg6.setCTAContactInformation(contactInfo);
@@ -322,7 +322,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
             C241DutyTaxFeeType c241 = new C241DutyTaxFeeType();
             // TODO: need an enum for the list of codes?
             // http://www.stylusstudio.com/edifact/D96A/5153.htm
-            c241.setE5153DutyTaxFeeTypeCoded(StringUtils.left(this.taxType, 3));
+            c241.setE5153DutyTaxFeeTypeCoded(leftWithUmlautAsDouble(this.taxType, 3));
             taxDetails.setC241DutyTaxFeeType(c241);
             C243DutyTaxFeeDetail c243 = new C243DutyTaxFeeDetail();
             c243.setE5278DutyTaxFeeRate(this.taxRate);
@@ -341,7 +341,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
             sg8.setCUXCurrencies(cux);
             C5041CurrencyDetails c5041 = new C5041CurrencyDetails();
             c5041.setE6347CurrencyDetailsQualifier("2");
-            c5041.setE6345CurrencyCoded(StringUtils.left(this.currencyCode, 3));
+            c5041.setE6345CurrencyCoded(leftWithUmlautAsDouble(this.currencyCode, 3));
             c5041.setE6343CurrencyQualifier("4");
             cux.setC5041CurrencyDetails(c5041);
             ordrsp.setSegmentGroup8(sg8s);
@@ -359,7 +359,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 lineItem.setE1082LineItemNumber(item.lineItemId);
                 Utility.patchLineItem(lineItem);
                 C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
-                c212.setE7140ItemNumber(StringUtils.left(item.ean, 35));
+                c212.setE7140ItemNumber(leftWithUmlautAsDouble(item.ean, 35));
                 c212.setE7143ItemNumberTypeCoded("EN");
                 lineItem.setC212ItemNumberIdentification(c212);
                 sg26.setLINLineItem(lineItem);
@@ -371,7 +371,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 segmentCount++;
                 pia.setE4347ProductIdFunctionQualifier("5");
                 C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
-                c212.setE7140ItemNumber(StringUtils.left(item.supplierSpecificProductId, 35));
+                c212.setE7140ItemNumber(leftWithUmlautAsDouble(item.supplierSpecificProductId, 35));
                 c212.setE7143ItemNumberTypeCoded("SA");
                 pia.setC2121ItemNumberIdentification(c212);
                 pias.add(pia);
@@ -381,7 +381,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 segmentCount++;
                 pia.setE4347ProductIdFunctionQualifier("5");
                 C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
-                c212.setE7140ItemNumber(StringUtils.left(item.buyerSpecificProductId, 35));
+                c212.setE7140ItemNumber(leftWithUmlautAsDouble(item.buyerSpecificProductId, 35));
                 c212.setE7143ItemNumberTypeCoded("BP");
                 pia.setC2121ItemNumberIdentification(c212);
                 pias.add(pia);
@@ -396,8 +396,8 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                     segmentCount++;
                     imd.setE7077ItemDescriptionTypeCoded("F");
                     C273ItemDescription c273 = new C273ItemDescription();
-                    c273.setE70081ItemDescription(StringUtils.left(getIndexOrNull(parts, i), 35));
-                    c273.setE70082ItemDescription(StringUtils.left(getIndexOrNull(parts, i + 1), 35));
+                    c273.setE70081ItemDescription(leftWithUmlautAsDouble(getIndexOrNull(parts, i), 35));
+                    c273.setE70082ItemDescription(leftWithUmlautAsDouble(getIndexOrNull(parts, i + 1), 35));
                     imd.setC273ItemDescription(c273);
                     imds.add(imd);
                 }
@@ -409,8 +409,8 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                     segmentCount++;
                     imd.setE7077ItemDescriptionTypeCoded("F");
                     C273ItemDescription c273 = new C273ItemDescription();
-                    c273.setE70081ItemDescription(StringUtils.left(getIndexOrNull(parts, i), 35));
-                    c273.setE70082ItemDescription(StringUtils.left(getIndexOrNull(parts, i + 1), 35));
+                    c273.setE70081ItemDescription(leftWithUmlautAsDouble(getIndexOrNull(parts, i), 35));
+                    c273.setE70082ItemDescription(leftWithUmlautAsDouble(getIndexOrNull(parts, i + 1), 35));
                     imd.setC273ItemDescription(c273);
                     imds.add(imd);
                 }
@@ -425,7 +425,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 C186QuantityDetails c186 = new C186QuantityDetails();
                 c186.setE6063QuantityQualifier("21");
                 c186.setE6060Quantity(item.orderQuantity);
-                c186.setE6411MeasureUnitQualifier(StringUtils.left(item.orderUnit, 3));
+                c186.setE6411MeasureUnitQualifier(leftWithUmlautAsDouble(item.orderUnit, 3));
                 qty.setC186QuantityDetails(c186);
             }
             if (item.deliveryQuantity != null) {
@@ -435,7 +435,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 C186QuantityDetails c186 = new C186QuantityDetails();
                 c186.setE6063QuantityQualifier("113");
                 c186.setE6060Quantity(item.deliveryQuantity);
-                c186.setE6411MeasureUnitQualifier(StringUtils.left(item.orderUnit, 3));
+                c186.setE6411MeasureUnitQualifier(leftWithUmlautAsDouble(item.orderUnit, 3));
                 qty.setC186QuantityDetails(c186);
             }
             sg26.setQTYQuantity(qtys);
@@ -485,7 +485,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 C516MonetaryAmount c516 = new C516MonetaryAmount();
                 c516.setE5025MonetaryAmountTypeQualifier("203");
                 c516.setE5004MonetaryAmount(item.priceLineAmount);
-                c516.setE6345CurrencyCoded(StringUtils.left(this.currencyCode, 3));
+                c516.setE6345CurrencyCoded(leftWithUmlautAsDouble(this.currencyCode, 3));
                 c516.setE6343CurrencyQualifier("4");
                 moa.setC516MonetaryAmount(c516);
                 moas.add(moa);
@@ -516,9 +516,9 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 segmentCount++;
                 C506Reference c506 = new C506Reference();
                 c506.setE1153ReferenceQualifier("ON");
-                c506.setE1154ReferenceNumber(StringUtils.left(item.buyerOrderId, 35));
+                c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(item.buyerOrderId, 35));
                 if (notNullOrEmpty(item.buyerOrderItemId)) {
-                    c506.setE1156LineNumber(StringUtils.left(item.buyerOrderItemId, 6));
+                    c506.setE1156LineNumber(leftWithUmlautAsDouble(item.buyerOrderItemId, 6));
                 }
                 rff.setC506Reference(c506);
                 sg31.setRFFReference(rff);
@@ -573,7 +573,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 c552.setE5189ChargeAllowanceDescriptionCoded("1");
                 alc.setC552AllowanceChargeInformation(c552);
                 if (notNullOrEmpty(aoc.sequence)) {
-                    alc.setE1227CalculationSequenceIndicatorCoded(StringUtils.left(aoc.sequence, 3));
+                    alc.setE1227CalculationSequenceIndicatorCoded(leftWithUmlautAsDouble(aoc.sequence, 3));
                 }
                 C214SpecialServicesIdentification c214 = new C214SpecialServicesIdentification();
                 if (aoc.serviceCoded != null) {
@@ -582,7 +582,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                     c214.setE7161SpecialServicesCoded("FC");
                 }
                 if (notNullOrEmpty(aoc.name)) {
-                    c214.setE71601SpecialService(StringUtils.left(aoc.name, 35));
+                    c214.setE71601SpecialService(leftWithUmlautAsDouble(aoc.name, 35));
                 }
                 alc.setC214SpecialServicesIdentification(c214);
 
