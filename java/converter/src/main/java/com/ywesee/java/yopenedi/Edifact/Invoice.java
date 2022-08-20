@@ -157,7 +157,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
         C002DocumentMessageName documentMessageName = new C002DocumentMessageName();
         documentMessageName.setE1001DocumentMessageNameCoded("380");
         bgm.setC002DocumentMessageName(documentMessageName);
-        bgm.setE1004DocumentMessageNumber(StringUtils.left(this.documentNumber, 35));
+        bgm.setE1004DocumentMessageNumber(leftWithUmlautAsDouble(this.documentNumber, 35));
         bgm.setE1225MessageFunctionCoded("47");
         invoic.setBGMBeginningOfMessage(bgm);
 
@@ -200,7 +200,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
             C506Reference r506 = new C506Reference();
             // DQ = Lieferscheinnummer  delivery note number
             r506.setE1153ReferenceQualifier("DQ");
-            r506.setE1154ReferenceNumber(StringUtils.left(this.deliveryNoteNumber, 35));
+            r506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.deliveryNoteNumber, 35));
             r.setC506Reference(r506);
             sg1.setRFFReference(r);
             sg1s.add(sg1);
@@ -213,7 +213,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
             C506Reference r506 = new C506Reference();
             // ON = Bestellnummer des Kunden   Order number of the customer
             r506.setE1153ReferenceQualifier("ON");
-            r506.setE1154ReferenceNumber(StringUtils.left(this.orderNumberForCustomer, 35));
+            r506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.orderNumberForCustomer, 35));
             r.setC506Reference(r506);
             sg1.setRFFReference(r);
             sg1s.add(sg1);
@@ -226,7 +226,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
             C506Reference r506 = new C506Reference();
             // VN = Auftragsnummer d. Lieferanten   supplier's order number
             r506.setE1153ReferenceQualifier("VN");
-            r506.setE1154ReferenceNumber(StringUtils.left(this.orderNumberForSupplier, 35));
+            r506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.orderNumberForSupplier, 35));
             r.setC506Reference(r506);
             sg1.setRFFReference(r);
             sg1s.add(sg1);
@@ -255,32 +255,32 @@ public class Invoice implements Writable, MessageExchange<Party> {
             }
             C082PartyIdentificationDetails c082 = new C082PartyIdentificationDetails();
             if (p.id != null) {
-                c082.setE3039PartyIdIdentification(StringUtils.left(p.id, 35));
+                c082.setE3039PartyIdIdentification(leftWithUmlautAsDouble(p.id, 35));
                 c082.setE3055CodeListResponsibleAgencyCoded("9");
             } else if (p.supplierSpecificPartyId != null) {
-                c082.setE3039PartyIdIdentification(StringUtils.left(p.supplierSpecificPartyId, 35));
+                c082.setE3039PartyIdIdentification(leftWithUmlautAsDouble(p.supplierSpecificPartyId, 35));
                 c082.setE3055CodeListResponsibleAgencyCoded("90");
             }
             nad.setC082PartyIdentificationDetails(c082);
             C080PartyName c080 = new C080PartyName();
             ArrayList<String> nameParts = splitStringIntoParts(p.name, 35, 5);
-            c080.setE30361PartyName(StringUtils.left(getIndexOrNull(nameParts,0), 35));
-            c080.setE30362PartyName(StringUtils.left(getIndexOrNull(nameParts,1), 35));
-            c080.setE30363PartyName(StringUtils.left(getIndexOrNull(nameParts,2), 35));
-            c080.setE30364PartyName(StringUtils.left(getIndexOrNull(nameParts,3), 35));
-            c080.setE30365PartyName(StringUtils.left(getIndexOrNull(nameParts,4), 35));
+            c080.setE30361PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,0), 35));
+            c080.setE30362PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,1), 35));
+            c080.setE30363PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,2), 35));
+            c080.setE30364PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,3), 35));
+            c080.setE30365PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,4), 35));
             nad.setC080PartyName(c080);
 
             C059Street c059 = new C059Street();
             ArrayList<String> streetParts = splitStringIntoParts(p.street, 35, 4);
-            c059.setE30421StreetAndNumberPOBox(StringUtils.left(getIndexOrNull(streetParts, 0), 35));
-            c059.setE30422StreetAndNumberPOBox(StringUtils.left(getIndexOrNull(streetParts, 1), 35));
-            c059.setE30423StreetAndNumberPOBox(StringUtils.left(getIndexOrNull(streetParts, 2), 35));
-            c059.setE30424StreetAndNumberPOBox(StringUtils.left(getIndexOrNull(streetParts, 3), 35));
+            c059.setE30421StreetAndNumberPOBox(leftWithUmlautAsDouble(getIndexOrNull(streetParts, 0), 35));
+            c059.setE30422StreetAndNumberPOBox(leftWithUmlautAsDouble(getIndexOrNull(streetParts, 1), 35));
+            c059.setE30423StreetAndNumberPOBox(leftWithUmlautAsDouble(getIndexOrNull(streetParts, 2), 35));
+            c059.setE30424StreetAndNumberPOBox(leftWithUmlautAsDouble(getIndexOrNull(streetParts, 3), 35));
             nad.setC059Street(c059);
-            nad.setE3164CityName(StringUtils.left(p.city, 35));
-            nad.setE3251PostcodeIdentification(StringUtils.left(p.zip, 9));
-            nad.setE3207CountryCoded(StringUtils.left(p.countryCoded, 3));
+            nad.setE3164CityName(leftWithUmlautAsDouble(p.city, 35));
+            nad.setE3251PostcodeIdentification(leftWithUmlautAsDouble(p.zip, 9));
+            nad.setE3207CountryCoded(leftWithUmlautAsDouble(p.countryCoded, 3));
             sg2.setNADNameAndAddress(nad);
 
             ArrayList<SegmentGroup3> sg3s = new ArrayList<>();
@@ -290,7 +290,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 segmentCount++;
                 C506Reference c506 = new C506Reference();
                 c506.setE1153ReferenceQualifier("VA");
-                c506.setE1154ReferenceNumber(StringUtils.left(p.vatId, 35));
+                c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(p.vatId, 35));
                 ref.setC506Reference(c506);
                 sg3.setRFFReference(ref);
                 sg3s.add(sg3);
@@ -301,7 +301,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 segmentCount++;
                 C506Reference c506 = new C506Reference();
                 c506.setE1153ReferenceQualifier("FC");
-                c506.setE1154ReferenceNumber(StringUtils.left(p.fiscalNumber, 35));
+                c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(p.fiscalNumber, 35));
                 ref.setC506Reference(c506);
                 sg3.setRFFReference(ref);
                 sg3s.add(sg3);
@@ -314,7 +314,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 CTAContactInformation contactInfo = new CTAContactInformation();
                 segmentCount++;
                 C056DepartmentOrEmployeeDetails c056 = new C056DepartmentOrEmployeeDetails();
-                c056.setE3412DepartmentOrEmployee(StringUtils.left(cd.name, 35));
+                c056.setE3412DepartmentOrEmployee(leftWithUmlautAsDouble(cd.name, 35));
                 contactInfo.setC056DepartmentOrEmployeeDetails(c056);
                 sg5.setCTAContactInformation(contactInfo);
                 ArrayList<COMCommunicationContact> contacts = new ArrayList<>();
@@ -363,10 +363,10 @@ public class Invoice implements Writable, MessageExchange<Party> {
             C241DutyTaxFeeType c241 = new C241DutyTaxFeeType();
             // TODO: need an enum for the list of codes?
             // http://www.stylusstudio.com/edifact/D96A/5153.htm
-            c241.setE5153DutyTaxFeeTypeCoded(StringUtils.left(this.taxType, 3));
+            c241.setE5153DutyTaxFeeTypeCoded(leftWithUmlautAsDouble(this.taxType, 3));
             taxDetails.setC241DutyTaxFeeType(c241);
             C243DutyTaxFeeDetail c243 = new C243DutyTaxFeeDetail();
-            c243.setE5278DutyTaxFeeRate(StringUtils.left(this.taxRate, 17));
+            c243.setE5278DutyTaxFeeRate(leftWithUmlautAsDouble(this.taxRate, 17));
             taxDetails.setC243DutyTaxFeeDetail(c243);
             sg6.setTAXDutyTaxFeeDetails(taxDetails);
             sg6s.add(sg6);
@@ -379,7 +379,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
         segmentCount++;
         C5041CurrencyDetails c5041 = new C5041CurrencyDetails();
         c5041.setE6347CurrencyDetailsQualifier("2");
-        c5041.setE6345CurrencyCoded(StringUtils.left(this.currencyCode, 3));
+        c5041.setE6345CurrencyCoded(leftWithUmlautAsDouble(this.currencyCode, 3));
         c5041.setE6343CurrencyQualifier("4");
         cux.setC5041CurrencyDetails(c5041);
         sg7.setCUXCurrencies(cux);
@@ -457,7 +457,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 c552.setE5189ChargeAllowanceDescriptionCoded("1");
                 alc.setC552AllowanceChargeInformation(c552);
                 if (notNullOrEmpty(aoc.sequence)) {
-                    alc.setE1227CalculationSequenceIndicatorCoded(StringUtils.left(aoc.sequence, 3));
+                    alc.setE1227CalculationSequenceIndicatorCoded(leftWithUmlautAsDouble(aoc.sequence, 3));
                 }
                 C214SpecialServicesIdentification c214 = new C214SpecialServicesIdentification();
                 if (aoc.serviceCoded != null) {
@@ -466,7 +466,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                     c214.setE7161SpecialServicesCoded("FC");
                 }
                 if (notNullOrEmpty(aoc.name)) {
-                    c214.setE71601SpecialService(StringUtils.left(aoc.name, 35));
+                    c214.setE71601SpecialService(leftWithUmlautAsDouble(aoc.name, 35));
                 }
                 alc.setC214SpecialServicesIdentification(c214);
                 sg15.setALCAllowanceOrCharge(alc);
@@ -495,7 +495,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 segmentCount++;
                 lineItem.setE1082LineItemNumber(ii.lineItemId);
                 C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
-                c212.setE7140ItemNumber(StringUtils.left(ii.ean, 35));
+                c212.setE7140ItemNumber(leftWithUmlautAsDouble(ii.ean, 35));
                 c212.setE7143ItemNumberTypeCoded("EN");
                 lineItem.setC212ItemNumberIdentification(c212);
                 Utility.patchLineItem(lineItem);
@@ -508,7 +508,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 segmentCount++;
                 pia.setE4347ProductIdFunctionQualifier("1");
                 C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
-                c212.setE7140ItemNumber(StringUtils.left(ii.supplierSpecificProductId, 35));
+                c212.setE7140ItemNumber(leftWithUmlautAsDouble(ii.supplierSpecificProductId, 35));
                 c212.setE7143ItemNumberTypeCoded("SA");
                 pia.setC2121ItemNumberIdentification(c212);
                 pias.add(pia);
@@ -518,7 +518,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 segmentCount++;
                 pia.setE4347ProductIdFunctionQualifier("1");
                 C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
-                c212.setE7140ItemNumber(StringUtils.left(ii.buyerSpecificProductId, 35));
+                c212.setE7140ItemNumber(leftWithUmlautAsDouble(ii.buyerSpecificProductId, 35));
                 c212.setE7143ItemNumberTypeCoded("BP");
                 pia.setC2121ItemNumberIdentification(c212);
                 pias.add(pia);
@@ -534,8 +534,8 @@ public class Invoice implements Writable, MessageExchange<Party> {
                     imds.add(imd);
                     imd.setE7077ItemDescriptionTypeCoded("F");
                     C273ItemDescription c273 = new C273ItemDescription();
-                    c273.setE70081ItemDescription(StringUtils.left(getIndexOrNull(parts, i), 35));
-                    c273.setE70082ItemDescription(StringUtils.left(getIndexOrNull(parts, i + 1), 35));
+                    c273.setE70081ItemDescription(leftWithUmlautAsDouble(getIndexOrNull(parts, i), 35));
+                    c273.setE70082ItemDescription(leftWithUmlautAsDouble(getIndexOrNull(parts, i + 1), 35));
                     imd.setC273ItemDescription(c273);
                 }
             }
@@ -547,8 +547,8 @@ public class Invoice implements Writable, MessageExchange<Party> {
                     imds.add(imd);
                     imd.setE7077ItemDescriptionTypeCoded("F");
                     C273ItemDescription c273 = new C273ItemDescription();
-                    c273.setE70081ItemDescription(StringUtils.left(getIndexOrNull(parts, i), 35));
-                    c273.setE70082ItemDescription(StringUtils.left(getIndexOrNull(parts, i + 1), 35));
+                    c273.setE70081ItemDescription(leftWithUmlautAsDouble(getIndexOrNull(parts, i), 35));
+                    c273.setE70082ItemDescription(leftWithUmlautAsDouble(getIndexOrNull(parts, i + 1), 35));
                     imd.setC273ItemDescription(c273);
                 }
             }
@@ -635,7 +635,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 C186QuantityDetails c186 = new C186QuantityDetails();
                 c186.setE6063QuantityQualifier("47");
                 c186.setE6060Quantity(ii.quantity);
-                c186.setE6411MeasureUnitQualifier(StringUtils.left(ii.orderUnit, 3));
+                c186.setE6411MeasureUnitQualifier(leftWithUmlautAsDouble(ii.orderUnit, 3));
                 qty.setC186QuantityDetails(c186);
                 sg25.setQTYQuantity(qtys);
             }
@@ -644,7 +644,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 ArrayList<ALIAdditionalInformation> alis = new ArrayList<>();
                 ALIAdditionalInformation ali = new ALIAdditionalInformation();
                 segmentCount++;
-                ali.setE3239CountryOfOriginCoded(StringUtils.left(ii.countryOfOriginCoded, 3));
+                ali.setE3239CountryOfOriginCoded(leftWithUmlautAsDouble(ii.countryOfOriginCoded, 3));
                 alis.add(ali);
                 sg25.setALIAdditionalInformation(alis);
             }
@@ -671,7 +671,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 C516MonetaryAmount c516 = new C516MonetaryAmount();
                 c516.setE5025MonetaryAmountTypeQualifier("203");
                 c516.setE5004MonetaryAmount(ii.priceLineAmount);
-                c516.setE6345CurrencyCoded(StringUtils.left(this.currencyCode, 3));
+                c516.setE6345CurrencyCoded(leftWithUmlautAsDouble(this.currencyCode, 3));
                 c516.setE6343CurrencyQualifier("4");
                 moa.setC516MonetaryAmount(c516);
                 sg26.setMOAMonetaryAmount(moa);
@@ -702,9 +702,9 @@ public class Invoice implements Writable, MessageExchange<Party> {
                     segmentCount++;
                     C506Reference c506 = new C506Reference();
                     c506.setE1153ReferenceQualifier("VN");
-                    c506.setE1154ReferenceNumber(StringUtils.left(ii.supplierOrderId, 35));
+                    c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(ii.supplierOrderId, 35));
                     if (notNullOrEmpty(ii.supplierOrderItemId)) {
-                        c506.setE1156LineNumber(StringUtils.left(ii.supplierOrderItemId, 6));
+                        c506.setE1156LineNumber(leftWithUmlautAsDouble(ii.supplierOrderItemId, 6));
                     }
                     rff.setC506Reference(c506);
                     sg29.setRFFReference(rff);
@@ -716,9 +716,9 @@ public class Invoice implements Writable, MessageExchange<Party> {
                     segmentCount++;
                     C506Reference c506 = new C506Reference();
                     c506.setE1153ReferenceQualifier("ON");
-                    c506.setE1154ReferenceNumber(StringUtils.left(ii.buyerOrderId, 35));
+                    c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(ii.buyerOrderId, 35));
                     if (notNullOrEmpty(ii.buyerOrderItemId)) {
-                        c506.setE1156LineNumber(StringUtils.left(ii.buyerOrderItemId, 6));
+                        c506.setE1156LineNumber(leftWithUmlautAsDouble(ii.buyerOrderItemId, 6));
                     }
                     rff.setC506Reference(c506);
                     sg29.setRFFReference(rff);
@@ -730,9 +730,9 @@ public class Invoice implements Writable, MessageExchange<Party> {
                     segmentCount++;
                     C506Reference c506 = new C506Reference();
                     c506.setE1153ReferenceQualifier("DQ");
-                    c506.setE1154ReferenceNumber(StringUtils.left(ii.deliveryNoteId, 35));
+                    c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(ii.deliveryNoteId, 35));
                     if (notNullOrEmpty(ii.deliveryOrderItemId)) {
-                        c506.setE1156LineNumber(StringUtils.left(ii.deliveryOrderItemId, 6));
+                        c506.setE1156LineNumber(leftWithUmlautAsDouble(ii.deliveryOrderItemId, 6));
                     }
                     rff.setC506Reference(c506);
                     sg29.setRFFReference(rff);
@@ -748,10 +748,10 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 segmentCount++;
                 tax.setE5283DutyTaxFeeFunctionQualifier("7");
                 C241DutyTaxFeeType c241 = new C241DutyTaxFeeType();
-                c241.setE5153DutyTaxFeeTypeCoded(StringUtils.left(ii.taxType, 3));
+                c241.setE5153DutyTaxFeeTypeCoded(leftWithUmlautAsDouble(ii.taxType, 3));
                 tax.setC241DutyTaxFeeType(c241);
                 C243DutyTaxFeeDetail c243 = new C243DutyTaxFeeDetail();
-                c243.setE5278DutyTaxFeeRate(StringUtils.left(ii.taxRate, 17));
+                c243.setE5278DutyTaxFeeRate(leftWithUmlautAsDouble(ii.taxRate, 17));
                 tax.setC243DutyTaxFeeDetail(c243);
                 sg33.setTAXDutyTaxFeeDetails(tax);
                 MOAMonetaryAmount moa = new MOAMonetaryAmount();
@@ -789,7 +789,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                     c552.setE5189ChargeAllowanceDescriptionCoded("1");
                     alc.setC552AllowanceChargeInformation(c552);
                     if (notNullOrEmpty(aoc.sequence)) {
-                        alc.setE1227CalculationSequenceIndicatorCoded(StringUtils.left(aoc.sequence, 3));
+                        alc.setE1227CalculationSequenceIndicatorCoded(leftWithUmlautAsDouble(aoc.sequence, 3));
                     }
                     C214SpecialServicesIdentification c214 = new C214SpecialServicesIdentification();
                     if (aoc.serviceCoded != null) {
@@ -798,7 +798,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                         c214.setE7161SpecialServicesCoded("FC");
                     }
                     if (notNullOrEmpty(aoc.name)) {
-                        c214.setE71601SpecialService(StringUtils.left(aoc.name, 35));
+                        c214.setE71601SpecialService(leftWithUmlautAsDouble(aoc.name, 35));
                     }
                     alc.setC214SpecialServicesIdentification(c214);
 

@@ -200,7 +200,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                 RFFReference rff = new RFFReference();
                 C506Reference c506 = new C506Reference();
                 c506.setE1153ReferenceQualifier("DQ");
-                c506.setE1154ReferenceNumber(StringUtils.left(this.deliveryNoteNumber, 35));
+                c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.deliveryNoteNumber, 35));
                 rff.setC506Reference(c506);
                 sg1.setRFFReference(rff);
             }
@@ -211,7 +211,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                 RFFReference rff = new RFFReference();
                 C506Reference c506 = new C506Reference();
                 c506.setE1153ReferenceQualifier("ON");
-                c506.setE1154ReferenceNumber(StringUtils.left(this.orderNumber, 35));
+                c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.orderNumber, 35));
                 rff.setC506Reference(c506);
                 sg1.setRFFReference(rff);
             }
@@ -222,7 +222,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                 RFFReference rff = new RFFReference();
                 C506Reference c506 = new C506Reference();
                 c506.setE1153ReferenceQualifier("SRN");
-                c506.setE1154ReferenceNumber(StringUtils.left(this.shipmentReferenceNumber, 35));
+                c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.shipmentReferenceNumber, 35));
                 rff.setC506Reference(c506);
                 sg1.setRFFReference(rff);
             }
@@ -253,29 +253,29 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                 C082PartyIdentificationDetails c082 = new C082PartyIdentificationDetails();
                 if (p.id != null) {
                     c082.setE1131CodeListQualifier("GLN");
-                    c082.setE3039PartyIdIdentification(StringUtils.left(p.id, 35));
+                    c082.setE3039PartyIdIdentification(leftWithUmlautAsDouble(p.id, 35));
                     c082.setE3055CodeListResponsibleAgencyCoded("9");
                 }
                 nad.setC082PartyIdentificationDetails(c082);
                 C080PartyName c080 = new C080PartyName();
                 ArrayList<String> nameParts = splitStringIntoParts(p.name, 35, 5);
-                c080.setE30361PartyName(StringUtils.left(getIndexOrNull(nameParts,0), 35));
-                c080.setE30362PartyName(StringUtils.left(getIndexOrNull(nameParts,1), 35));
-                c080.setE30363PartyName(StringUtils.left(getIndexOrNull(nameParts,2), 35));
-                c080.setE30364PartyName(StringUtils.left(getIndexOrNull(nameParts,3), 35));
-                c080.setE30365PartyName(StringUtils.left(getIndexOrNull(nameParts,4), 35));
+                c080.setE30361PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,0), 35));
+                c080.setE30362PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,1), 35));
+                c080.setE30363PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,2), 35));
+                c080.setE30364PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,3), 35));
+                c080.setE30365PartyName(leftWithUmlautAsDouble(getIndexOrNull(nameParts,4), 35));
                 nad.setC080PartyName(c080);
 
                 C059Street c059 = new C059Street();
                 ArrayList<String> streetParts = splitStringIntoParts(p.street, 35, 4);
-                c059.setE30421StreetAndNumberPOBox(StringUtils.left(getIndexOrNull(streetParts, 0), 35));
-                c059.setE30422StreetAndNumberPOBox(StringUtils.left(getIndexOrNull(streetParts, 1), 35));
-                c059.setE30423StreetAndNumberPOBox(StringUtils.left(getIndexOrNull(streetParts, 2), 35));
-                c059.setE30424StreetAndNumberPOBox(StringUtils.left(getIndexOrNull(streetParts, 3), 35));
+                c059.setE30421StreetAndNumberPOBox(leftWithUmlautAsDouble(getIndexOrNull(streetParts, 0), 35));
+                c059.setE30422StreetAndNumberPOBox(leftWithUmlautAsDouble(getIndexOrNull(streetParts, 1), 35));
+                c059.setE30423StreetAndNumberPOBox(leftWithUmlautAsDouble(getIndexOrNull(streetParts, 2), 35));
+                c059.setE30424StreetAndNumberPOBox(leftWithUmlautAsDouble(getIndexOrNull(streetParts, 3), 35));
                 nad.setC059Street(c059);
-                nad.setE3164CityName(StringUtils.left(p.city, 35));
-                nad.setE3251PostcodeIdentification(StringUtils.left(p.zip, 9));
-                nad.setE3207CountryCoded(StringUtils.left(p.countryCoded, 3));
+                nad.setE3164CityName(leftWithUmlautAsDouble(p.city, 35));
+                nad.setE3251PostcodeIdentification(leftWithUmlautAsDouble(p.zip, 9));
+                nad.setE3207CountryCoded(leftWithUmlautAsDouble(p.countryCoded, 3));
 
                 ArrayList<SegmentGroup4> sg4s = new ArrayList<>();
                 sg2.setSegmentGroup4(sg4s);
@@ -284,7 +284,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                     segmentCount++;
                     CTAContactInformation contactInfo = new CTAContactInformation();
                     C056DepartmentOrEmployeeDetails c056 = new C056DepartmentOrEmployeeDetails();
-                    c056.setE3412DepartmentOrEmployee(StringUtils.left(cd.name, 35));
+                    c056.setE3412DepartmentOrEmployee(leftWithUmlautAsDouble(cd.name, 35));
                     contactInfo.setE3139ContactFunctionCoded("OC");
                     contactInfo.setC056DepartmentOrEmployeeDetails(c056);
                     sg6.setCTAContactInformation(contactInfo);
@@ -368,8 +368,8 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                         gins.add(gin);
                         gin.setE7405IdentityNumberQualifier("BJ");
                         C2081IdentityNumberRange c2081 = new C2081IdentityNumberRange();
-                        c2081.setE74021IdentityNumber(StringUtils.left(item.goodsIdentityNumberStart, 35));
-                        c2081.setE74022IdentityNumber(StringUtils.left(item.goodsIdentityNumberEnd, 35));
+                        c2081.setE74021IdentityNumber(leftWithUmlautAsDouble(item.goodsIdentityNumberStart, 35));
+                        c2081.setE74022IdentityNumber(leftWithUmlautAsDouble(item.goodsIdentityNumberEnd, 35));
                         gin.setC2081IdentityNumberRange(c2081);
                     }
                     sg15.setGINGoodsIdentityNumber(gins);
@@ -382,7 +382,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                     {
                         lin.setE1082LineItemNumber(item.lineItemNumber);
                         C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
-                        c212.setE7140ItemNumber(StringUtils.left(item.ean, 35));
+                        c212.setE7140ItemNumber(leftWithUmlautAsDouble(item.ean, 35));
                         c212.setE7143ItemNumberTypeCoded("EN");
                         lin.setC212ItemNumberIdentification(c212);
                     }
@@ -394,7 +394,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                         pias.add(pia);
                         pia.setE4347ProductIdFunctionQualifier("5");
                         C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
-                        c212.setE7140ItemNumber(StringUtils.left(item.buyerProductId, 35));
+                        c212.setE7140ItemNumber(leftWithUmlautAsDouble(item.buyerProductId, 35));
                         c212.setE7143ItemNumberTypeCoded("BP");
                         pia.setC2121ItemNumberIdentification(c212);
                     }
@@ -404,7 +404,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                         pias.add(pia);
                         pia.setE4347ProductIdFunctionQualifier("5");
                         C212ItemNumberIdentification c212 = new C212ItemNumberIdentification();
-                        c212.setE7140ItemNumber(StringUtils.left(item.supplierProductId, 35));
+                        c212.setE7140ItemNumber(leftWithUmlautAsDouble(item.supplierProductId, 35));
                         c212.setE7143ItemNumberTypeCoded("SA");
                         pia.setC2121ItemNumberIdentification(c212);
                     }
@@ -418,8 +418,8 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                             imds.add(imd);
                             imd.setE7077ItemDescriptionTypeCoded("F");
                             C273ItemDescription c273 = new C273ItemDescription();
-                            c273.setE70081ItemDescription(StringUtils.left(getIndexOrNull(parts, i), 35));
-                            c273.setE70082ItemDescription(StringUtils.left(getIndexOrNull(parts, i + 1), 35));
+                            c273.setE70081ItemDescription(leftWithUmlautAsDouble(getIndexOrNull(parts, i), 35));
+                            c273.setE70082ItemDescription(leftWithUmlautAsDouble(getIndexOrNull(parts, i + 1), 35));
                             imd.setC273ItemDescription(c273);
                         }
                     }
@@ -431,8 +431,8 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                             imds.add(imd);
                             imd.setE7077ItemDescriptionTypeCoded("F");
                             C273ItemDescription c273 = new C273ItemDescription();
-                            c273.setE70081ItemDescription(StringUtils.left(getIndexOrNull(parts, i), 35));
-                            c273.setE70082ItemDescription(StringUtils.left(getIndexOrNull(parts, i + 1), 35));
+                            c273.setE70081ItemDescription(leftWithUmlautAsDouble(getIndexOrNull(parts, i), 35));
+                            c273.setE70082ItemDescription(leftWithUmlautAsDouble(getIndexOrNull(parts, i + 1), 35));
                             imd.setC273ItemDescription(c273);
                         }
                     }
@@ -522,7 +522,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                         C186QuantityDetails c186 = new C186QuantityDetails();
                         c186.setE6063QuantityQualifier("12");
                         c186.setE6060Quantity(item.quantity);
-                        c186.setE6411MeasureUnitQualifier(StringUtils.left(item.quantityUnit, 3));
+                        c186.setE6411MeasureUnitQualifier(leftWithUmlautAsDouble(item.quantityUnit, 3));
                         qty.setC186QuantityDetails(c186);
                         sg15.setQTYQuantity(qtys);
                     }
@@ -536,7 +536,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                             RFFReference rff = new RFFReference();
                             C506Reference c506 = new C506Reference();
                             c506.setE1153ReferenceQualifier("DQ");
-                            c506.setE1154ReferenceNumber(StringUtils.left(this.deliveryNoteNumber, 35));
+                            c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.deliveryNoteNumber, 35));
                             rff.setC506Reference(c506);
                             sg16.setRFFReference(rff);
                         }
@@ -547,9 +547,9 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                             RFFReference rff = new RFFReference();
                             C506Reference c506 = new C506Reference();
                             c506.setE1153ReferenceQualifier("ON");
-                            c506.setE1154ReferenceNumber(StringUtils.left(item.orderId, 35));
+                            c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(item.orderId, 35));
                             if (notNullOrEmpty(item.orderLineItemId)) {
-                                c506.setE1156LineNumber(StringUtils.left(item.orderLineItemId, 6));
+                                c506.setE1156LineNumber(leftWithUmlautAsDouble(item.orderLineItemId, 6));
                             }
                             rff.setC506Reference(c506);
                             sg16.setRFFReference(rff);
@@ -561,9 +561,9 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                             RFFReference rff = new RFFReference();
                             C506Reference c506 = new C506Reference();
                             c506.setE1153ReferenceQualifier("VN");
-                            c506.setE1154ReferenceNumber(StringUtils.left(item.supplierOrderId, 35));
+                            c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(item.supplierOrderId, 35));
                             if (notNullOrEmpty(item.supplierOrderItemId)) {
-                                c506.setE1156LineNumber(StringUtils.left(item.supplierOrderItemId, 6));
+                                c506.setE1156LineNumber(leftWithUmlautAsDouble(item.supplierOrderItemId, 6));
                             }
                             rff.setC506Reference(c506);
                             sg16.setRFFReference(rff);
@@ -575,7 +575,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                             RFFReference rff = new RFFReference();
                             C506Reference c506 = new C506Reference();
                             c506.setE1153ReferenceQualifier("ABD");
-                            c506.setE1154ReferenceNumber(StringUtils.left(item.tariffCustomsNumber, 35));
+                            c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(item.tariffCustomsNumber, 35));
                             rff.setC506Reference(c506);
                             sg16.setRFFReference(rff);
                         }
