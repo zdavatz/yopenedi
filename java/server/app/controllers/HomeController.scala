@@ -5,6 +5,10 @@ import play.api._
 import play.api.mvc._
 import play.api.libs.json._
 
+import akka.actor.ActorSystem
+import play.api.libs.streams._
+import scala.concurrent.ExecutionContext.Implicits.global
+
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
 import java.io.File
@@ -26,7 +30,7 @@ import com.ywesee.java.yopenedi.OpenTrans._
  * application's home page.
  */
 @Singleton
-class HomeController @Inject()(cc: ControllerComponents, config: Configuration) extends AbstractController(cc) {
+class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, config: Configuration) extends AbstractController(cc) {
 
   /**
    * Create an Action to render an HTML page.
@@ -72,6 +76,9 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
             Left(BadRequest("No file found"))
           } else {
             val file = c.mfd.files.head
+            Logger.debug("!!!!contentType IS: " + file.contentType)
+            Logger.debug("!!!!filename IS: " + file.filename)
+            Logger.debug("!!!!key IS: " + file.key)
             Right(new FileInputStream(file.ref.path.toFile()))
           }
         case c: AnyContentAsText =>
@@ -139,13 +146,31 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
     result match {
       case Left(e) => return e
       case Right(_) =>
-        val obj = Json.obj(
-          "ok" -> true
-        )
-        return Ok(Json.toJson(obj))
+        // val obj = Json.obj(
+        //   "ok" -> true
+        // )
+        val message = new models.Message(messageId.getOrElse("MISSING MESSAGE ID"), as2From.getOrElse("MISSING as2From"), as2To.getOrElse("MISSING as2To"))
+        val data = helpers.MultipartFormData.makeMultipartString(List(message.makeReport("mdnboundarystring1")), "mdnboundarystring2")
+        return Ok(data).as("multipart/report")
     }
   }
-  def as2() = Action(as2Fn(_))
+
+  val multi = BodyParser { req =>
+    BodyParsers.parse.raw(req)
+    .mapFuture {
+      case Left(result) =>
+        scala.concurrent.Future { Left(result) }
+      case Right(buffer: play.api.mvc.RawBuffer) =>
+        val bytes = buffer.asBytes().getOrElse(akka.util.ByteString.empty)
+        Logger.debug("Bytes!!!!" + bytes.toString())
+        val str = bytes.decodeString(StandardCharsets.UTF_8)
+        Logger.debug("Str!!!!" + str)
+        implicit val materializer = new play.api.libs.concurrent.MaterializerProvider(system).get
+        BodyParsers.parse.default(req).run(bytes)
+        // Right(WrappedPayload(wrapped(request), bytes))
+    }
+  }
+  def as2() = Action(multi) { request => as2Fn(request) }
 
   def janicoFn(request: Request[AnyContent]): Result = {
     val now = LocalDateTime.now()
