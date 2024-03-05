@@ -1,7 +1,16 @@
 package models
 
-class Message(var messageId: String, var requestSender: String, var requestRecipient: String) {
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.TimeZone
+
+class Message(var messageId: String, var requestSender: String, var requestRecipient: String, mic: String) {
   def mdnTextPart(): String = {
+    val tz = TimeZone.getTimeZone("UTC")
+    val  df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm'Z'")
+    df.setTimeZone(tz)
+    val nowAsISO = df.format(new Date())
+
     "Content-Type: text/plain\r\n" +
     "Content-Transfer-Encoding: 7bit\r\n" +
     "\r\n" +
@@ -9,7 +18,7 @@ class Message(var messageId: String, var requestSender: String, var requestRecip
     " Message ID: " + messageId + "\r\n" +
     "  From: \"" + requestSender + "\"\r\n" +
     "  To: \"" + requestRecipient + "\"\r\n" +
-    "  Received on: 2002-07-31 at 09:34:14 (EDT)\r\n" +
+    "  Received on: " + nowAsISO + "\r\n" +
     " Status: processed\r\n" +
     " Comment: This is not a guarantee that the message has\r\n" +
     "  been completely processed or &understood by the receiving\r\n" +
@@ -24,7 +33,7 @@ class Message(var messageId: String, var requestSender: String, var requestRecip
     "Original-Recipient: rfc822; " + requestRecipient + "\r\n" +
     "Final-Recipient: rfc822; " + requestRecipient + "\r\n" +
     "Original-Message-ID: " + messageId + "\r\n" +
-    "Received-content-MIC: 7v7F++fQaNB1sVLFtMRp+dF+eG4=, sha1\r\n" +
+    "Received-content-MIC: " + mic + ", sha1\r\n" +
     "Disposition: automatic-action/MDN-sent-automatically;\r\n" +
     "  processed\r\n" +
     "\r\n"
@@ -32,8 +41,7 @@ class Message(var messageId: String, var requestSender: String, var requestRecip
 
   def makeReport(boundary: String): String = {
     "Content-Type: multipart/report;\r\n" +
-    "Report-Type=disposition-notification;\r\n" +
-    "boundary=\"" + boundary + "\"\r\n" +
+    "Report-Type=disposition-notification; boundary=\"" + boundary + "\"\r\n" +
     helpers.MultipartFormData.makeMultipartString(List(
       mdnTextPart(),
       mdnMessagePart()

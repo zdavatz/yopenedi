@@ -43,7 +43,7 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
     Ok(views.html.index())
   }
 
-  def as2Fn(request: Request[AnyContent]): Result = {
+  def as2Fn(request: Request[(akka.util.ByteString, AnyContent)]): Result = {
     val messageId = request.headers.get("message-id")
     val as2To = request.headers.get("as2-to")
     val as2From = request.headers.get("as2-from")
@@ -69,16 +69,15 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
       throw new Exception(otOrdersPath + " is not a directory");
     }
 
+    val (rawBytes, body) = request.body
+
     def makeStream(): Either[Result, InputStream] = {
-      request.body match {
+      body match {
         case c: AnyContentAsMultipartFormData =>
           if (c.mfd.files.length == 0) {
             Left(BadRequest("No file found"))
           } else {
             val file = c.mfd.files.head
-            Logger.debug("!!!!contentType IS: " + file.contentType)
-            Logger.debug("!!!!filename IS: " + file.filename)
-            Logger.debug("!!!!key IS: " + file.key)
             Right(new FileInputStream(file.ref.path.toFile()))
           }
         case c: AnyContentAsText =>
@@ -138,6 +137,8 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
       }
     })
 
+    val mic = makeReceivedContentMIC(request)
+
     result match {
       case Left(e) => return e
       case _ => {}
@@ -146,31 +147,59 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
     result match {
       case Left(e) => return e
       case Right(_) =>
-        // val obj = Json.obj(
-        //   "ok" -> true
-        // )
-        val message = new models.Message(messageId.getOrElse("MISSING MESSAGE ID"), as2From.getOrElse("MISSING as2From"), as2To.getOrElse("MISSING as2To"))
+        val message = new models.Message(
+          messageId.getOrElse("MISSING MESSAGE ID"),
+          as2From.getOrElse("MISSING as2From"),
+          as2To.getOrElse("MISSING as2To"),
+          mic
+        )
         val data = helpers.MultipartFormData.makeMultipartString(List(message.makeReport("mdnboundarystring1")), "mdnboundarystring2")
         return Ok(data).as("multipart/report")
     }
   }
 
-  val multi = BodyParser { req =>
+  def makeReceivedContentMIC(request: Request[(akka.util.ByteString, AnyContent)]): String = {
+    val (rawBytes, body) = request.body
+    val md = java.security.MessageDigest.getInstance("SHA-1")
+    var base64Encoder = new sun.misc.BASE64Encoder()
+    body match {
+      case c: AnyContentAsMultipartFormData =>
+        val firstLineEnd = rawBytes.indexOfSlice("\r\n".getBytes(StandardCharsets.UTF_8))
+        val seperator = rawBytes.slice(0, firstLineEnd)
+        val withoutFirstLine = rawBytes.slice(firstLineEnd + 2, rawBytes.length)
+        val content = withoutFirstLine.slice(0, withoutFirstLine.indexOfSlice(seperator))
+        val sig = base64Encoder.encode(md.digest(content.toArray))
+        return sig
+      case c: AnyContentAsText =>
+        val sig = base64Encoder.encode(md.digest(convertedText(request.charset, c.txt).getBytes(StandardCharsets.UTF_8)))
+        return sig
+      case c: AnyContentAsRaw =>
+        val file = c.raw.asFile
+        val bytes = new Array[Byte](1024 * 1024)
+        val fis = new FileInputStream(file)
+        Stream.continually(fis.read(bytes)).takeWhile(-1 !=).foreach(md.update(bytes, 0, _))
+        val sig = base64Encoder.encode(md.digest())
+        return sig
+      case _ =>
+        Left(BadRequest("Invalid content type"))
+    }
+    null
+  }
+
+  val withRawBytes = BodyParser { req =>
     BodyParsers.parse.raw(req)
     .mapFuture {
       case Left(result) =>
         scala.concurrent.Future { Left(result) }
       case Right(buffer: play.api.mvc.RawBuffer) =>
         val bytes = buffer.asBytes().getOrElse(akka.util.ByteString.empty)
-        Logger.debug("Bytes!!!!" + bytes.toString())
-        val str = bytes.decodeString(StandardCharsets.UTF_8)
-        Logger.debug("Str!!!!" + str)
         implicit val materializer = new play.api.libs.concurrent.MaterializerProvider(system).get
-        BodyParsers.parse.default(req).run(bytes)
-        // Right(WrappedPayload(wrapped(request), bytes))
+        BodyParsers.parse.default(req).run(bytes).map { eitherReq =>
+          eitherReq.map { r => (bytes, r)}
+        }
     }
   }
-  def as2() = Action(multi) { request => as2Fn(request) }
+  def as2() = Action(withRawBytes) { request => as2Fn(request) }
 
   def janicoFn(request: Request[AnyContent]): Result = {
     val now = LocalDateTime.now()

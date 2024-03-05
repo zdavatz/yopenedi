@@ -10,7 +10,6 @@ object MultipartFormData {
     val HTTP_SEPARATOR = "\r\n"
     val actualBoundary = "--" + boundary
     val endBoundary = actualBoundary + "--" + HTTP_SEPARATOR
-    val contentType = "multipart/form-data; boundary=" + boundary
     val content = elements.map(value => {
       // val (name, value) = nameValuePair
       actualBoundary + HTTP_SEPARATOR +
