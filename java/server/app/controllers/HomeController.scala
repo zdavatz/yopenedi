@@ -17,6 +17,7 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import java.net._
 import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 
@@ -153,10 +154,29 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
           as2To.getOrElse("MISSING as2To"),
           mic
         )
-        val data = helpers.MultipartFormData.makeMultipartString(List(message.makeReport("mdnboundarystring1")), "mdnboundarystring2")
-        return Ok(data).as("multipart/report")
+        return makeSignedMDNResult(message)
     }
   }
+
+  def makeUnsignedMDNResult(message: models.Message): Result = {
+    val body = message.makeReport("-----mdnboundarystring1")
+    return Ok(body).as("multipart/report; Report-Type=disposition-notification; boundary=\"-----mdnboundarystring1\"")
+  }
+
+  def makeSignedMDNResult(message: models.Message): Result = {
+    val body = message.makeReportWithHeader("-----mdnboundarystring1")
+    val signaturePart = "Content-Type: application/pkcs7-signature; name=smime.p7s\r\n" +
+      "Content-Transfer-Encoding: base64\r\n" +
+      "Content-Disposition: attachment; filename=smime.p7s\r\n\r\n" +
+      helpers.PKCS7Signature.sign(
+        "/Users/b123400/github/yopenedi/self-signed.crt",
+        "/Users/b123400/github/yopenedi/self-signed.key",
+        body.getBytes(StandardCharsets.UTF_8)
+      )
+    val data = helpers.MultipartFormData.makeMultipartString(List(body, signaturePart), "-----mdnboundarystring2")
+    return Ok(data).as("multipart/signed; micalg=sha1; protocol=\"application/pkcs7-signature\"; boundary=\"-----mdnboundarystring2\"")
+  }
+
 
   def makeReceivedContentMIC(request: Request[(akka.util.ByteString, AnyContent)]): String = {
     val (rawBytes, body) = request.body
@@ -164,12 +184,19 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
     var base64Encoder = new sun.misc.BASE64Encoder()
     body match {
       case c: AnyContentAsMultipartFormData =>
-        val firstLineEnd = rawBytes.indexOfSlice("\r\n".getBytes(StandardCharsets.UTF_8))
-        val seperator = rawBytes.slice(0, firstLineEnd)
-        val withoutFirstLine = rawBytes.slice(firstLineEnd + 2, rawBytes.length)
-        val content = withoutFirstLine.slice(0, withoutFirstLine.indexOfSlice(seperator))
-        val sig = base64Encoder.encode(md.digest(content.toArray))
-        return sig
+        if (request.headers.get("Content-Type") == "multipart/signed") {
+          val firstLineEnd = rawBytes.indexOfSlice("\r\n".getBytes(StandardCharsets.UTF_8))
+          val seperator = rawBytes.slice(0, firstLineEnd)
+          val withoutFirstLine = rawBytes.slice(firstLineEnd + 2, rawBytes.length)
+          val content = withoutFirstLine.slice(0, withoutFirstLine.indexOfSlice(seperator))
+          val sig = base64Encoder.encode(md.digest(content.toArray))
+          return sig
+        } else {
+          val file = c.mfd.files.head
+          val content = Files.readAllBytes(file.ref.path)
+          val sig = base64Encoder.encode(md.digest(content.toArray))
+          return sig
+        }
       case c: AnyContentAsText =>
         val sig = base64Encoder.encode(md.digest(convertedText(request.charset, c.txt).getBytes(StandardCharsets.UTF_8)))
         return sig

@@ -40,11 +40,15 @@ class Message(var messageId: String, var requestSender: String, var requestRecip
   }
 
   def makeReport(boundary: String): String = {
-    "Content-Type: multipart/report;\r\n" +
-    "Report-Type=disposition-notification; boundary=\"" + boundary + "\"\r\n" +
     helpers.MultipartFormData.makeMultipartString(List(
       mdnTextPart(),
       mdnMessagePart()
     ), boundary)
+  }
+
+  def makeReportWithHeader(boundary: String): String = {
+    "Content-Type: multipart/report;\r\n" +
+    "Report-Type=disposition-notification; boundary=\"" + boundary + "\"\r\n" +
+    makeReport(boundary)
   }
 }
