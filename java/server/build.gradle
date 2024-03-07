@@ -63,10 +63,16 @@ dependencies {
     play dependencyFor("com.typesafe.play:filters-helpers", scalaVersion, playVersion)
 
     playTest dependencyFor("org.scalatestplus.play:scalatestplus-play", scalaVersion, "3.1.2")
+
+    play 'org.bouncycastle:bcprov-jdk18on:1.77'
+    play 'org.bouncycastle:bcmail-jdk18on:1.77'
+
+    // implementation group: 'org.bouncycastle', name: 'bcprov-jdk18on', version: ''
 }
 
 repositories {
     jcenter()
+    mavenCentral()
     maven {
         name "lightbend-maven-releases"
         url "https://repo.lightbend.com/lightbend/maven-release"
