@@ -54,9 +54,8 @@ object PKCS7Signature {
 
     val signedData: CMSSignedData = gen.generate(msg, false);
     val pkcs7: Array[Byte] = signedData.getEncoded()
-    var base64Encoder = new sun.misc.BASE64Encoder()
-    val encoded = base64Encoder.encode(pkcs7)
-    return encoded
+    val encoded = Base64.getEncoder().encode(pkcs7)
+    return new String(encoded)
   }
 
   def getPrivateKey(path: String): PrivateKey = {
