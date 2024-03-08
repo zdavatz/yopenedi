@@ -4,6 +4,10 @@ import javax.inject._
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
+import play.api.libs.ws._
+
+import play.api.libs.streams._
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
@@ -13,6 +17,7 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import java.net._
 import java.nio.charset.StandardCharsets
+import java.nio.file.Files
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
 
@@ -26,7 +31,7 @@ import com.ywesee.java.yopenedi.OpenTrans._
  * application's home page.
  */
 @Singleton
-class HomeController @Inject()(cc: ControllerComponents, config: Configuration) extends AbstractController(cc) {
+class HomeController @Inject()(cc: ControllerComponents, config: Configuration, ws: WSClient) extends AbstractController(cc) {
 
   /**
    * Create an Action to render an HTML page.
@@ -131,21 +136,155 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration) 
       }
     })
 
-    result match {
-      case Left(e) => return e
-      case _ => {}
-    }
+    val mic = makeReceivedContentMIC(request)
+
+    val notificationOptions = request.headers.get("Disposition-notification-options")
+    val isSigned = canSign() && (notificationOptions match {
+      case None => false
+      case Some(optionsStr: String)=> {
+        val options = optionsStr.split(";")
+        options.exists((option: String) => {
+          val parts = option.split("=")
+          if (parts.length == 2) {
+            val key = parts(0)
+            val value = parts(1)
+            if (key.trim() == "signed-receipt-protocol") {
+              value.trim().contains("pkcs7-signature")
+            } else {
+              false
+            }
+          } else {
+            false
+          }
+        })
+      }
+    })
 
     result match {
       case Left(e) => return e
       case Right(_) =>
-        val obj = Json.obj(
-          "ok" -> true
+        val message = new models.Message(
+          messageId.getOrElse("MISSING MESSAGE ID"),
+          as2From.getOrElse("MISSING as2From"),
+          as2To.getOrElse("MISSING as2To"),
+          mic
         )
-        return Ok(Json.toJson(obj))
+        request.headers.get("Receipt-Delivery-Option") match {
+          case Some(url) => {
+            if (isSigned) {
+              makeAsyncSignedMDNRequest(message, url, request.headers)
+            } else {
+              makeAsyncUnsignedMDNRequest(message, url, request.headers)
+            }
+          }
+          case None => {}
+        }
+        if (isSigned) {
+          return makeSignedMDNResult(message)
+        }
+        return makeUnsignedMDNResult(message)
     }
   }
+
+  def makeUnsignedMDNResult(message: models.Message): Result = {
+    val body = message.makeReport("-----mdnboundarystring1")
+    return Ok(body).as("multipart/report; Report-Type=disposition-notification; boundary=\"-----mdnboundarystring1\"")
+  }
+
+  def makeSignedMDNResult(message: models.Message): Result = {
+    val body = message.makeReportWithHeader("-----mdnboundarystring1")
+    val signaturePart = "Content-Type: application/pkcs7-signature; name=smime.p7s\r\n" +
+      "Content-Transfer-Encoding: base64\r\n" +
+      "Content-Disposition: attachment; filename=smime.p7s\r\n\r\n" +
+      sign(body.getBytes(StandardCharsets.UTF_8))
+    val data = helpers.MultipartFormData.makeMultipartString(List(body, signaturePart), "-----mdnboundarystring2")
+    return Ok(data).as("multipart/signed; micalg=sha1; protocol=\"application/pkcs7-signature\"; boundary=\"-----mdnboundarystring2\"")
+  }
+
+  def makeAsyncUnsignedMDNRequest(message: models.Message, url: String, headers: Headers) = {
+    val boundary = "-----mdnboundarystring1"
+    val request: WSRequest = ws.url(url)
+    request
+      .addHttpHeaders("Message-ID" -> message.messageId)
+      .addHttpHeaders("Recipient-Address" -> url)
+      .addHttpHeaders("AS2-To" -> message.requestRecipient)
+      .addHttpHeaders("AS2-From" -> message.requestSender)
+      .addHttpHeaders("Subject" -> "Your Requested MDN Response")
+      .addHttpHeaders("Content-Type" -> ("multipart/report; Report-Type=disposition-notification; boundary=\"" + boundary + "\""))
+      .post(message.makeReport(boundary))
+  }
+
+  def makeAsyncSignedMDNRequest(message: models.Message, url: String, headers: Headers) = {
+    val outerBoundary = "-----mdnboundarystring1"
+    val innerBoundary = "-----mdnboundarystring2"
+    val request: WSRequest = ws.url(url)
+      .addHttpHeaders("Message-ID" -> message.messageId)
+      .addHttpHeaders("Recipient-Address" -> url)
+      .addHttpHeaders("AS2-To" -> message.requestRecipient)
+      .addHttpHeaders("AS2-From" -> message.requestSender)
+      .addHttpHeaders("Subject" -> "Your Requested MDN Response")
+      .addHttpHeaders("Content-Type" -> ("multipart/signed; micalg=sha1; protocol=\"application/pkcs7-signature\"; boundary=\"" + outerBoundary + "\""))
+    val body = message.makeReportWithHeader(innerBoundary)
+    val signaturePart = "Content-Type: application/pkcs7-signature; name=smime.p7s\r\n" +
+      "Content-Transfer-Encoding: base64\r\n" +
+      "Content-Disposition: attachment; filename=smime.p7s\r\n\r\n" +
+      sign(body.getBytes(StandardCharsets.UTF_8))
+    val data = helpers.MultipartFormData.makeMultipartString(List(body, signaturePart), outerBoundary)
+    request.post(data)
+  }
+
+  def makeReceivedContentMIC(request: Request[AnyContent]): String = {
+    val md = java.security.MessageDigest.getInstance("SHA-1")
+    var base64Encoder = new sun.misc.BASE64Encoder()
+    request.body match {
+      case c: AnyContentAsMultipartFormData =>
+        val file = c.mfd.files.head
+        val content = Files.readAllBytes(file.ref.path)
+        val sig = base64Encoder.encode(md.digest(content.toArray))
+        return sig
+      case c: AnyContentAsText =>
+        val sig = base64Encoder.encode(md.digest(convertedText(request.charset, c.txt).getBytes(StandardCharsets.UTF_8)))
+        return sig
+      case c: AnyContentAsRaw =>
+        val file = c.raw.asFile
+        val bytes = new Array[Byte](1024 * 1024)
+        val fis = new FileInputStream(file)
+        Stream.continually(fis.read(bytes)).takeWhile(-1 !=).foreach(md.update(bytes, 0, _))
+        val sig = base64Encoder.encode(md.digest())
+        return sig
+      case _ =>
+        Left(BadRequest("Invalid content type"))
+    }
+    null
+  }
+
   def as2() = Action(as2Fn(_))
+
+  def canSign(): Boolean = {
+    try {
+      val certPath = config.get[String]("cert")
+      val keyPath = config.get[String]("private-key")
+      val certFile = new File(certPath)
+      if (!certFile.exists() || certFile.isDirectory()) {
+        return false
+      }
+      val keyFile = new File(keyPath)
+      if (!keyFile.exists() || keyFile.isDirectory()) {
+        return false
+      }
+      return true
+    } catch {
+      case _ : Throwable => return false
+    }
+  }
+
+  def sign(data: Array[Byte]): String = {
+    helpers.PKCS7Signature.sign(
+      config.get[String]("cert"),
+      config.get[String]("private-key"),
+      data,
+    )
+  }
 
   def janicoFn(request: Request[AnyContent]): Result = {
     val now = LocalDateTime.now()
