@@ -4,6 +4,7 @@ import javax.inject._
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
+import play.api.libs.ws._
 
 import akka.actor.ActorSystem
 import play.api.libs.streams._
@@ -31,7 +32,7 @@ import com.ywesee.java.yopenedi.OpenTrans._
  * application's home page.
  */
 @Singleton
-class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, config: Configuration) extends AbstractController(cc) {
+class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, config: Configuration, ws: WSClient) extends AbstractController(cc) {
 
   /**
    * Create an Action to render an HTML page.
@@ -140,10 +141,27 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
 
     val mic = makeReceivedContentMIC(request)
 
-    result match {
-      case Left(e) => return e
-      case _ => {}
-    }
+    val notificationOptions = request.headers.get("Disposition-notification-options")
+    val isSigned = canSign() && (notificationOptions match {
+      case None => false
+      case Some(optionsStr: String)=> {
+        val options = optionsStr.split(";")
+        options.exists((option: String) => {
+          val parts = option.split("=")
+          if (parts.length == 2) {
+            val key = parts(0)
+            val value = parts(1)
+            if (key.trim() == "signed-receipt-protocol") {
+              value.trim().contains("pkcs7-signature")
+            } else {
+              false
+            }
+          } else {
+            false
+          }
+        })
+      }
+    })
 
     result match {
       case Left(e) => return e
@@ -154,7 +172,20 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
           as2To.getOrElse("MISSING as2To"),
           mic
         )
-        return makeSignedMDNResult(message)
+        request.headers.get("Receipt-Delivery-Option") match {
+          case Some(url) => {
+            if (isSigned) {
+              makeAsyncSignedMDNRequest(message, url, request.headers)
+            } else {
+              makeAsyncUnsignedMDNRequest(message, url, request.headers)
+            }
+          }
+          case None => {}
+        }
+        if (isSigned) {
+          return makeSignedMDNResult(message)
+        }
+        return makeUnsignedMDNResult(message)
     }
   }
 
@@ -168,15 +199,58 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
     val signaturePart = "Content-Type: application/pkcs7-signature; name=smime.p7s\r\n" +
       "Content-Transfer-Encoding: base64\r\n" +
       "Content-Disposition: attachment; filename=smime.p7s\r\n\r\n" +
-      helpers.PKCS7Signature.sign(
-        "/Users/b123400/github/yopenedi/self-signed.crt",
-        "/Users/b123400/github/yopenedi/self-signed.key",
-        body.getBytes(StandardCharsets.UTF_8)
-      )
+      sign(body.getBytes(StandardCharsets.UTF_8))
     val data = helpers.MultipartFormData.makeMultipartString(List(body, signaturePart), "-----mdnboundarystring2")
     return Ok(data).as("multipart/signed; micalg=sha1; protocol=\"application/pkcs7-signature\"; boundary=\"-----mdnboundarystring2\"")
   }
 
+  def makeAsyncUnsignedMDNRequest(message: models.Message, url: String, headers: Headers) = {
+            val proxy = DefaultWSProxyServer(
+          host = "0.0.0.0",
+          port = 8888,
+          principal = None,
+          password = None,
+          protocol = Some("http")
+        )
+    val boundary = "-----mdnboundarystring1"
+    val request: WSRequest = ws.url(url)
+    request
+      .addHttpHeaders("Message-ID" -> message.messageId)
+      .addHttpHeaders("Recipient-Address" -> url)
+      .addHttpHeaders("AS2-To" -> message.requestRecipient)
+      .addHttpHeaders("AS2-From" -> message.requestSender)
+      .addHttpHeaders("Subject" -> "Your Requested MDN Response")
+      .addHttpHeaders("Content-Type" -> ("multipart/report; Report-Type=disposition-notification; boundary=\"" + boundary + "\""))
+      .withProxyServer(proxy)
+      .post(message.makeReport(boundary))
+  }
+
+  def makeAsyncSignedMDNRequest(message: models.Message, url: String, headers: Headers) = {
+        val proxy = DefaultWSProxyServer(
+          host = "0.0.0.0",
+          port = 8888,
+          principal = None,
+          password = None,
+          protocol = Some("http")
+        )
+    val outerBoundary = "-----mdnboundarystring1"
+    val innerBoundary = "-----mdnboundarystring2"
+    val request: WSRequest = ws.url(url)
+      .addHttpHeaders("Message-ID" -> message.messageId)
+      .addHttpHeaders("Recipient-Address" -> url)
+      .addHttpHeaders("AS2-To" -> message.requestRecipient)
+      .addHttpHeaders("AS2-From" -> message.requestSender)
+      .addHttpHeaders("Subject" -> "Your Requested MDN Response")
+      .addHttpHeaders("Content-Type" -> ("multipart/signed; micalg=sha1; protocol=\"application/pkcs7-signature\"; boundary=\"" + outerBoundary + "\""))
+      .withProxyServer(proxy)
+    val body = message.makeReportWithHeader(innerBoundary)
+    val signaturePart = "Content-Type: application/pkcs7-signature; name=smime.p7s\r\n" +
+      "Content-Transfer-Encoding: base64\r\n" +
+      "Content-Disposition: attachment; filename=smime.p7s\r\n\r\n" +
+      sign(body.getBytes(StandardCharsets.UTF_8))
+    val data = helpers.MultipartFormData.makeMultipartString(List(body, signaturePart), outerBoundary)
+    request.post(data)
+  }
 
   def makeReceivedContentMIC(request: Request[(akka.util.ByteString, AnyContent)]): String = {
     val (rawBytes, body) = request.body
@@ -227,6 +301,32 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
     }
   }
   def as2() = Action(withRawBytes) { request => as2Fn(request) }
+
+  def canSign(): Boolean = {
+    try {
+      val certPath = config.get[String]("cert")
+      val keyPath = config.get[String]("private-key")
+      val certFile = new File(certPath)
+      if (!certFile.exists() || certFile.isDirectory()) {
+        return false
+      }
+      val keyFile = new File(keyPath)
+      if (!keyFile.exists() || keyFile.isDirectory()) {
+        return false
+      }
+      return true
+    } catch {
+      case _ => return false
+    }
+  }
+
+  def sign(data: Array[Byte]): String = {
+    helpers.PKCS7Signature.sign(
+      config.get[String]("cert"),
+      config.get[String]("private-key"),
+      data,
+    )
+  }
 
   def janicoFn(request: Request[AnyContent]): Result = {
     val now = LocalDateTime.now()
