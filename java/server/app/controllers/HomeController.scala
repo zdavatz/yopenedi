@@ -6,7 +6,6 @@ import play.api.mvc._
 import play.api.libs.json._
 import play.api.libs.ws._
 
-import akka.actor.ActorSystem
 import play.api.libs.streams._
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -32,7 +31,7 @@ import com.ywesee.java.yopenedi.OpenTrans._
  * application's home page.
  */
 @Singleton
-class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, config: Configuration, ws: WSClient) extends AbstractController(cc) {
+class HomeController @Inject()(cc: ControllerComponents, config: Configuration, ws: WSClient) extends AbstractController(cc) {
 
   /**
    * Create an Action to render an HTML page.
@@ -45,7 +44,7 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
     Ok(views.html.index())
   }
 
-  def as2Fn(request: Request[(akka.util.ByteString, AnyContent)]): Result = {
+  def as2Fn(request: Request[AnyContent]): Result = {
     val messageId = request.headers.get("message-id")
     val as2To = request.headers.get("as2-to")
     val as2From = request.headers.get("as2-from")
@@ -71,10 +70,8 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
       throw new Exception(otOrdersPath + " is not a directory");
     }
 
-    val (rawBytes, body) = request.body
-
     def makeStream(): Either[Result, InputStream] = {
-      body match {
+      request.body match {
         case c: AnyContentAsMultipartFormData =>
           if (c.mfd.files.length == 0) {
             Left(BadRequest("No file found"))
@@ -205,13 +202,6 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
   }
 
   def makeAsyncUnsignedMDNRequest(message: models.Message, url: String, headers: Headers) = {
-            val proxy = DefaultWSProxyServer(
-          host = "0.0.0.0",
-          port = 8888,
-          principal = None,
-          password = None,
-          protocol = Some("http")
-        )
     val boundary = "-----mdnboundarystring1"
     val request: WSRequest = ws.url(url)
     request
@@ -221,18 +211,10 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
       .addHttpHeaders("AS2-From" -> message.requestSender)
       .addHttpHeaders("Subject" -> "Your Requested MDN Response")
       .addHttpHeaders("Content-Type" -> ("multipart/report; Report-Type=disposition-notification; boundary=\"" + boundary + "\""))
-      .withProxyServer(proxy)
       .post(message.makeReport(boundary))
   }
 
   def makeAsyncSignedMDNRequest(message: models.Message, url: String, headers: Headers) = {
-        val proxy = DefaultWSProxyServer(
-          host = "0.0.0.0",
-          port = 8888,
-          principal = None,
-          password = None,
-          protocol = Some("http")
-        )
     val outerBoundary = "-----mdnboundarystring1"
     val innerBoundary = "-----mdnboundarystring2"
     val request: WSRequest = ws.url(url)
@@ -242,7 +224,6 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
       .addHttpHeaders("AS2-From" -> message.requestSender)
       .addHttpHeaders("Subject" -> "Your Requested MDN Response")
       .addHttpHeaders("Content-Type" -> ("multipart/signed; micalg=sha1; protocol=\"application/pkcs7-signature\"; boundary=\"" + outerBoundary + "\""))
-      .withProxyServer(proxy)
     val body = message.makeReportWithHeader(innerBoundary)
     val signaturePart = "Content-Type: application/pkcs7-signature; name=smime.p7s\r\n" +
       "Content-Transfer-Encoding: base64\r\n" +
@@ -252,25 +233,15 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
     request.post(data)
   }
 
-  def makeReceivedContentMIC(request: Request[(akka.util.ByteString, AnyContent)]): String = {
-    val (rawBytes, body) = request.body
+  def makeReceivedContentMIC(request: Request[AnyContent]): String = {
     val md = java.security.MessageDigest.getInstance("SHA-1")
     var base64Encoder = new sun.misc.BASE64Encoder()
-    body match {
+    request.body match {
       case c: AnyContentAsMultipartFormData =>
-        if (request.headers.get("Content-Type") == "multipart/signed") {
-          val firstLineEnd = rawBytes.indexOfSlice("\r\n".getBytes(StandardCharsets.UTF_8))
-          val seperator = rawBytes.slice(0, firstLineEnd)
-          val withoutFirstLine = rawBytes.slice(firstLineEnd + 2, rawBytes.length)
-          val content = withoutFirstLine.slice(0, withoutFirstLine.indexOfSlice(seperator))
-          val sig = base64Encoder.encode(md.digest(content.toArray))
-          return sig
-        } else {
-          val file = c.mfd.files.head
-          val content = Files.readAllBytes(file.ref.path)
-          val sig = base64Encoder.encode(md.digest(content.toArray))
-          return sig
-        }
+        val file = c.mfd.files.head
+        val content = Files.readAllBytes(file.ref.path)
+        val sig = base64Encoder.encode(md.digest(content.toArray))
+        return sig
       case c: AnyContentAsText =>
         val sig = base64Encoder.encode(md.digest(convertedText(request.charset, c.txt).getBytes(StandardCharsets.UTF_8)))
         return sig
@@ -287,20 +258,7 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
     null
   }
 
-  val withRawBytes = BodyParser { req =>
-    BodyParsers.parse.raw(req)
-    .mapFuture {
-      case Left(result) =>
-        scala.concurrent.Future { Left(result) }
-      case Right(buffer: play.api.mvc.RawBuffer) =>
-        val bytes = buffer.asBytes().getOrElse(akka.util.ByteString.empty)
-        implicit val materializer = new play.api.libs.concurrent.MaterializerProvider(system).get
-        BodyParsers.parse.default(req).run(bytes).map { eitherReq =>
-          eitherReq.map { r => (bytes, r)}
-        }
-    }
-  }
-  def as2() = Action(withRawBytes) { request => as2Fn(request) }
+  def as2() = Action(as2Fn(_))
 
   def canSign(): Boolean = {
     try {
@@ -316,7 +274,7 @@ class HomeController @Inject()(system: ActorSystem, cc: ControllerComponents, co
       }
       return true
     } catch {
-      case _ => return false
+      case _ : Throwable => return false
     }
   }
 

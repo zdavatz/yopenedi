@@ -37,8 +37,6 @@ object PKCS7Signature {
     }
      certStream.close();
 
-     // val dataToSign = Array[Byte](104, 101, 108, 108, 111)
-
     val privateKey = getPrivateKey(privateKeyPath);
 
     val certList = List(cert)

@@ -11,10 +11,7 @@ object MultipartFormData {
     val actualBoundary = "--" + boundary
     val endBoundary = actualBoundary + "--" + HTTP_SEPARATOR
     val content = elements.map(value => {
-      // val (name, value) = nameValuePair
       actualBoundary + HTTP_SEPARATOR +
-      // "Content-Disposition: form-data; name=\"" + name + "\"" + HTTP_SEPARATOR +
-      // HTTP_SEPARATOR +
       value + HTTP_SEPARATOR
     }).mkString + endBoundary
     return content
