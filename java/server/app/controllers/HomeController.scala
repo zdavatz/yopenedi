@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets
 import java.nio.file.Files
 import java.time.format.DateTimeFormatter
 import java.time.LocalDateTime
+import java.util.Base64
 
 import com.ywesee.java.yopenedi.common._
 import com.ywesee.java.yopenedi.converter._
@@ -235,22 +236,21 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
 
   def makeReceivedContentMIC(request: Request[AnyContent]): String = {
     val md = java.security.MessageDigest.getInstance("SHA-1")
-    var base64Encoder = new sun.misc.BASE64Encoder()
     request.body match {
       case c: AnyContentAsMultipartFormData =>
         val file = c.mfd.files.head
         val content = Files.readAllBytes(file.ref.path)
-        val sig = base64Encoder.encode(md.digest(content.toArray))
+        val sig = new String(Base64.getEncoder().encode(md.digest(content.toArray)))
         return sig
       case c: AnyContentAsText =>
-        val sig = base64Encoder.encode(md.digest(convertedText(request.charset, c.txt).getBytes(StandardCharsets.UTF_8)))
+        val sig = new String(Base64.getEncoder().encode(md.digest(convertedText(request.charset, c.txt).getBytes(StandardCharsets.UTF_8))))
         return sig
       case c: AnyContentAsRaw =>
         val file = c.raw.asFile
         val bytes = new Array[Byte](1024 * 1024)
         val fis = new FileInputStream(file)
         Stream.continually(fis.read(bytes)).takeWhile(-1 !=).foreach(md.update(bytes, 0, _))
-        val sig = base64Encoder.encode(md.digest())
+        val sig = new String(Base64.getEncoder().encode(md.digest()))
         return sig
       case _ =>
         Left(BadRequest("Invalid content type"))
