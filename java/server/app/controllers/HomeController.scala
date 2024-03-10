@@ -1,6 +1,7 @@
 package controllers
 
 import javax.inject._
+import play.api.inject._
 import play.api._
 import play.api.mvc._
 import play.api.libs.json._
@@ -33,7 +34,7 @@ import com.ywesee.java.yopenedi.OpenTrans._
  */
 @Singleton
 class HomeController @Inject()(cc: ControllerComponents, config: Configuration, ws: WSClient) extends AbstractController(cc) {
-
+  val logger: Logger = Logger(this.getClass())
   /**
    * Create an Action to render an HTML page.
    *
@@ -98,7 +99,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
       val ediFile = new File(ediOrdersFolder, filename)
       val ediOutStream = new FileOutputStream(ediFile)
       IOUtils.copy(s, ediOutStream)
-      Logger.debug("Edifact File size: " + ediFile.length())
+      logger.debug("Edifact File size: " + ediFile.length())
 
       val outFile = new File(otOrdersFolder, filename)
       if (outFile.exists() && !outFile.canWrite()) {
@@ -108,7 +109,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
       val er = new EdifactReader()
       val ediInStream = new FileInputStream(ediFile)
       val ediOrders = er.run(ediInStream)
-      Logger.debug("EDIFACT orders count: " + ediOrders.size())
+      logger.debug("EDIFACT orders count: " + ediOrders.size())
       val converter = new Converter(converterConfig)
       if (ediOrders.size() == 0) {
         Left(BadRequest("No order found in EDIFACT file."))
@@ -117,7 +118,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
       } else {
         val otOrder = converter.orderToOpenTrans(ediOrders.get(0))
         otOrder.isTestEnvironment = isTestEnvironment
-        Logger.debug("Opentrans order: " + otOrder.toString())
+        logger.debug("Opentrans order: " + otOrder.toString())
 
         val recipient = otOrder.getRecipient()
         if (recipient != null) {
@@ -130,10 +131,10 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
         outStream.flush()
         outStream.getFD().sync()
         outStream.close()
-        Logger.debug("File written: " + outFile.getAbsolutePath())
-        Logger.debug("File size: " + outFile.length())
+        logger.debug("File written: " + outFile.getAbsolutePath())
+        logger.debug("File size: " + outFile.length())
         converterConfig.dispatchResult(recipientGLN, "ORDERS", outFile, messageId.getOrElse(""))
-        Right(Unit)
+        Right(())
       }
     })
 
@@ -249,7 +250,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
         val file = c.raw.asFile
         val bytes = new Array[Byte](1024 * 1024)
         val fis = new FileInputStream(file)
-        Stream.continually(fis.read(bytes)).takeWhile(-1 !=).foreach(md.update(bytes, 0, _))
+        LazyList.continually(fis.read(bytes)).takeWhile(-1 != _).foreach(md.update(bytes, 0, _))
         val sig = new String(Base64.getEncoder().encode(md.digest()))
         return sig
       case _ =>
@@ -401,7 +402,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
 
         val otOutStream = new FileOutputStream(outFile)
         writable.write(otOutStream, converterConfig)
-        Logger.debug("Wrote file to: " + outFile.getAbsolutePath())
+        logger.debug("Wrote file to: " + outFile.getAbsolutePath())
     }
 
     val inFile = new File(otFolder, filename)
@@ -415,7 +416,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
       case Right(s) =>
         val otStream = new FileOutputStream(inFile)
         IOUtils.copy(s, otStream)
-        Logger.debug("OpenTrans File size: " + inFile.length())
+        logger.debug("OpenTrans File size: " + inFile.length())
     }
 
     converterConfig.dispatchResult(recipientGLN, edifactType, outFile, orderId)
@@ -431,18 +432,18 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
   // the request when multipart boundary has "="
   // We retry when the stream fails, by manually extracting the EDIFACT out of the request body
   private def retryWithEdifactExtracted[A, B](mkStream: () => Either[A, InputStream], op: (InputStream, Boolean) => Either[A, B]): Either[A, B] = {
-    mkStream().right.flatMap { s =>
+    mkStream().flatMap { s =>
       val result = op(s, false)
       result match {
         case Right(a) => Right(a)
         case Left(_) =>
-          Logger.info("Retrying by extracting EDIFACT from request body")
-          mkStream().right.flatMap { s =>
+          logger.info("Retrying by extracting EDIFACT from request body")
+          mkStream().flatMap { s =>
             var ediLine: Option[String] = extractedEdifact(s)
             ediLine match {
               case Some(l) => op(IOUtils.toInputStream(l, "UTF-8"), true)
               case None =>
-                Logger.error("Cannot find EDIFACT from request body")
+                logger.error("Cannot find EDIFACT from request body")
                 op(IOUtils.toInputStream("", "UTF-8"), true)
             }
           }

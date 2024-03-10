@@ -20,8 +20,7 @@ import org.bouncycastle.operator.ContentSigner
 import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder
 
-
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 
 
 object PKCS7Signature {
