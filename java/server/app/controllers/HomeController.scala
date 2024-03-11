@@ -190,7 +190,14 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
 
   def makeUnsignedMDNResult(message: models.Message): Result = {
     val body = message.makeReport("-----mdnboundarystring1")
-    return Ok(body).as("multipart/report; Report-Type=disposition-notification; boundary=\"-----mdnboundarystring1\"")
+    return Ok(body)
+      .withHeaders(
+        "Message-ID" -> message.messageId,
+        "AS2-To" -> message.requestSender,
+        "AS2-From" -> message.requestRecipient,
+        "AS2-Version" -> "1.1",
+      )
+      .as("multipart/report; Report-Type=disposition-notification; boundary=\"-----mdnboundarystring1\"")
   }
 
   def makeSignedMDNResult(message: models.Message): Result = {
@@ -200,7 +207,14 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
       "Content-Disposition: attachment; filename=smime.p7s\r\n\r\n" +
       sign(body.getBytes(StandardCharsets.UTF_8))
     val data = helpers.MultipartFormData.makeMultipartString(List(body, signaturePart), "-----mdnboundarystring2")
-    return Ok(data).as("multipart/signed; micalg=sha1; protocol=\"application/pkcs7-signature\"; boundary=\"-----mdnboundarystring2\"")
+    return Ok(data)
+      .withHeaders(
+        "Message-ID" -> message.messageId,
+        "AS2-To" -> message.requestSender,
+        "AS2-From" -> message.requestRecipient,
+        "AS2-Version" -> "1.1",
+      )
+      .as("multipart/signed; micalg=sha1; protocol=\"application/pkcs7-signature\"; boundary=\"-----mdnboundarystring2\"")
   }
 
   def makeAsyncUnsignedMDNRequest(message: models.Message, url: String, headers: Headers) = {
@@ -209,8 +223,8 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
     request
       .addHttpHeaders("Message-ID" -> message.messageId)
       .addHttpHeaders("Recipient-Address" -> url)
-      .addHttpHeaders("AS2-To" -> message.requestRecipient)
-      .addHttpHeaders("AS2-From" -> message.requestSender)
+      .addHttpHeaders("AS2-To" -> message.requestSender)
+      .addHttpHeaders("AS2-From" -> message.requestRecipient)
       .addHttpHeaders("Subject" -> "Your Requested MDN Response")
       .addHttpHeaders("Content-Type" -> ("multipart/report; Report-Type=disposition-notification; boundary=\"" + boundary + "\""))
       .post(message.makeReport(boundary))
@@ -222,8 +236,8 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
     val request: WSRequest = ws.url(url)
       .addHttpHeaders("Message-ID" -> message.messageId)
       .addHttpHeaders("Recipient-Address" -> url)
-      .addHttpHeaders("AS2-To" -> message.requestRecipient)
-      .addHttpHeaders("AS2-From" -> message.requestSender)
+      .addHttpHeaders("AS2-To" -> message.requestSender)
+      .addHttpHeaders("AS2-From" -> message.requestRecipient)
       .addHttpHeaders("Subject" -> "Your Requested MDN Response")
       .addHttpHeaders("Content-Type" -> ("multipart/signed; micalg=sha1; protocol=\"application/pkcs7-signature\"; boundary=\"" + outerBoundary + "\""))
     val body = message.makeReportWithHeader(innerBoundary)
