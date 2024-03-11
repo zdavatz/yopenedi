@@ -19,6 +19,6 @@ run-server:
 .PHONEY: run-server
 
 dist-server:
-	./gradlew server:dist
-	echo "You can find the zips under java/server/build/distributions"
+	./gradlew converter:shadowJar && cp converter/build/libs/converter-1.0-all.jar ./server/lib/
+	cd server && sbt dist
 .PHONEY: dist-server
