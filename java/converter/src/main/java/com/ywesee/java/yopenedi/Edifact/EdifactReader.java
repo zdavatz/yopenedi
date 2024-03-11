@@ -96,6 +96,11 @@ public class EdifactReader {
                     if (o == null) o = this.tryWithBatchSize(prefix, suffix, itemStrings, 10);
                     if (o == null) o = this.tryWithBatchSize(prefix, suffix, itemStrings, 5);
                     if (o == null) o = this.tryWithBatchSize(prefix, suffix, itemStrings, 1);
+                    if (o == null) {
+                        System.err.println("Failed to recover.");
+                    } else {
+                        System.err.println("Recovered.");
+                    }
                     ArrayList<Order> result = new ArrayList<>();
                     result.add(o);
                     return result;

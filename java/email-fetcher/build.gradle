@@ -23,14 +23,14 @@ repositories {
 
 dependencies {
 // https://mvnrepository.com/artifact/javax.mail/mail
-    compile group: 'javax.mail', name: 'mail', version: '1.5.0-b01'
+    implementation group: 'javax.mail', name: 'mail', version: '1.5.0-b01'
 
     // https://mvnrepository.com/artifact/commons-io/commons-io
-    compile group: 'commons-io', name: 'commons-io', version: '2.7'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.7'
     implementation 'commons-cli:commons-cli:1.4'
     implementation 'com.jcraft:jsch:0.1.55'
 
-    compile project(':converter')
+    implementation project(':converter')
     // Use JUnit test framework
     testImplementation 'junit:junit:4.12'
 }
