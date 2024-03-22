@@ -17,7 +17,7 @@
       "edifact_types": ["ORDRSP", "DESADV", "INVOIC"]
     },
     "http": {
-      "url": "https://fegime-comsrv-prod.compacer.net:9444/fegime"
+      "url": "https://fegime-comsrv-prod.compacer.net:9444/fegime",
       "headers": {
         "AS2-From": "FEGIME-PROD",
         "AS2-To": "FEGIME-PROD"
