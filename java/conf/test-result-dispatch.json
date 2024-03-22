@@ -19,7 +19,7 @@
     "http": {
       "url": "https://fegime-comsrv-prod.compacer.net:9444/fegime",
       "headers": {
-        "AS2-From": "FEGIME-PROD",
+        "AS2-From": "janico",
         "AS2-To": "FEGIME-PROD"
       }
     }
