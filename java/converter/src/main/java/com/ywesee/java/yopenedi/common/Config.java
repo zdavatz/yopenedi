@@ -37,6 +37,7 @@ public class Config {
             return map;
         } catch (Exception e) {
             System.out.println("Cannot get file: " + f.getAbsolutePath());
+            System.out.println("Error: " + e.toString());
         }
         return new HashMap<>();
     }

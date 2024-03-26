@@ -189,6 +189,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
   }
 
   def makeUnsignedMDNResult(message: models.Message): Result = {
+    logger.info("Returning unsigned MDN Result to " + message.requestSender)
     val body = message.makeReport("-----mdnboundarystring1")
     return Ok(body)
       .withHeaders(
@@ -201,6 +202,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
   }
 
   def makeSignedMDNResult(message: models.Message): Result = {
+    logger.info("Returning signed MDN Result to " + message.requestSender)
     val body = message.makeReportWithHeader("-----mdnboundarystring1")
     val signaturePart = "Content-Type: application/pkcs7-signature; name=smime.p7s\r\n" +
       "Content-Transfer-Encoding: base64\r\n" +
@@ -218,6 +220,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
   }
 
   def makeAsyncUnsignedMDNRequest(message: models.Message, url: String, headers: Headers) = {
+    logger.info("Sending unsigned async MDN Result to " + message.requestSender)
     val boundary = "-----mdnboundarystring1"
     val request: WSRequest = ws.url(url)
     request
@@ -231,6 +234,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
   }
 
   def makeAsyncSignedMDNRequest(message: models.Message, url: String, headers: Headers) = {
+    logger.info("Sending signed async MDN Result to " + message.requestSender)
     val outerBoundary = "-----mdnboundarystring1"
     val innerBoundary = "-----mdnboundarystring2"
     val request: WSRequest = ws.url(url)
