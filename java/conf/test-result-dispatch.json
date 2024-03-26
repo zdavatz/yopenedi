@@ -12,7 +12,8 @@
   {
     "filters": {
       "glns": [
-        "4399901494343"
+        "4399901494343",
+        "4399901251786"
       ],
       "edifact_types": ["ORDRSP", "DESADV", "INVOIC"]
     },
