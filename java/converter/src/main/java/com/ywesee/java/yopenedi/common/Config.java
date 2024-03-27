@@ -27,6 +27,7 @@ public class Config {
         File f = new File(this.path, "udx-channel.json");
         try {
             String str = FileUtils.readFileToString(f, "UTF-8");
+            str = str.replace("\uFEFF", "");
             JSONParser parser = new JSONParser();
             JSONObject obj = (JSONObject)parser.parse(str);
             Map<String, String> map = new HashMap<>();
@@ -91,6 +92,7 @@ public class Config {
                     File f = new File(this.path, "test-result-dispatch.json");
                     System.out.println("Reading from " + f.getAbsolutePath());
                     str = FileUtils.readFileToString(f, "UTF-8");
+                    str = str.replace("\uFEFF", "");
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
@@ -99,6 +101,7 @@ public class Config {
                 File f = new File(this.path, "result-dispatch.json");
                 System.out.println("Reading from " + f.getAbsolutePath());
                 str = FileUtils.readFileToString(f, "UTF-8");
+                str = str.replace("\uFEFF", "");
             }
             JSONParser parser = new JSONParser();
             JSONArray arr = (JSONArray) parser.parse(str);
@@ -126,6 +129,7 @@ public class Config {
             HashMap<String, String> result = new HashMap<>();
             File f = new File(this.path, "gln-override.json");
             String str = FileUtils.readFileToString(f, "UTF-8");
+            str = str.replace("\uFEFF", "");
             JSONParser parser = new JSONParser();
             JSONObject obj = (JSONObject) parser.parse(str);
             Set<String> keys = obj.keySet();

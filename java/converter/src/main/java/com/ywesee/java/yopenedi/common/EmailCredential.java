@@ -19,6 +19,7 @@ public class EmailCredential {
 
     EmailCredential(File file) throws IOException, ParseException {
         String str = FileUtils.readFileToString(file, "UTF-8");
+        str = str.replace("\uFEFF", "");
         JSONParser parser = new JSONParser();
         JSONObject obj = (JSONObject)parser.parse(str);
         this.smtpHost = (String)obj.get("smtp-host");
