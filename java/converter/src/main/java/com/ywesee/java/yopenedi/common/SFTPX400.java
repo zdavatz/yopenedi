@@ -17,6 +17,7 @@ public class SFTPX400 {
 
     public SFTPX400(File file) throws IOException, ParseException {
         String str = FileUtils.readFileToString(file, "UTF-8");
+        str = str.replace("\uFEFF", "");
         JSONParser parser = new JSONParser();
         JSONObject obj = (JSONObject)parser.parse(str);
         this.host = (String)obj.get("host");
