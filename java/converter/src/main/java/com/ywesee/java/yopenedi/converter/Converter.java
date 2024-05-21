@@ -174,11 +174,12 @@ public class Converter {
         com.ywesee.java.yopenedi.Edifact.Invoice i = new com.ywesee.java.yopenedi.Edifact.Invoice();
         i.referenceNumber = invoice.documentNumber;
         i.documentNumber = invoice.documentNumber;
-        i.orderDate = invoice.invoiceDate;
+        i.invoiceDate = invoice.invoiceDate;
         i.deliveryDate = invoice.deliveryEndDate;
         i.deliveryNoteNumber = invoice.getDeliveryNoteId();
         i.orderNumberForCustomer = invoice.getBuyerOrderId();
         i.orderNumberForSupplier = invoice.getSupplierOrderId();
+        i.orderDate = invoice.getOrderDate();
         i.taxType = invoice.taxType;
         i.taxRate = String.valueOf(Float.parseFloat(invoice.taxRate) * 100);
         i.currencyCode = invoice.currencyCode;

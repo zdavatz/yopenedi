@@ -7,6 +7,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +43,7 @@ public class InvoiceItem {
     public String supplierOrderItemId; // Like line number, e.g. 1
     public String buyerOrderId;
     public String buyerOrderItemId; // Like line number, e.g. 1
+    public Date buyerOrderDate;
     public String deliveryOrderId;
     public String deliveryOrderItemId; // Like line number, e.g. 1
 
@@ -101,16 +103,6 @@ public class InvoiceItem {
                     this.orderUnit = nextStringOrNull(er);
                 } else if (name.equals("COUNTRY_OF_ORIGIN")) {
                     this.countryOfOriginCoded = nextStringOrNull(er);
-                } else if (name.equals("DELIVERY_START_DATE")) {
-                    try {
-                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                        this.deliveryStartDate = df.parse(nextStringOrNull(er));
-                    } catch (Exception e){}
-                } else if (name.equals("DELIVERY_END_DATE")) {
-                    try {
-                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                        this.deliveryEndDate = df.parse(nextStringOrNull(er));
-                    } catch (Exception e){}
                 } else if (prefix.equals("bmecat") && name.equals("PRICE_AMOUNT")) {
                     try {
                         this.price = Float.parseFloat(nextStringOrNull(er));
@@ -165,6 +157,11 @@ public class InvoiceItem {
                     this.buyerOrderId = nextStringOrNull(er);
                 } else if (name.equals("LINE_ITEM_ID")) {
                     this.buyerOrderItemId = nextStringOrNull(er);
+                } else if (name.equals("ORDER_DATE")) {
+                    DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
+                    try {
+                        this.buyerOrderDate = df.parse(nextStringOrNull(er));
+                    } catch (Exception e) {}
                 }
             }
             if (event.isEndElement()) {
@@ -189,6 +186,16 @@ public class InvoiceItem {
                     this.deliveryOrderItemId = nextStringOrNull(er);
                 } else if (name.equals("DELIVERYNOTE_ID")) {
                     this.deliveryNoteId = nextStringOrNull(er);
+                } else if (name.equals("DELIVERY_START_DATE")) {
+                    try {
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                        this.deliveryStartDate = df.parse(nextStringOrNull(er));
+                    } catch (Exception e){}
+                } else if (name.equals("DELIVERY_END_DATE")) {
+                    try {
+                        DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+                        this.deliveryEndDate = df.parse(nextStringOrNull(er));
+                    } catch (Exception e){}
                 }
             }
             if (event.isEndElement()) {
