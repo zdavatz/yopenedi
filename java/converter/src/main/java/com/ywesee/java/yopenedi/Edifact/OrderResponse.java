@@ -33,6 +33,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
     public Date deliveryDate;
     public Date promisedDeliveryDate;
     public String orderNumberFromBuyer; // Reference number assigned by the buyer to an order.
+    public String orderNumberFromSupplier;
     public Date referenceDate; // Date/time on which the reference was issued.
 
     public String taxType; // e.g. "VAT"
@@ -206,6 +207,12 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
         }
         if (this.referenceDate != null) {
             SegmentGroup1 sg1 = new SegmentGroup1();
+            RFFReference rff = new RFFReference();
+            sg1.setRFFReference(rff);
+            C506Reference c506 = new C506Reference();
+            rff.setC506Reference(c506);
+            c506.setE1153ReferenceQualifier("VN");
+            c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.orderNumberFromSupplier, 35));
             ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
             DTMDateTimePeriod dtm = new DTMDateTimePeriod();
             segmentCount++;
@@ -362,7 +369,6 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 c212.setE7140ItemNumber(leftWithUmlautAsDouble(item.ean, 35));
                 c212.setE7143ItemNumberTypeCoded("EN");
                 lineItem.setC212ItemNumberIdentification(c212);
-                sg26.setLINLineItem(lineItem);
             }
 
             ArrayList<PIAAdditionalProductId> pias = new ArrayList<>();
@@ -433,7 +439,21 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 segmentCount++;
                 qtys.add(qty);
                 C186QuantityDetails c186 = new C186QuantityDetails();
+                // Quantity to be delivered
+                // The quantity to be delivered.
                 c186.setE6063QuantityQualifier("113");
+                c186.setE6060Quantity(item.deliveryQuantity);
+                c186.setE6411MeasureUnitQualifier(leftWithUmlautAsDouble(item.orderUnit, 3));
+                qty.setC186QuantityDetails(c186);
+            }
+            if (item.deliveryQuantity != null) {
+                QTYQuantity qty = new QTYQuantity();
+                segmentCount++;
+                qtys.add(qty);
+                C186QuantityDetails c186 = new C186QuantityDetails();
+                // Delivery quantity.
+                // Quantity required by buyer to be delivered.
+                c186.setE6063QuantityQualifier("131");
                 c186.setE6060Quantity(item.deliveryQuantity);
                 c186.setE6411MeasureUnitQualifier(leftWithUmlautAsDouble(item.orderUnit, 3));
                 qty.setC186QuantityDetails(c186);
@@ -491,13 +511,15 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 moas.add(moa);
                 sg26.setMOAMonetaryAmount(moas);
             }
+            ArrayList<SegmentGroup30> sg30s = new ArrayList<>();
             {
-                ArrayList<SegmentGroup30> sg30s = new ArrayList<>();
                 SegmentGroup30 sg30 = new SegmentGroup30();
                 PRIPriceDetails pri = new PRIPriceDetails();
                 segmentCount++;
 
                 C509PriceInformation c509 = new C509PriceInformation();
+                // Calculation gross
+                // The price stated is the gross price to which allowances/ charges must be applied.
                 c509.setE5125PriceQualifier("AAB");
                 c509.setE5118Price(item.price);
                 c509.setE5284UnitPriceBasis(item.priceQuantity);
@@ -505,8 +527,24 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
 
                 sg30.setPRIPriceDetails(pri);
                 sg30s.add(sg30);
-                sg26.setSegmentGroup30(sg30s);
             }
+            {
+                SegmentGroup30 sg30 = new SegmentGroup30();
+                PRIPriceDetails pri = new PRIPriceDetails();
+                segmentCount++;
+
+                C509PriceInformation c509 = new C509PriceInformation();
+                // Calculation net
+                // The price stated is the net price including allowances/ charges.
+                // Allowances/charges may be stated for information only.
+                c509.setE5125PriceQualifier("AAA");
+                c509.setE5118Price(item.priceLineAmount);
+                pri.setC509PriceInformation(c509);
+
+                sg30.setPRIPriceDetails(pri);
+                sg30s.add(sg30);
+            }
+            sg26.setSegmentGroup30(sg30s);
 
             ArrayList<SegmentGroup31> sg31s = new ArrayList<>();
             if (notNullOrEmpty(item.buyerOrderId)) {

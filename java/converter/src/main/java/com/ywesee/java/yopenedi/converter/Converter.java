@@ -392,6 +392,7 @@ public class Converter {
         com.ywesee.java.yopenedi.Edifact.OrderResponse or = new com.ywesee.java.yopenedi.Edifact.OrderResponse();
         or.referenceNumber = orderResponse.orderId;
         or.documentNumber = orderResponse.supplierOrderId;
+        or.orderNumberFromSupplier = orderResponse.supplierOrderId;
         or.orderDate = orderResponse.orderResponseDate;
         or.deliveryDate = orderResponse.deliveryEndDate;
         or.orderNumberFromBuyer = orderResponse.orderId;
@@ -442,10 +443,13 @@ public class Converter {
         ori.buyerOrderItemId = orderResponseItem.buyerLineItemId;
 
         ArrayList<com.ywesee.java.yopenedi.Edifact.AllowanceOrCharge> aocs = new ArrayList<>();
-        if (orderResponseItem.allowanceOrCharge != null) {
-            aocs.add(allowanceOrChargesToEdifact(orderResponseItem.allowanceOrCharge));
+        for (AllowanceOrCharge aoc : orderResponseItem.allowanceOrCharges) {
+            aocs.add(allowanceOrChargesToEdifact(aoc));
         }
         ori.allowanceOrCharges = aocs;
+        if (orderResponseItem.allowanceOrChargesTotalAmount != null) {
+            ori.allowanceOrChargesTotalAmount = new BigDecimal(orderResponseItem.allowanceOrChargesTotalAmount);
+        }
         return ori;
     }
 

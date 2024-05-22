@@ -6,6 +6,7 @@ import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import static com.ywesee.java.yopenedi.OpenTrans.Utility.nextStringOrNull;
@@ -23,7 +24,8 @@ public class OrderResponseItem {
     public String orderUnit;
     public String priceAmount;
     public String priceQuantity;
-    public AllowanceOrCharge allowanceOrCharge;
+    public ArrayList<AllowanceOrCharge> allowanceOrCharges = new ArrayList<>();
+    public String allowanceOrChargesTotalAmount;
     public String taxCategory;
     public String taxType;
     public Float tax; // 0.19 means 19%
@@ -61,7 +63,9 @@ public class OrderResponseItem {
                 } else if (name.equals("PRICE_QUANTITY")) {
                     this.priceQuantity = nextStringOrNull(er);
                 } else if (name.equals("ALLOW_OR_CHARGE")) {
-                    this.allowanceOrCharge = new AllowanceOrCharge(er, se);
+                    this.allowanceOrCharges.add(new AllowanceOrCharge(er, se));
+                } else if (name.equals("ALLOW_OR_CHARGES_TOTAL_AMOUNT")) {
+                    this.allowanceOrChargesTotalAmount = nextStringOrNull(er);
                 } else if (name.equals("TAX_CATEGORY")) {
                     this.taxCategory = nextStringOrNull(er);
                 } else if (name.equals("TAX_TYPE")) {
@@ -86,15 +90,5 @@ public class OrderResponseItem {
                 }
             }
         }
-    }
-
-    public String getTextType() {
-        if (this.taxType != null) {
-            return this.taxType;
-        }
-        if (this.allowanceOrCharge != null) {
-            return this.allowanceOrCharge.innerType;
-        }
-        return null;
     }
 }

@@ -29,4 +29,5 @@ public class OrderResponseItem {
     public Date referenceDate;
 
     public ArrayList<AllowanceOrCharge> allowanceOrCharges;
+    public BigDecimal allowanceOrChargesTotalAmount;
 }
