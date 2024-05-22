@@ -40,6 +40,15 @@ public class DispatchNotification {
         return null;
     }
 
+    public String getSupplierOrderId() {
+        for (DispatchNotificationItem item : items) {
+            if (notNullOrEmpty(item.supplierOrderId)) {
+                return item.supplierOrderId;
+            }
+        }
+        return null;
+    }
+
     public Party getRecipient() {
         for (Party party : parties) {
             if (party.role == Party.Role.Buyer) {

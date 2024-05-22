@@ -462,6 +462,7 @@ public class Converter {
         despatchAdvice.deliveryDate = dispatchNotification.fixedDeliveryStartDate;
         despatchAdvice.deliveryNoteNumber = dispatchNotification.id;
         despatchAdvice.orderNumber = dispatchNotification.getOrderId();
+        despatchAdvice.supplierOrderNumber = dispatchNotification.getSupplierOrderId();
         if (dispatchNotification.deliveryIdRef != null) {
             despatchAdvice.shipmentReferenceNumber = dispatchNotification.deliveryIdRef;
         } else if (dispatchNotification.finalDeliveryIdRef != null) {
