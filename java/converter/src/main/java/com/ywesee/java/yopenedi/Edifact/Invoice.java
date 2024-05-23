@@ -29,8 +29,9 @@ import static com.ywesee.java.yopenedi.converter.Utility.*;
 public class Invoice implements Writable, MessageExchange<Party> {
     public String referenceNumber;
     public String documentNumber;
-    public Date orderDate;
+    public Date invoiceDate;
     public Date deliveryDate;
+    public Date orderDate;
 
     public String deliveryNoteNumber;
     public String orderNumberForCustomer;
@@ -163,9 +164,21 @@ public class Invoice implements Writable, MessageExchange<Party> {
 
         {
             ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
-
+            DateFormat df = new SimpleDateFormat("yyyyMMdd");
+            if (this.invoiceDate != null) {
+                // https://github.com/zdavatz/yopenedi/issues/262
+                DTMDateTimePeriod issueDate = new DTMDateTimePeriod();
+                segmentCount++;
+                C507DateTimePeriod orderC507 = new C507DateTimePeriod();
+                // Reference date/time
+                // Date/time on which the reference was issued.
+                orderC507.setE2005DateTimePeriodQualifier("171");
+                orderC507.setE2380DateTimePeriod(df.format(this.invoiceDate));
+                orderC507.setE2379DateTimePeriodFormatQualifier("102");
+                issueDate.setC507DateTimePeriod(orderC507);
+                dtms.add(issueDate);
+            }
             if (this.orderDate != null) {
-                DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 DTMDateTimePeriod orderDate = new DTMDateTimePeriod();
                 segmentCount++;
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
@@ -176,7 +189,6 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 dtms.add(orderDate);
             }
             if (this.deliveryDate != null) {
-                DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 DTMDateTimePeriod deliveryDate = new DTMDateTimePeriod();
                 segmentCount++;
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
@@ -194,6 +206,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
         ArrayList<SegmentGroup1> sg1s = new ArrayList<>();
 
         if (notNullOrEmpty(this.deliveryNoteNumber)) {
+            DateFormat df = new SimpleDateFormat("yyyyMMdd");
             SegmentGroup1 sg1 = new SegmentGroup1();
             RFFReference r = new RFFReference();
             segmentCount++;
@@ -203,6 +216,17 @@ public class Invoice implements Writable, MessageExchange<Party> {
             r506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.deliveryNoteNumber, 35));
             r.setC506Reference(r506);
             sg1.setRFFReference(r);
+            ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
+            DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+            dtms.add(dtm);
+            C507DateTimePeriod c507 = new C507DateTimePeriod();
+            dtm.setC507DateTimePeriod(c507);
+            // Delivery date/time, actual
+            // Date/time on which goods or consignment are delivered at their destination.
+            c507.setE2005DateTimePeriodQualifier("35");
+            c507.setE2380DateTimePeriod(df.format(this.deliveryDate));
+            c507.setE2379DateTimePeriodFormatQualifier("102");
+            sg1.setDTMDateTimePeriod(dtms);
             sg1s.add(sg1);
         }
 
@@ -735,9 +759,22 @@ public class Invoice implements Writable, MessageExchange<Party> {
                         c506.setE1156LineNumber(leftWithUmlautAsDouble(ii.deliveryOrderItemId, 6));
                     }
                     rff.setC506Reference(c506);
+
+                    if (ii.deliveryDate != null) {
+                        DateFormat df = new SimpleDateFormat("yyyyMMdd");
+                        ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
+                        DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                        C507DateTimePeriod c507 = new C507DateTimePeriod();
+                        c507.setE2380DateTimePeriod(df.format(ii.deliveryDate));
+                        c507.setE2379DateTimePeriodFormatQualifier("102");
+                        c507.setE2005DateTimePeriodQualifier("37");
+                        dtm.setC507DateTimePeriod(c507);
+                        sg29.setDTMDateTimePeriod(dtms);
+                    }
                     sg29.setRFFReference(rff);
                     sg29s.add(sg29);
                 }
+
                 sg25.setSegmentGroup29(sg29s);
             }
 

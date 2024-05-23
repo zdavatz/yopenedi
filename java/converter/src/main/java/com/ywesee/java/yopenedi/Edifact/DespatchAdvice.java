@@ -35,6 +35,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
     public Date deliveryDate;
     public String deliveryNoteNumber;
     public String orderNumber; // Order number (purchase) Reference number assigned by the buyer to an order.
+    public String supplierOrderNumber;
     public String shipmentReferenceNumber;
     public BigDecimal numberOfPackage;
     public String recipientGLNOverride;
@@ -152,10 +153,22 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
 
         {
             ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
-
+            DateFormat df = new SimpleDateFormat("yyyyMMdd");
+            {
+                // https://github.com/zdavatz/yopenedi/issues/262
+                DTMDateTimePeriod issueDate = new DTMDateTimePeriod();
+                segmentCount++;
+                C507DateTimePeriod orderC507 = new C507DateTimePeriod();
+                // Reference date/time
+                // Date/time on which the reference was issued.
+                orderC507.setE2005DateTimePeriodQualifier("171");
+                orderC507.setE2380DateTimePeriod(df.format(new Date()));
+                orderC507.setE2379DateTimePeriodFormatQualifier("102");
+                issueDate.setC507DateTimePeriod(orderC507);
+                dtms.add(issueDate);
+            }
             if (this.orderDate != null) {
                 segmentCount++;
-                DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 DTMDateTimePeriod orderDate = new DTMDateTimePeriod();
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
                 orderC507.setE2005DateTimePeriodQualifier("137"); // order date Belegdatum
@@ -166,7 +179,6 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
             }
             if (this.fixedDeliveryDate != null) {
                 segmentCount++;
-                DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 DTMDateTimePeriod deliveryDate = new DTMDateTimePeriod();
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
                 orderC507.setE2005DateTimePeriodQualifier("2"); // festes Lieferdatum
@@ -177,7 +189,6 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
             }
             if (this.deliveryDate != null) {
                 segmentCount++;
-                DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 DTMDateTimePeriod deliveryDate = new DTMDateTimePeriod();
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
                 orderC507.setE2005DateTimePeriodQualifier("191"); // Anlieferdatum
@@ -213,6 +224,25 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                 c506.setE1153ReferenceQualifier("ON");
                 c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.orderNumber, 35));
                 rff.setC506Reference(c506);
+                sg1.setRFFReference(rff);
+            }
+            if (notNullOrEmpty(this.supplierOrderNumber)) {
+                segmentCount++;
+                SegmentGroup1 sg1 = new SegmentGroup1();
+                sg1s.add(sg1);
+                RFFReference rff = new RFFReference();
+                C506Reference c506 = new C506Reference();
+                c506.setE1153ReferenceQualifier("VN");
+                c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.supplierOrderNumber, 35));
+                rff.setC506Reference(c506);
+                DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                sg1.setDTMDateTimePeriod(dtm);
+                C507DateTimePeriod c507 = new C507DateTimePeriod();
+                dtm.setC507DateTimePeriod(c507);
+                DateFormat df = new SimpleDateFormat("yyyyMMdd");
+                c507.setE2380DateTimePeriod(df.format(this.orderDate));
+                c507.setE2005DateTimePeriodQualifier("171");
+                c507.setE2379DateTimePeriodFormatQualifier("102");
                 sg1.setRFFReference(rff);
             }
             if (notNullOrEmpty(this.shipmentReferenceNumber)) {

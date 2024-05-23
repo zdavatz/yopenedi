@@ -101,6 +101,15 @@ public class Invoice {
         return null;
     }
 
+    public Date getOrderDate() {
+        for (InvoiceItem ii : this.invoiceItems) {
+            if (ii.buyerOrderDate != null) {
+                return ii.buyerOrderDate;
+            }
+        }
+        return null;
+    }
+
     public Invoice(InputStream stream) throws XMLStreamException {
         XMLInputFactory factory = XMLInputFactory.newFactory();
         XMLEventReader eventReader = factory.createXMLEventReader(stream, "UTF-8");

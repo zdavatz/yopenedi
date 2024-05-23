@@ -30,10 +30,12 @@ public class OrderResponse {
     public ArrayList<OrderResponseItem> orderResponseItems = new ArrayList<>();
 
     public String getTaxType() {
-        if (this.orderResponseItems.size() == 0) {
-            return null;
+        for (OrderResponseItem i : this.orderResponseItems) {
+            if (i.taxType != null) {
+                return i.taxType;
+            }
         }
-        return this.orderResponseItems.get(0).getTextType();
+        return null;
     }
 
     public Float getTaxRate() {

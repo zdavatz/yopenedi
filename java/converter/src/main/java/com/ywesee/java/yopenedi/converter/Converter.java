@@ -174,11 +174,12 @@ public class Converter {
         com.ywesee.java.yopenedi.Edifact.Invoice i = new com.ywesee.java.yopenedi.Edifact.Invoice();
         i.referenceNumber = invoice.documentNumber;
         i.documentNumber = invoice.documentNumber;
-        i.orderDate = invoice.invoiceDate;
+        i.invoiceDate = invoice.invoiceDate;
         i.deliveryDate = invoice.deliveryEndDate;
         i.deliveryNoteNumber = invoice.getDeliveryNoteId();
         i.orderNumberForCustomer = invoice.getBuyerOrderId();
         i.orderNumberForSupplier = invoice.getSupplierOrderId();
+        i.orderDate = invoice.getOrderDate();
         i.taxType = invoice.taxType;
         i.taxRate = String.valueOf(Float.parseFloat(invoice.taxRate) * 100);
         i.currencyCode = invoice.currencyCode;
@@ -391,6 +392,7 @@ public class Converter {
         com.ywesee.java.yopenedi.Edifact.OrderResponse or = new com.ywesee.java.yopenedi.Edifact.OrderResponse();
         or.referenceNumber = orderResponse.orderId;
         or.documentNumber = orderResponse.supplierOrderId;
+        or.orderNumberFromSupplier = orderResponse.supplierOrderId;
         or.orderDate = orderResponse.orderResponseDate;
         or.deliveryDate = orderResponse.deliveryEndDate;
         or.orderNumberFromBuyer = orderResponse.orderId;
@@ -441,10 +443,13 @@ public class Converter {
         ori.buyerOrderItemId = orderResponseItem.buyerLineItemId;
 
         ArrayList<com.ywesee.java.yopenedi.Edifact.AllowanceOrCharge> aocs = new ArrayList<>();
-        if (orderResponseItem.allowanceOrCharge != null) {
-            aocs.add(allowanceOrChargesToEdifact(orderResponseItem.allowanceOrCharge));
+        for (AllowanceOrCharge aoc : orderResponseItem.allowanceOrCharges) {
+            aocs.add(allowanceOrChargesToEdifact(aoc));
         }
         ori.allowanceOrCharges = aocs;
+        if (orderResponseItem.allowanceOrChargesTotalAmount != null) {
+            ori.allowanceOrChargesTotalAmount = new BigDecimal(orderResponseItem.allowanceOrChargesTotalAmount);
+        }
         return ori;
     }
 
@@ -457,6 +462,7 @@ public class Converter {
         despatchAdvice.deliveryDate = dispatchNotification.fixedDeliveryStartDate;
         despatchAdvice.deliveryNoteNumber = dispatchNotification.id;
         despatchAdvice.orderNumber = dispatchNotification.getOrderId();
+        despatchAdvice.supplierOrderNumber = dispatchNotification.getSupplierOrderId();
         if (dispatchNotification.deliveryIdRef != null) {
             despatchAdvice.shipmentReferenceNumber = dispatchNotification.deliveryIdRef;
         } else if (dispatchNotification.finalDeliveryIdRef != null) {
