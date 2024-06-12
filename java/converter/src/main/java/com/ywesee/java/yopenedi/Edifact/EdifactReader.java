@@ -72,7 +72,7 @@ public class EdifactReader {
             e.printStackTrace();
             System.out.println("Recovering...");
             if (e instanceof SmooksException) {
-                Pattern p = Pattern.compile("LIN\\+[0-9]+.*'");
+                Pattern p = Pattern.compile("LIN\\+[0-9]+[^']*'");
                 Matcher m = p.matcher(ediString);
                 boolean match = false;
                 ArrayList<Integer> starts = new ArrayList<>();
@@ -81,12 +81,12 @@ public class EdifactReader {
                 }
                 ArrayList<String> itemStrings = new ArrayList<>();
                 if (starts.size() > 2) {
-                    String prefix = ediString.substring(0, starts.get(0) - 1);
-                    String suffix = ediString.substring(starts.get(starts.size()-1) - 1);
+                    String prefix = ediString.substring(0, starts.get(0) );
+                    String suffix = ediString.substring(starts.get(starts.size()-1));
 
                     for (int i = 0; i < starts.size()-1; i++) {
                         Integer start = starts.get(i);
-                        Integer end = starts.get(i+1)-1;
+                        Integer end = starts.get(i+1);
                         itemStrings.add(ediString.substring(start, end));
                     }
                     Order o = null;
@@ -102,7 +102,9 @@ public class EdifactReader {
                         System.err.println("Recovered.");
                     }
                     ArrayList<Order> result = new ArrayList<>();
-                    result.add(o);
+                    if (o != null) {
+                        result.add(o);
+                    }
                     return result;
                 }
             }
