@@ -72,7 +72,7 @@ public class EdifactReader {
             e.printStackTrace();
             System.out.println("Recovering...");
             if (e instanceof SmooksException) {
-                Pattern p = Pattern.compile("LIN\\+[0-9]+.*'");
+                Pattern p = Pattern.compile("LIN\\+[0-9]+[^']*'");
                 Matcher m = p.matcher(ediString);
                 boolean match = false;
                 ArrayList<Integer> starts = new ArrayList<>();
