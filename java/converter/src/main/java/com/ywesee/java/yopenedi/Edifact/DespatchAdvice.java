@@ -235,6 +235,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                 c506.setE1153ReferenceQualifier("VN");
                 c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.supplierOrderNumber, 35));
                 rff.setC506Reference(c506);
+                segmentCount++;
                 DTMDateTimePeriod dtm = new DTMDateTimePeriod();
                 sg1.setDTMDateTimePeriod(dtm);
                 C507DateTimePeriod c507 = new C507DateTimePeriod();
