@@ -216,16 +216,20 @@ public class Invoice implements Writable, MessageExchange<Party> {
             r506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.deliveryNoteNumber, 35));
             r.setC506Reference(r506);
             sg1.setRFFReference(r);
+
             ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
-            DTMDateTimePeriod dtm = new DTMDateTimePeriod();
-            dtms.add(dtm);
-            C507DateTimePeriod c507 = new C507DateTimePeriod();
-            dtm.setC507DateTimePeriod(c507);
-            // Delivery date/time, actual
-            // Date/time on which goods or consignment are delivered at their destination.
-            c507.setE2005DateTimePeriodQualifier("35");
-            c507.setE2380DateTimePeriod(df.format(this.deliveryDate));
-            c507.setE2379DateTimePeriodFormatQualifier("102");
+            if (this.deliveryDate != null) {
+                segmentCount++;
+                DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                dtms.add(dtm);
+                C507DateTimePeriod c507 = new C507DateTimePeriod();
+                dtm.setC507DateTimePeriod(c507);
+                // Delivery date/time, actual
+                // Date/time on which goods or consignment are delivered at their destination.
+                c507.setE2005DateTimePeriodQualifier("35");
+                c507.setE2380DateTimePeriod(df.format(this.deliveryDate));
+                c507.setE2379DateTimePeriodFormatQualifier("102");
+            }
             sg1.setDTMDateTimePeriod(dtms);
             sg1s.add(sg1);
         }
@@ -763,6 +767,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                     if (ii.deliveryDate != null) {
                         DateFormat df = new SimpleDateFormat("yyyyMMdd");
                         ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
+                        segmentCount++;
                         DTMDateTimePeriod dtm = new DTMDateTimePeriod();
                         C507DateTimePeriod c507 = new C507DateTimePeriod();
                         c507.setE2380DateTimePeriod(df.format(ii.deliveryDate));
