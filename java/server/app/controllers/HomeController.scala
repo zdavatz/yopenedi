@@ -377,7 +377,15 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
         return r
       case Right(s) =>
         val converter = new Converter(converterConfig)
-        val writable = converter.run(s).snd
+        val result = converter.run(s)
+        val fileType = result.fst
+        if (fileType == Converter.FileType.Edifact) {
+          return BadRequest("The file sent is not an XML file but and EDIFACT file. Please send a XML OpenTrans file. Thank you.");
+        }
+        if (fileType != Converter.FileType.OpenTrans) {
+          return BadRequest("The file sent is not an XML file. Please send a XML OpenTrans file. Thank you.");
+        }
+        val writable = result.snd
 
         if (writable.isInstanceOf[com.ywesee.java.yopenedi.Edifact.OrderResponse]) {
           val r = writable.asInstanceOf[com.ywesee.java.yopenedi.Edifact.OrderResponse]
@@ -410,7 +418,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
             recipientGLN = recipient.id
           }
         } else {
-          return BadRequest("Invalid file type")
+          return BadRequest("Invalid file type. This endpoint only accept OpenTrans XML");
         }
 
         outFile = new File(ediFolder, filename)

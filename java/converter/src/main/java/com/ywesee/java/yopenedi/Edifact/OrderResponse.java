@@ -207,6 +207,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
         }
         if (this.referenceDate != null) {
             SegmentGroup1 sg1 = new SegmentGroup1();
+            segmentCount++;
             RFFReference rff = new RFFReference();
             sg1.setRFFReference(rff);
             C506Reference c506 = new C506Reference();
@@ -455,7 +456,9 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 // Quantity required by buyer to be delivered.
                 c186.setE6063QuantityQualifier("131");
                 c186.setE6060Quantity(item.deliveryQuantity);
-                c186.setE6411MeasureUnitQualifier(leftWithUmlautAsDouble(item.orderUnit, 3));
+                if (item.orderUnit != null) {
+                    c186.setE6411MeasureUnitQualifier(leftWithUmlautAsDouble(item.orderUnit, 3));
+                }
                 qty.setC186QuantityDetails(c186);
             }
             sg26.setQTYQuantity(qtys);
@@ -538,7 +541,9 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 // The price stated is the net price including allowances/ charges.
                 // Allowances/charges may be stated for information only.
                 c509.setE5125PriceQualifier("AAA");
-                c509.setE5118Price(item.priceLineAmount);
+                if (item.priceLineAmount != null) {
+                    c509.setE5118Price(item.priceLineAmount);
+                }
                 pri.setC509PriceInformation(c509);
 
                 sg30.setPRIPriceDetails(pri);

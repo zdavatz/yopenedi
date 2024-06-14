@@ -166,11 +166,20 @@ public class Invoice {
                 } else if (name.equals("PAYMENT_TERMS")) {
                     processPaymentTerms(er, se);
                 } else if (name.equals("INVOICE_DATE")) {
-                    this.invoiceDate = com.ywesee.java.yopenedi.converter.Utility.dateFromISOString(nextStringOrNull(er));
+                    String dateString = nextStringOrNull(er);
+                    if (dateString != null) {
+                        this.invoiceDate = com.ywesee.java.yopenedi.converter.Utility.dateFromISOString(dateString);
+                    }
                 } else if (name.equals("DELIVERY_START_DATE")) {
-                    this.deliveryStartDate = com.ywesee.java.yopenedi.converter.Utility.dateFromISOString(nextStringOrNull(er));
+                    String dateString = nextStringOrNull(er);
+                    if (dateString != null) {
+                        this.deliveryStartDate = com.ywesee.java.yopenedi.converter.Utility.dateFromISOString(dateString);
+                    }
                 } else if (name.equals("DELIVERY_END_DATE")) {
-                    this.deliveryEndDate = Utility.dateFromISOString(nextStringOrNull(er));
+                    String dateString = nextStringOrNull(er);
+                    if (dateString != null) {
+                        this.deliveryEndDate = Utility.dateFromISOString(dateString);
+                    }
                 } else if (name.equals("DELIVERY_IDREF")) {
                     this.deliveryIdRef = nextStringOrNull(er);
                 } else if (name.equals("INVOICE_ISSUER_IDREF")) {
@@ -236,12 +245,21 @@ public class Invoice {
                 if (name.equals("PAYMENT_DATE")) {
                     try {
                         DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
-                        pt.date = df.parse(nextStringOrNull(er));
+                        String nextString = nextStringOrNull(er);
+                        if (nextString != null) {
+                            pt.date = df.parse(nextString);
+                        }
                     } catch (Exception e) {}
                 } else if (name.equals("DAYS")) {
-                    pt.days = Integer.parseInt(nextStringOrNull(er));
+                    String nextString = nextStringOrNull(er);
+                    if (nextString != null) {
+                        pt.days = Integer.parseInt(nextString);
+                    }
                 } else if (name.equals("DISCOUNT_FACTOR")) {
-                    pt.discountFactor = Float.parseFloat(nextStringOrNull(er));
+                    String nextString = nextStringOrNull(er);
+                    if (nextString != null) {
+                        pt.discountFactor = Float.parseFloat(nextString);
+                    }
                 }
             }
             if (event.isEndElement()) {

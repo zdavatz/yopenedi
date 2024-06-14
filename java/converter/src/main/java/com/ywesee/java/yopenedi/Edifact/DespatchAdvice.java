@@ -235,16 +235,19 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
                 c506.setE1153ReferenceQualifier("VN");
                 c506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.supplierOrderNumber, 35));
                 rff.setC506Reference(c506);
-                segmentCount++;
-                DTMDateTimePeriod dtm = new DTMDateTimePeriod();
-                sg1.setDTMDateTimePeriod(dtm);
-                C507DateTimePeriod c507 = new C507DateTimePeriod();
-                dtm.setC507DateTimePeriod(c507);
-                DateFormat df = new SimpleDateFormat("yyyyMMdd");
-                c507.setE2380DateTimePeriod(df.format(this.orderDate));
-                c507.setE2005DateTimePeriodQualifier("171");
-                c507.setE2379DateTimePeriodFormatQualifier("102");
                 sg1.setRFFReference(rff);
+
+                if (orderDate != null) {
+                    segmentCount++;
+                    DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                    sg1.setDTMDateTimePeriod(dtm);
+                    C507DateTimePeriod c507 = new C507DateTimePeriod();
+                    dtm.setC507DateTimePeriod(c507);
+                    DateFormat df = new SimpleDateFormat("yyyyMMdd");
+                    c507.setE2380DateTimePeriod(df.format(this.orderDate));
+                    c507.setE2005DateTimePeriodQualifier("171");
+                    c507.setE2379DateTimePeriodFormatQualifier("102");
+                }
             }
             if (notNullOrEmpty(this.shipmentReferenceNumber)) {
                 segmentCount++;
