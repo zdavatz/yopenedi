@@ -26,9 +26,13 @@ public class Converter {
     }
 
     public Pair<FileType, Writable> run(InputStream s) {
+        FileType fileType = FileType.Unknown;
         try {
             Pair<InputStream, FileType> pair = Converter.detectFileType(s);
+            fileType = pair.snd;
             switch (pair.snd) {
+                case Unknown:
+                    return new Pair<>(fileType, null);
                 case OpenTrans:
                     OpenTransReader reader = new OpenTransReader();
                     Object otObject = reader.run(pair.fst);
@@ -37,19 +41,19 @@ public class Converter {
                         this.gln = otInvoice.getRecipientGLN();
                         com.ywesee.java.yopenedi.Edifact.Invoice invoice = this.invoiceToEdifact(otInvoice);
                         config.replaceGLN(invoice);
-                        return new Pair<>(pair.snd, invoice);
+                        return new Pair<>(fileType, invoice);
                     } else if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.OrderResponse) {
                         com.ywesee.java.yopenedi.OpenTrans.OrderResponse or = (com.ywesee.java.yopenedi.OpenTrans.OrderResponse) otObject;
                         this.gln = or.getRecipientGLN();
                         com.ywesee.java.yopenedi.Edifact.OrderResponse orderResponse = this.orderResponseToEdifact(or);
                         config.replaceGLN(orderResponse);
-                        return new Pair<>(pair.snd, orderResponse);
+                        return new Pair<>(fileType, orderResponse);
                     } else if (otObject instanceof com.ywesee.java.yopenedi.OpenTrans.DispatchNotification) {
                         com.ywesee.java.yopenedi.OpenTrans.DispatchNotification od = (com.ywesee.java.yopenedi.OpenTrans.DispatchNotification) otObject;
                         this.gln = od.getRecipientGLN();
                         com.ywesee.java.yopenedi.Edifact.DespatchAdvice despatchAdvice = this.dispatchNotificationToEdifact(od);
                         config.replaceGLN(despatchAdvice);
-                        return new Pair<>(pair.snd, despatchAdvice);
+                        return new Pair<>(fileType, despatchAdvice);
                     }
                     break;
                 case Edifact:
@@ -61,12 +65,12 @@ public class Converter {
                     }
                     com.ywesee.java.yopenedi.Edifact.Order ediOrder = ediOrders.get(0);
                     Order otOrder = orderToOpenTrans(ediOrder);
-                    return new Pair<>(pair.snd, otOrder);
+                    return new Pair<>(fileType, otOrder);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return null;
+        return new Pair<>(fileType, null);
     }
 
     public Order orderToOpenTrans(com.ywesee.java.yopenedi.Edifact.Order order) {
@@ -552,6 +556,7 @@ public class Converter {
     public enum FileType {
         Edifact,
         OpenTrans,
+        Unknown,
     }
 
     public static Pair<InputStream, FileType> detectFileType(InputStream inputStream) throws Exception {
@@ -571,6 +576,6 @@ public class Converter {
         } else if (firstBitOfFile.startsWith("U")) {
             return new Pair<>(s, FileType.Edifact);
         }
-        throw new Exception("Unrecognised file type");
+        return new Pair<>(s, FileType.Unknown);
     }
 }
