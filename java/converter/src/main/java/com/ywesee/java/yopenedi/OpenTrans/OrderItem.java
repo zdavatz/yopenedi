@@ -82,9 +82,11 @@ public class OrderItem {
         // TODO: more id of other types? e.g. supplier id
         s.writeEndElement(); // PRODUCT_ID
 
-        s.writeStartElement("QUANTITY");
-        s.writeCharacters(this.quantity.toString());
-        s.writeEndElement(); // QUANTITY
+        if (this.quantity != null) {
+            s.writeStartElement("QUANTITY");
+            s.writeCharacters(this.quantity.toString());
+            s.writeEndElement(); // QUANTITY
+        }
 
         s.writeStartElement("bmecat:ORDER_UNIT");
         s.writeCharacters(this.quantityUnit);
