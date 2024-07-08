@@ -25,7 +25,7 @@ import static com.ywesee.java.yopenedi.converter.Utility.*;
 public class EdifactReader {
 
     public ArrayList<Order> run(InputStream stream) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.UTF_8));
+        BufferedReader reader = new BufferedReader(new InputStreamReader(stream, StandardCharsets.ISO_8859_1));
         String ediString = reader.lines().collect(Collectors.joining("\n"));
 
         try {
@@ -293,7 +293,12 @@ public class EdifactReader {
                     ArrayList<String> descriptions = new ArrayList<String>();
                     for (IMDItemDescription itemDescription : segmentGroup25.getIMDItemDescription()) {
                         try {
-                            String desc = itemDescription.getC273ItemDescription().getE70081ItemDescription();
+                            C273ItemDescription c273 = itemDescription.getC273ItemDescription();
+                            String desc = c273.getE70081ItemDescription();
+                            String desc2 = c273.getE70082ItemDescription();
+                            if (desc2 != null) {
+                                desc += desc2;
+                            }
 
                             // Seems like it's possible for supplier to put their product id
                             // into description. We treat description string that's a number as the supplier product id
