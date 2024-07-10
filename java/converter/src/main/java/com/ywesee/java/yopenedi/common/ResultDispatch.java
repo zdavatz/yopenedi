@@ -83,19 +83,22 @@ public class ResultDispatch {
             }
         }
 
-        boolean shouldSend(String gln, String edifactType) {
-            String a = null;
+        String reasonForNotSending(String gln, String edifactType) {
+            String reason = "";
             if (glns != null) {
                 if (!glns.contains(gln)) {
-                    return false;
+                    reason = "The gln is " + gln + ", not one of the following: " + glns.toString() + "\n";
                 }
             }
             if (edifactTypes != null) {
                 if (!edifactTypes.contains(edifactType)) {
-                    return false;
+                    reason += "The edifact type is " + edifactType + ", not one of the following: " + edifactTypes.toString() + "\n";
                 }
             }
-            return true;
+            if (reason.length() > 0) {
+                return reason;
+            }
+            return null;
         }
     }
 
@@ -121,9 +124,13 @@ public class ResultDispatch {
         }
     }
 
-    void send(String gln, String edifactType, File file, String messageId) {
-        if (this.filter != null && !this.filter.shouldSend(gln, edifactType)) {
-            return;
+    /**
+     * @return Null if it sends, otherwise the reason for not sending
+     */
+    String send(String gln, String edifactType, File file, String messageId) {
+        if (this.filter != null) {
+            String reasonForNotSending = this.filter.reasonForNotSending(gln, edifactType);
+            if (reasonForNotSending != null) return reasonForNotSending + "----------\n";
         }
         if (this.httpPost != null) {
             this.sendHTTPPost(file, messageId);
@@ -134,6 +141,7 @@ public class ResultDispatch {
         if (this.emailDest != null) {
             this.sendEmail(file);
         }
+        return null;
     }
 
     void sendHTTPPost(File file, String messageId) {

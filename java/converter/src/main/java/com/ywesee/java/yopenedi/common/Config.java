@@ -119,8 +119,21 @@ public class Config {
 
     public void dispatchResult(String gln, String edifactType, File file, String messageId) {
         ArrayList<ResultDispatch> dispatches = this.getResultDispatches();
+        boolean anySent = false;
+        int i = 0;
+        String reasons = "";
         for (ResultDispatch dispatch : dispatches) {
-            dispatch.send(gln, edifactType, file, messageId);
+            String reasonForNotSending = dispatch.send(gln, edifactType, file, messageId);
+            if (reasonForNotSending != null) {
+                reasons += "Dispatch " + i + "\n";
+                reasons += reasonForNotSending;
+            } else {
+                anySent = true;
+            }
+            i++;
+        }
+        if (!anySent) {
+            System.out.println("Not sending result, because: \n" + reasons);
         }
     }
 
