@@ -769,6 +769,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                         ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
                         segmentCount++;
                         DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                        dtms.add(dtm);
                         C507DateTimePeriod c507 = new C507DateTimePeriod();
                         c507.setE2380DateTimePeriod(df.format(ii.deliveryDate));
                         c507.setE2379DateTimePeriodFormatQualifier("102");
