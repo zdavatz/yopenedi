@@ -17,6 +17,7 @@ public class OrderResponse {
     public String orderId;
     public String supplierOrderId;
     public Date orderResponseDate;
+    public Date orderDate;
     public Date deliveryStartDate;
     public Date deliveryEndDate;
     public String language;
@@ -114,6 +115,8 @@ public class OrderResponse {
                     this.supplierOrderId = nextStringOrNull(er);
                 } else if (name.equals("ORDERRESPONSE_DATE")) {
                     this.orderResponseDate = parseNextDateString(er);
+                } else if (name.equals("ORDER_DATE")) {
+                    this.orderDate = parseNextDateString(er);
                 } else if (name.equals("DELIVERY_START_DATE")) {
                     this.deliveryStartDate = parseNextDateString(er);
                 } else if (name.equals("DELIVERY_END_DATE")) {

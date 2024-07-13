@@ -173,7 +173,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 // Reference date/time
                 // Date/time on which the reference was issued.
                 orderC507.setE2005DateTimePeriodQualifier("171");
-                orderC507.setE2380DateTimePeriod(df.format(this.invoiceDate));
+                orderC507.setE2380DateTimePeriod(df.format(this.orderDate));
                 orderC507.setE2379DateTimePeriodFormatQualifier("102");
                 issueDate.setC507DateTimePeriod(orderC507);
                 dtms.add(issueDate);
@@ -773,7 +773,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                         C507DateTimePeriod c507 = new C507DateTimePeriod();
                         c507.setE2380DateTimePeriod(df.format(ii.deliveryDate));
                         c507.setE2379DateTimePeriodFormatQualifier("102");
-                        c507.setE2005DateTimePeriodQualifier("37");
+                        c507.setE2005DateTimePeriodQualifier("171");
                         dtm.setC507DateTimePeriod(c507);
                         sg29.setDTMDateTimePeriod(dtms);
                     }
