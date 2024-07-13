@@ -232,6 +232,7 @@ public class Converter {
         ii.shortDescription = invoiceItem.shortDescription;
         ii.longDescription = invoiceItem.longDescription;
         ii.deliveryNoteId = invoiceItem.deliveryNoteId;
+        ii.buyerOrderDate = invoiceItem.buyerOrderDate;
 
         if (invoiceItem.volume != null) {
             ii.volume = BigDecimal.valueOf(invoiceItem.volume);
@@ -397,7 +398,7 @@ public class Converter {
         or.referenceNumber = orderResponse.orderId;
         or.documentNumber = orderResponse.supplierOrderId;
         or.orderNumberFromSupplier = orderResponse.supplierOrderId;
-        or.orderDate = orderResponse.orderResponseDate;
+        or.orderDate = orderResponse.orderDate;
         or.deliveryDate = orderResponse.deliveryEndDate;
         or.orderNumberFromBuyer = orderResponse.orderId;
 

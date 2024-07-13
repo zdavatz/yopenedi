@@ -220,7 +220,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
             DateFormat df = new SimpleDateFormat("yyyyMMdd");
             C507DateTimePeriod c507 = new C507DateTimePeriod();
             c507.setE2005DateTimePeriodQualifier("171");
-            c507.setE2380DateTimePeriod(df.format(this.referenceDate));
+            c507.setE2380DateTimePeriod(df.format(this.orderDate));
             c507.setE2379DateTimePeriodFormatQualifier("102");
             dtm.setC507DateTimePeriod(c507);
             dtms.add(dtm);

@@ -22,6 +22,7 @@ public class InvoiceItem {
     public String countryOfOriginCoded;
 
     public Date deliveryDate; // When it arrives
+    public Date buyerOrderDate;
     public BigDecimal price;  // How much is it per (this.priceQuantity)
     public BigDecimal priceQuantity; // The quantity that (this.price) can buy.
     public String orderUnit;
