@@ -159,8 +159,19 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 DTMDateTimePeriod orderDate = new DTMDateTimePeriod();
                 segmentCount++;
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
-                orderC507.setE2005DateTimePeriodQualifier("171"); // order date Belegdatum
+                orderC507.setE2005DateTimePeriodQualifier("171"); // Reference Date = Bestelldatum #278
                 orderC507.setE2380DateTimePeriod(df.format(this.orderDate));
+                orderC507.setE2379DateTimePeriodFormatQualifier("102");
+                orderDate.setC507DateTimePeriod(orderC507);
+                dtms.add(orderDate);
+            }
+            if (this.referenceDate != null) {
+                DateFormat df = new SimpleDateFormat("yyyyMMdd");
+                DTMDateTimePeriod orderDate = new DTMDateTimePeriod();
+                segmentCount++;
+                C507DateTimePeriod orderC507 = new C507DateTimePeriod();
+                orderC507.setE2005DateTimePeriodQualifier("137"); // Document date = Belegdatum
+                orderC507.setE2380DateTimePeriod(df.format(this.referenceDate));
                 orderC507.setE2379DateTimePeriodFormatQualifier("102");
                 orderDate.setC507DateTimePeriod(orderC507);
                 dtms.add(orderDate);
