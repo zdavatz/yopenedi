@@ -165,7 +165,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
         {
             ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
             DateFormat df = new SimpleDateFormat("yyyyMMdd");
-            if (this.invoiceDate != null) {
+            if (this.orderDate != null) {
                 // https://github.com/zdavatz/yopenedi/issues/262
                 DTMDateTimePeriod issueDate = new DTMDateTimePeriod();
                 segmentCount++;
@@ -244,6 +244,19 @@ public class Invoice implements Writable, MessageExchange<Party> {
             r506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.orderNumberForCustomer, 35));
             r.setC506Reference(r506);
             sg1.setRFFReference(r);
+            if (this.orderDate != null) {
+                DateFormat df = new SimpleDateFormat("yyyyMMdd");
+                DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                segmentCount++;
+                C507DateTimePeriod c507 = new C507DateTimePeriod();
+                c507.setE2005DateTimePeriodQualifier("171"); // order date Belegdatum
+                c507.setE2380DateTimePeriod(df.format(this.orderDate));
+                c507.setE2379DateTimePeriodFormatQualifier("102");
+                dtm.setC507DateTimePeriod(c507);
+                ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
+                dtms.add(dtm);
+                sg1.setDTMDateTimePeriod(dtms);
+            }
             sg1s.add(sg1);
         }
 
