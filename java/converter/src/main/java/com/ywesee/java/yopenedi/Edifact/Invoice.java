@@ -172,18 +172,18 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
                 // Reference date/time
                 // Date/time on which the reference was issued.
-                orderC507.setE2005DateTimePeriodQualifier("171");
+                orderC507.setE2005DateTimePeriodQualifier("171"); // Reference date = Bestelldatum #278
                 orderC507.setE2380DateTimePeriod(df.format(this.orderDate));
                 orderC507.setE2379DateTimePeriodFormatQualifier("102");
                 issueDate.setC507DateTimePeriod(orderC507);
                 dtms.add(issueDate);
             }
-            if (this.orderDate != null) {
+            if (this.invoiceDate != null) {
                 DTMDateTimePeriod orderDate = new DTMDateTimePeriod();
                 segmentCount++;
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
-                orderC507.setE2005DateTimePeriodQualifier("137"); // order date Belegdatum
-                orderC507.setE2380DateTimePeriod(df.format(this.orderDate));
+                orderC507.setE2005DateTimePeriodQualifier("137"); // Document date = Belegdatum #278
+                orderC507.setE2380DateTimePeriod(df.format(this.invoiceDate));
                 orderC507.setE2379DateTimePeriodFormatQualifier("102");
                 orderDate.setC507DateTimePeriod(orderC507);
                 dtms.add(orderDate);
