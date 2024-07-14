@@ -159,7 +159,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 DTMDateTimePeriod orderDate = new DTMDateTimePeriod();
                 segmentCount++;
                 C507DateTimePeriod orderC507 = new C507DateTimePeriod();
-                orderC507.setE2005DateTimePeriodQualifier("137"); // order date Belegdatum
+                orderC507.setE2005DateTimePeriodQualifier("171"); // order date Belegdatum
                 orderC507.setE2380DateTimePeriod(df.format(this.orderDate));
                 orderC507.setE2379DateTimePeriodFormatQualifier("102");
                 orderDate.setC507DateTimePeriod(orderC507);
@@ -187,8 +187,6 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
                 deliveryDate.setC507DateTimePeriod(orderC507);
                 dtms.add(deliveryDate);
             }
-
-
             ordrsp.setDTMDateTimePeriod(dtms);
         }
 
@@ -202,10 +200,23 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
             r506.setE1153ReferenceQualifier("ON");
             r506.setE1154ReferenceNumber(leftWithUmlautAsDouble(this.orderNumberFromBuyer, 35));
             r.setC506Reference(r506);
+            if (this.orderDate != null) {
+                ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
+                DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                segmentCount++;
+                DateFormat df = new SimpleDateFormat("yyyyMMdd");
+                C507DateTimePeriod c507 = new C507DateTimePeriod();
+                c507.setE2005DateTimePeriodQualifier("171");
+                c507.setE2380DateTimePeriod(df.format(this.orderDate));
+                c507.setE2379DateTimePeriodFormatQualifier("102");
+                dtm.setC507DateTimePeriod(c507);
+                dtms.add(dtm);
+                sg1.setDTMDateTimePeriod(dtms);
+            }
             sg1.setRFFReference(r);
             sg1s.add(sg1);
         }
-        if (this.referenceDate != null) {
+        if (this.orderDate != null) {
             SegmentGroup1 sg1 = new SegmentGroup1();
             segmentCount++;
             RFFReference rff = new RFFReference();
