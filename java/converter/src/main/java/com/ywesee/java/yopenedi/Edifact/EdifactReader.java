@@ -127,13 +127,17 @@ public class EdifactReader {
                 Order thisOrder = orders.get(0);
                 if (order == null) {
                     order = thisOrder;
+                    // Remove last, as the last one will be added later
+                    order.orderItems.remove(order.orderItems.size() - 1);
                 } else {
                     for (int j = 0; j < thisOrder.orderItems.size() - 1; j++) {
-                        order.orderItems.add(thisOrder.orderItems.get(0));
+                        OrderItem oi = thisOrder.orderItems.get(j);
+                        order.orderItems.add(oi);
                     }
                 }
                 if (i + batchSize >= itemStrings.size()) {
-                    order.orderItems.add(thisOrder.orderItems.get(thisOrder.orderItems.size() - 1));
+                    OrderItem oi = thisOrder.orderItems.get(thisOrder.orderItems.size() - 1);
+                    order.orderItems.add(oi);
                 }
             }
         } catch (Exception e) {
