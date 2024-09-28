@@ -957,7 +957,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
         message41.setMessageTrailer(unt41);
         interchange.setMessages(Arrays.asList(message41));
 
-        factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+        factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream, StandardCharsets.ISO_8859_1));
     }
 
     public void write(OutputStream s, Config _config) throws Exception {
