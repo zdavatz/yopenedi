@@ -627,7 +627,7 @@ public class DespatchAdvice implements Writable, MessageExchange<Party> {
         unt41.setMessageRefNum("1");
         unt41.setSegmentCount(segmentCount);
         message41.setMessageTrailer(unt41);
-        factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream, StandardCharsets.UTF_8));
+        factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream, StandardCharsets.ISO_8859_1));
     }
 
     public void write(OutputStream s, Config _config) throws Exception {
