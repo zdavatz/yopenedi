@@ -16,6 +16,7 @@ import org.milyn.smooks.edi.unedifact.model.r41.types.SyntaxIdentifier;
 
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -78,7 +79,7 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
         this.recipientGLNOverride = replaced;
     }
 
-    public void write(OutputStream outputStream) throws Exception {
+    public void write(OutputStream outputStream, Charset encoding) throws Exception {
         D96AInterchangeFactory factory = D96AInterchangeFactory.getInstance();
         UNEdifactInterchange41 interchange = new UNEdifactInterchange41();
         Delimiters delimiters = new Delimiters();
@@ -692,10 +693,10 @@ public class OrderResponse implements Writable, MessageExchange<Party> {
         message41.setMessageTrailer(unt41);
         interchange.setMessages(Arrays.asList(message41));
 
-        factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream, StandardCharsets.ISO_8859_1));
+        factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream, encoding));
     }
 
-    public void write(OutputStream s, Config _config) throws Exception {
-        this.write(s);
+    public void write(OutputStream s, Config _config, Charset encoding) throws Exception {
+        this.write(s, encoding);
     }
 }

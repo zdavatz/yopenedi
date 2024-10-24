@@ -125,15 +125,14 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
           recipientGLN = recipient.id
         }
 
-        val writer = new OpenTransWriter(converterConfig)
         val outStream = new FileOutputStream(outFile)
-        writer.write(otOrder, outStream)
+        otOrder.write(outStream, converterConfig, StandardCharsets.UTF_8)
         outStream.flush()
         outStream.getFD().sync()
         outStream.close()
         logger.debug("File written: " + outFile.getAbsolutePath())
         logger.debug("File size: " + outFile.length())
-        converterConfig.dispatchResult(recipientGLN, "ORDERS", outFile, messageId.getOrElse(""))
+        converterConfig.dispatchResult(recipientGLN, "ORDERS", otOrder, messageId.getOrElse(""))
         Right(())
       }
     })
@@ -372,6 +371,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
     var ediFolder: File = null
     var otFolder: File = null
     var outFile: File = null
+    var writable: Writable = null
     makeStream() match {
       case Left(r) =>
         return r
@@ -385,7 +385,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
         if (fileType != Converter.FileType.OpenTrans) {
           return BadRequest("The file sent is not an XML file. Please send a XML OpenTrans file. Thank you.");
         }
-        val writable = result.snd
+        writable = result.snd
 
         if (writable.isInstanceOf[com.ywesee.java.yopenedi.Edifact.OrderResponse]) {
           val r = writable.asInstanceOf[com.ywesee.java.yopenedi.Edifact.OrderResponse]
@@ -427,7 +427,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
         }
 
         val otOutStream = new FileOutputStream(outFile)
-        writable.write(otOutStream, converterConfig)
+        writable.write(otOutStream, converterConfig, StandardCharsets.UTF_8)
         logger.debug("Wrote file to: " + outFile.getAbsolutePath())
     }
 
@@ -445,7 +445,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
         logger.debug("OpenTrans File size: " + inFile.length())
     }
 
-    converterConfig.dispatchResult(recipientGLN, edifactType, outFile, orderId)
+    converterConfig.dispatchResult(recipientGLN, edifactType, writable, orderId)
 
     val obj = Json.obj(
       "ok" -> true

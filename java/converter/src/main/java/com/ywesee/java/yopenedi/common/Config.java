@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import com.ywesee.java.yopenedi.converter.Writable;
 import org.apache.commons.io.FileUtils;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -117,13 +118,13 @@ public class Config {
         return new ArrayList<>();
     }
 
-    public void dispatchResult(String gln, String edifactType, File file, String messageId) {
+    public void dispatchResult(String gln, String edifactType, Writable writable, String messageId) {
         ArrayList<ResultDispatch> dispatches = this.getResultDispatches();
         boolean anySent = false;
         int i = 0;
         String reasons = "";
         for (ResultDispatch dispatch : dispatches) {
-            String reasonForNotSending = dispatch.send(gln, edifactType, file, messageId);
+            String reasonForNotSending = dispatch.send(gln, edifactType, writable, messageId);
             if (reasonForNotSending != null) {
                 reasons += "Dispatch " + i + "\n";
                 reasons += reasonForNotSending;

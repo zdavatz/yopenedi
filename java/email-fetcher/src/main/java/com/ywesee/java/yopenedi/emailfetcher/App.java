@@ -188,10 +188,10 @@ public class App {
                 }
                 edifactType = "DESADV";
             }
-            converted.snd.write(outputStream, config);
+            converted.snd.write(outputStream, config, StandardCharsets.UTF_8);
             outputStream.close();
 
-            config.dispatchResult(recipientGLN, edifactType, targetFile, orderId);
+            config.dispatchResult(recipientGLN, edifactType, converted.snd, orderId);
         }
         System.out.println("Done");
     }
