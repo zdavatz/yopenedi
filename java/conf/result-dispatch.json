@@ -55,7 +55,8 @@
       "headers": {
         "AS2-From": "janico_ch",
         "AS2-To": "NOWISCC_AS2"
-      }
+      },
+      "encoding": "UTF-8"
     }
   },
   {

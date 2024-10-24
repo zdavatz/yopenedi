@@ -1,6 +1,7 @@
 package com.ywesee.java.yopenedi.common;
 
 import com.jcraft.jsch.*;
+import com.ywesee.java.yopenedi.converter.Writable;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.json.simple.JSONArray;
@@ -30,6 +31,7 @@ public class ResultDispatch {
     class EmailDest {
         String to;
         String subject;
+        Charset encoding;
         EmailDest(JSONObject obj) {
             this.to = (String)obj.get("to");
             if (obj.containsKey("subject")) {
@@ -37,10 +39,16 @@ public class ResultDispatch {
             } else {
                 this.subject = "No subject";
             }
+            if (obj.containsKey("encoding") && obj.get("encoding").equals("UTF-8")) {
+                encoding = StandardCharsets.UTF_8;
+            } else {
+                encoding = StandardCharsets.ISO_8859_1;
+            }
         }
     }
     class HTTPPost {
         String url;
+        Charset encoding;
         HashMap<String, String> headers = new HashMap<>();
         HTTPPost(JSONObject obj) {
             this.url = (String)obj.get("url");
@@ -51,15 +59,26 @@ public class ResultDispatch {
                     this.headers.put(key, (String)headersObj.get(key));
                 }
             }
+            if (obj.containsKey("encoding") && obj.get("encoding").equals("UTF-8")) {
+                encoding = StandardCharsets.UTF_8;
+            } else {
+                encoding = StandardCharsets.ISO_8859_1;
+            }
         }
     }
     class SFTPX400 {
         // e.g. "cn=xxxxx; s=yyyyy; o=zzzzzz-gmbh; p=AAAAA; a=VIAT; c=DE"
         String toAddress;
         String toUserId;
+        Charset encoding;
         SFTPX400(JSONObject obj) {
             this.toAddress = (String)obj.getOrDefault("toAddress", null);
             this.toUserId = (String)obj.getOrDefault("toUserId", null);
+            if (obj.containsKey("encoding") && obj.get("encoding").equals("UTF-8")) {
+                encoding = StandardCharsets.UTF_8;
+            } else {
+                encoding = StandardCharsets.ISO_8859_1;
+            }
         }
     }
     class Filter {
@@ -127,25 +146,25 @@ public class ResultDispatch {
     /**
      * @return Null if it sends, otherwise the reason for not sending
      */
-    String send(String gln, String edifactType, File file, String messageId) {
+    String send(String gln, String edifactType, Writable writable, String messageId) {
         if (this.filter != null) {
             String reasonForNotSending = this.filter.reasonForNotSending(gln, edifactType);
             if (reasonForNotSending != null) return reasonForNotSending + "----------\n";
         }
         if (this.httpPost != null) {
-            this.sendHTTPPost(file, messageId);
+            this.sendHTTPPost(writable, messageId);
         }
         if (this.sftpx400 != null) {
-            this.sendSFPTX400(file, messageId);
+            this.sendSFPTX400(writable, messageId);
         }
         if (this.emailDest != null) {
-            this.sendEmail(file);
+            this.sendEmail(writable);
         }
         return null;
     }
 
-    void sendHTTPPost(File file, String messageId) {
-        System.out.println("Uploading file (" + file.getAbsolutePath() + ") to " + this.httpPost.url);
+    void sendHTTPPost(Writable writable, String messageId) {
+        System.out.println("Uploading file to " + this.httpPost.url);
         try {
             URL url = new URL(this.httpPost.url);
             URLConnection con = url.openConnection();
@@ -158,15 +177,15 @@ public class ResultDispatch {
             http.setRequestProperty("Message-ID", messageId);
             http.setDoInput(true);
             http.setDoOutput(true);
-            IOUtils.copy(new FileInputStream(file), con.getOutputStream());
+            writable.write(con.getOutputStream(), config, this.httpPost.encoding);
             String res = IOUtils.toString(con.getInputStream(), Charset.defaultCharset());
             System.out.println("Response: " + res);
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    void sendEmail(File file) {
+    void sendEmail(Writable writable) {
         EmailCredential emailCreds = this.config.getEmailCredential();
         Properties prop = new Properties();
         prop.put("mail.smtp.host", emailCreds.smtpHost);
@@ -196,6 +215,11 @@ public class ResultDispatch {
             message.setSubject(emailDest.subject);
             Multipart multipart = new MimeMultipart();
             BodyPart messageBodyPart = new MimeBodyPart();
+
+            File file = File.createTempFile("temp", null);
+            FileOutputStream outStream = new FileOutputStream(file);
+            writable.write(outStream, config, this.emailDest.encoding);
+
             DataSource source = new FileDataSource(file);
             messageBodyPart.setDataHandler(new DataHandler(source));
             messageBodyPart.setFileName(file.getName());
@@ -208,13 +232,13 @@ public class ResultDispatch {
 
             System.out.println("Finished sending email");
 
-        } catch (MessagingException e) {
+        } catch (Exception e) {
             System.out.println(e.toString());
             e.printStackTrace(System.out);
         }
     }
 
-    void sendSFPTX400(File file, String messageId) {
+    void sendSFPTX400(Writable writable, String messageId) {
         try {
             com.ywesee.java.yopenedi.common.SFTPX400 sftpConfig = this.config.getSFTPX400Credential();
             if (sftpConfig == null) {
@@ -233,7 +257,7 @@ public class ResultDispatch {
 
             String randomMessageFilename = RandomStringUtils.randomNumeric(9);
             String pwd = sftp.pwd();
-            File messageFile = this.tempFileForX400Message(file, messageId);
+            File messageFile = this.tempFileForX400Message(writable, messageId);
             sftp.put(messageFile.getAbsolutePath(), pwd + "/M_" + randomMessageFilename + ".TMP");
             System.out.println("Uploaded as: " + pwd + "/M_" + randomMessageFilename + ".TMP");
 
@@ -246,10 +270,9 @@ public class ResultDispatch {
         }
     }
 
-    public File tempFileForX400Message(File file, String messageId) throws IOException {
+    public File tempFileForX400Message(Writable writable, String messageId) throws IOException {
         File tempFile = File.createTempFile("temp", null);
         FileOutputStream outStream = new FileOutputStream(tempFile);
-        FileInputStream inStream = new FileInputStream(file);
         String boundaryString = RandomStringUtils.randomAlphabetic(10);
         try {
             outStream.write(("To: \"" + (this.sftpx400.toAddress == null ? "" : this.sftpx400.toAddress) + "\" ").getBytes(StandardCharsets.UTF_8));
@@ -268,13 +291,12 @@ public class ResultDispatch {
             outStream.write("".getBytes(StandardCharsets.UTF_8));
             byte[] buffer = new byte[1024];
             int length;
-            while ((length = inStream.read(buffer)) > 0) {
-                outStream.write(buffer, 0, length);
-            }
+            writable.write(outStream, config, this.sftpx400.encoding);
             outStream.write(("\n--boundary"+ boundaryString +"—").getBytes(StandardCharsets.UTF_8));
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             outStream.close();
-            inStream.close();
         }
         tempFile.deleteOnExit();
         return tempFile;

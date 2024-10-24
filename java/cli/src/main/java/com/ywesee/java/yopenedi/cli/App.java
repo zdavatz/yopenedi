@@ -7,7 +7,6 @@ import com.ywesee.java.yopenedi.Edifact.*;
 import com.ywesee.java.yopenedi.OpenTrans.Order;
 import com.ywesee.java.yopenedi.common.Config;
 import com.ywesee.java.yopenedi.converter.Converter;
-import com.ywesee.java.yopenedi.OpenTrans.OpenTransWriter;
 import com.ywesee.java.yopenedi.converter.Pair;
 import com.ywesee.java.yopenedi.converter.Writable;
 import org.apache.commons.cli.*;
@@ -21,6 +20,7 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Properties;
 
@@ -193,8 +193,7 @@ public class App {
             } else {
                 out = System.out;
             }
-            OpenTransWriter w = new OpenTransWriter(config);
-            w.write(otOrder, out);
+            otOrder.write(out, config, StandardCharsets.UTF_8);
             out.close();
             if (!isMultiple) {
                 break;
@@ -212,7 +211,7 @@ public class App {
             out = System.out;
         }
         Pair<Converter.FileType, Writable> result = converter.run(in);
-        result.snd.write(out, config);
+        result.snd.write(out, config, StandardCharsets.ISO_8859_1);
 
         out.flush();
         if (out instanceof FileOutputStream) {

@@ -4,10 +4,12 @@ import com.ywesee.java.yopenedi.common.Config;
 import com.ywesee.java.yopenedi.converter.Utility;
 import com.ywesee.java.yopenedi.converter.Writable;
 
+import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import java.io.OutputStream;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Map;
@@ -215,8 +217,13 @@ public class Order implements Writable {
         streamWriter.writeEndElement(); // ORDER_SUMMARY
     }
 
-    public void write(OutputStream s, Config config) throws Exception {
-        OpenTransWriter writer = new OpenTransWriter(config);
-        writer.write(this, s);
+    public void write(OutputStream s, Config config, Charset encoding) throws Exception {
+        XMLOutputFactory xof = XMLOutputFactory.newFactory();
+        XMLStreamWriter xmlWriter = xof.createXMLStreamWriter(s, encoding.name());
+        xmlWriter.writeStartDocument();
+        this.write(xmlWriter, config);
+        xmlWriter.writeEndDocument();
+        xmlWriter.flush();
+        xmlWriter.close();
     }
 }
