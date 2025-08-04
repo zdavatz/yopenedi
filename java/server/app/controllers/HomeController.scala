@@ -99,7 +99,8 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
       val ediFile = new File(ediOrdersFolder, filename)
       val ediOutStream = new FileOutputStream(ediFile)
       IOUtils.copy(s, ediOutStream)
-      logger.debug("Edifact File size: " + ediFile.length())
+      System.out.println("Received Edifact File path: " + ediFile.getAbsolutePath())
+      System.out.println("Edifact File size: " + ediFile.length())
 
       val outFile = new File(otOrdersFolder, filename)
       if (outFile.exists() && !outFile.canWrite()) {
@@ -109,7 +110,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
       val er = new EdifactReader()
       val ediInStream = new FileInputStream(ediFile)
       val ediOrders = er.run(ediInStream)
-      logger.debug("EDIFACT orders count: " + ediOrders.size())
+      System.out.println("EDIFACT orders count: " + ediOrders.size())
       val converter = new Converter(converterConfig)
       if (ediOrders.size() == 0) {
         Left(BadRequest("No order found in EDIFACT file."))
@@ -118,21 +119,22 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
       } else {
         val otOrder = converter.orderToOpenTrans(ediOrders.get(0))
         otOrder.isTestEnvironment = isTestEnvironment
-        logger.debug("Opentrans order: " + otOrder.toString())
+        System.out.println("Opentrans order: " + otOrder.toString())
 
         val recipient = otOrder.getRecipient()
         if (recipient != null) {
           recipientGLN = recipient.id
         }
 
+        System.out.println("Writing to file: " + outFile.getAbsolutePath())
         val outStream = new FileOutputStream(outFile)
         otOrder.write(outStream, converterConfig, StandardCharsets.UTF_8)
         outStream.flush()
         outStream.getFD().sync()
         outStream.close()
-        logger.debug("File written: " + outFile.getAbsolutePath())
-        logger.debug("File size: " + outFile.length())
+        System.out.println("File written, File size: " + outFile.length())
         converterConfig.dispatchResult(recipientGLN, "ORDERS", otOrder, messageId.getOrElse(""))
+        System.out.println("Dispatched result")
         Right(())
       }
     })
@@ -428,7 +430,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
 
         val otOutStream = new FileOutputStream(outFile)
         writable.write(otOutStream, converterConfig, StandardCharsets.UTF_8)
-        logger.debug("Wrote file to: " + outFile.getAbsolutePath())
+        System.out.println("Wrote file to: " + outFile.getAbsolutePath())
     }
 
     val inFile = new File(otFolder, filename)
@@ -442,7 +444,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
       case Right(s) =>
         val otStream = new FileOutputStream(inFile)
         IOUtils.copy(s, otStream)
-        logger.debug("OpenTrans File size: " + inFile.length())
+        System.out.println("OpenTrans File size: " + inFile.length())
     }
 
     converterConfig.dispatchResult(recipientGLN, edifactType, writable, orderId)
