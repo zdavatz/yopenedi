@@ -114,6 +114,7 @@ public class App {
             confPath = cmd.getOptionValue("conf", "./conf");
             return true;
         } catch (ParseException e) {
+            System.out.println(e.toString());
             return false;
         }
     }
@@ -134,6 +135,8 @@ public class App {
         ArrayList<File> filesFromSFTP = fetchSTPX400(config);
         ArrayList<File> files = new ArrayList<>(filesFromEmail);
         files.addAll(filesFromSFTP);
+        System.out.println("Got " + filesFromEmail.size() + " files from email");
+        System.out.println("Got " + filesFromSFTP.size() + " files from SFTP");
 
         for (File file : files) {
             File outFolder;
@@ -148,6 +151,7 @@ public class App {
             Converter converter = new Converter(config);
             converter.shouldMergeContactDetails = true;
 
+            System.out.println("Processing file: " + inFilePath);
             Pair<Converter.FileType, Writable> converted = converter.run(new FileInputStream(file));
 
             File targetFile = new File(outFolder, inFileName + ".xml");
@@ -169,6 +173,7 @@ public class App {
             } else if (converted.snd instanceof com.ywesee.java.yopenedi.Edifact.OrderResponse) {
                 com.ywesee.java.yopenedi.Edifact.OrderResponse ediOrderResponse = (com.ywesee.java.yopenedi.Edifact.OrderResponse)converted.snd;
                 com.ywesee.java.yopenedi.Edifact.Party recipient = ediOrderResponse.getRecipient();
+                System.out.println("Outputting Edifact OrderRsp(documentNumber=" + ediOrderResponse.documentNumber + ") to " + targetFile.getAbsolutePath());
                 if (recipient != null) {
                     recipientGLN = recipient.id;
                 }
@@ -176,6 +181,7 @@ public class App {
             } else if (converted.snd instanceof com.ywesee.java.yopenedi.Edifact.Invoice) {
                 com.ywesee.java.yopenedi.Edifact.Invoice ediInvoice = (com.ywesee.java.yopenedi.Edifact.Invoice)converted.snd;
                 com.ywesee.java.yopenedi.Edifact.Party recipient = ediInvoice.getRecipient();
+                System.out.println("Outputting Edifact Invoice(documentNumber=" + ediInvoice.documentNumber + ") to " + targetFile.getAbsolutePath());
                 if (recipient != null) {
                     recipientGLN = recipient.id;
                 }
@@ -183,15 +189,19 @@ public class App {
             } else if (converted.snd instanceof com.ywesee.java.yopenedi.Edifact.DespatchAdvice) {
                 com.ywesee.java.yopenedi.Edifact.DespatchAdvice ediDispatchAdvice = (com.ywesee.java.yopenedi.Edifact.DespatchAdvice)converted.snd;
                 com.ywesee.java.yopenedi.Edifact.Party recipient = ediDispatchAdvice.getRecipient();
+                System.out.println("Outputting Edifact DespatchAdvice(documentNumber=" + ediDispatchAdvice.documentNumber + ") to " + targetFile.getAbsolutePath());
                 if (recipient != null) {
                     recipientGLN = recipient.id;
                 }
                 edifactType = "DESADV";
             }
+            System.out.println("Writing to file...");
             converted.snd.write(outputStream, config, StandardCharsets.UTF_8);
             outputStream.close();
+            System.out.println("Finished writing file, dispatching result");
 
             config.dispatchResult(recipientGLN, edifactType, converted.snd, orderId);
+            System.out.println("Dispatched result");
         }
         System.out.println("Done");
     }
