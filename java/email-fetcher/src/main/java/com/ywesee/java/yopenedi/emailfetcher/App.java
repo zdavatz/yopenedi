@@ -131,9 +131,10 @@ public class App {
         }
 
         Config config = new Config(confPath, isTestEnvironment);
+        ArrayList<File> files = new ArrayList<>();
         ArrayList<File> filesFromEmail = fetchEmail(config);
+        files.addAll(filesFromEmail);
         ArrayList<File> filesFromSFTP = fetchSTPX400(config);
-        ArrayList<File> files = new ArrayList<>(filesFromEmail);
         files.addAll(filesFromSFTP);
         System.out.println("Got " + filesFromEmail.size() + " files from email");
         System.out.println("Got " + filesFromSFTP.size() + " files from SFTP");
@@ -347,13 +348,13 @@ public class App {
                     sftp.rm(remoteFileName);
 
                     FileInputStream inputStream = new FileInputStream(outPath);
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.ISO_8859_1));
                     String fileContent = reader.lines().collect(Collectors.joining("\n"));
 
                     int fileContentIndex = fileContent.indexOf("\n\n");
                     if (fileContentIndex > -1) {
                         String edifactString = fileContent.substring(fileContentIndex + 2);
-                        File outFile = saveStream(IOUtils.toInputStream(edifactString, StandardCharsets.UTF_8), remoteFileName);
+                        File outFile = saveStream(IOUtils.toInputStream(edifactString, StandardCharsets.ISO_8859_1), remoteFileName);
                         outFiles.add(outFile);
                     } else {
                         System.err.println("Cannot find file content: " + outPath);
