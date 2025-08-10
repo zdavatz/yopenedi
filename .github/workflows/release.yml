@@ -22,3 +22,5 @@ jobs:
           allowUpdates: true
           artifacts: |
             java/server/target/universal/yopenedi-1.0-SNAPSHOT.zip
+            java/email-fetcher/build/libs/email-fetcher-1.0-all.jar
+            java/cli/build/libs/cli-1.0-all.jar
