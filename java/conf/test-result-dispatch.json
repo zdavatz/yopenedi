@@ -49,10 +49,14 @@
       ],
       "edifact_types": ["ORDRSP", "DESADV", "INVOIC"]
     },
-    "email": {
-      "subject": "No subject",
-      "to": "edi@vrg-curamus.de"
-    },
+    "http": {
+      "url": "https://edi-t-as2.vrg.de",
+      "headers": {
+        "AS2-From": "janico_ch",
+        "AS2-To": "CURAMUSCC-T"
+      },
+      "encoding": "UTF-8"
+    }
   },
   {
     "filters": {

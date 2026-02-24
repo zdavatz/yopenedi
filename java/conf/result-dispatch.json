@@ -225,10 +225,10 @@
       "edifact_types": ["ORDRSP", "DESADV", "INVOIC"]
     },
     "http": {
-      "url": "https://eddy.vrg.de:4443",
+      "url": "https://edi-p-as2.vrg.de",
       "headers": {
         "AS2-From": "janico_ch",
-        "AS2-To": "NOWISCC_AS2"
+        "AS2-To": "CURAMUSCC-P"
       },
       "encoding": "UTF-8"
     }
