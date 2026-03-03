@@ -50,7 +50,7 @@
       "edifact_types": ["ORDRSP", "DESADV", "INVOIC"]
     },
     "http": {
-      "url": "https://edi-t-as2.vrg.de",
+      "url": "https://edi-t-as2.vrg.de:443",
       "headers": {
         "AS2-From": "janico_ch",
         "AS2-To": "CURAMUSCC-T"
