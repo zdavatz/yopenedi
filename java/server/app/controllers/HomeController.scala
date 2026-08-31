@@ -8,7 +8,9 @@ import play.api.libs.json._
 import play.api.libs.ws._
 
 import play.api.libs.streams._
-import scala.concurrent.ExecutionContext.Implicits.global
+import org.apache.pekko.actor.ActorSystem
+import scala.concurrent.{ExecutionContext, Future}
+import scala.util.{Failure, Success}
 
 import org.apache.commons.io.FileUtils
 import org.apache.commons.io.IOUtils
@@ -33,8 +35,17 @@ import com.ywesee.java.yopenedi.OpenTrans._
  * application's home page.
  */
 @Singleton
-class HomeController @Inject()(cc: ControllerComponents, config: Configuration, ws: WSClient) extends AbstractController(cc) {
+class HomeController @Inject()(cc: ControllerComponents, config: Configuration, ws: WSClient, actorSystem: ActorSystem) extends AbstractController(cc) {
   val logger: Logger = Logger(this.getClass())
+
+  // Conversion and result dispatch block: they parse files and talk to partner
+  // systems over HTTP/SMTP/SFTP. Running them on Play's default dispatcher means a
+  // handful of slow partners starves the pool and the server stops answering
+  // anything at all -- while the process stays alive, so runit never restarts it.
+  // Keep them on a pool of their own.
+  private implicit val blockingEc: ExecutionContext =
+    actorSystem.dispatchers.lookup("contexts.blocking-io-dispatcher")
+
   /**
    * Create an Action to render an HTML page.
    *
@@ -133,8 +144,11 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
         outStream.getFD().sync()
         outStream.close()
         System.out.println("File written, File size: " + outFile.length())
-        converterConfig.dispatchResult(recipientGLN, "ORDERS", otOrder, messageId.getOrElse(""))
-        System.out.println("Dispatched result")
+        // Deliberately not awaited. Forwarding the order to the downstream partner
+        // must not delay the MDN we owe the sender, or they hit a read timeout
+        // waiting for it. Dispatch failures were already swallowed and never
+        // affected the MDN, so nothing the caller sees changes here.
+        dispatchInBackground(converterConfig, recipientGLN, "ORDERS", otOrder, messageId.getOrElse(""))
         Right(())
       }
     })
@@ -231,7 +245,9 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
       .addHttpHeaders("AS2-From" -> message.requestRecipient)
       .addHttpHeaders("Subject" -> "Your Requested MDN Response")
       .addHttpHeaders("Content-Type" -> ("multipart/report; Report-Type=disposition-notification; boundary=\"" + boundary + "\""))
+      .withRequestTimeout(asyncMDNTimeout)
       .post(message.makeReport(boundary))
+      .onComplete(logMDNOutcome(url))
   }
 
   def makeAsyncSignedMDNRequest(message: models.Message, url: String, headers: Headers) = {
@@ -251,7 +267,28 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
       "Content-Disposition: attachment; filename=smime.p7s\r\n\r\n" +
       sign(body.getBytes(StandardCharsets.UTF_8))
     val data = helpers.MultipartFormData.makeMultipartString(List(body, signaturePart), outerBoundary)
-    request.post(data)
+    request.withRequestTimeout(asyncMDNTimeout).post(data).onComplete(logMDNOutcome(url))
+  }
+
+  private val asyncMDNTimeout = scala.concurrent.duration.Duration(60, "seconds")
+
+  private def logMDNOutcome(url: String): scala.util.Try[WSResponse] => Unit = {
+    case Success(response) =>
+      logger.info("Async MDN to " + url + " returned " + response.status)
+    case Failure(e) =>
+      // Previously the future was dropped on the floor, so a failing async MDN
+      // left no trace at all.
+      logger.error("Async MDN to " + url + " failed", e)
+  }
+
+  private def dispatchInBackground(converterConfig: Config, gln: String, edifactType: String, writable: Writable, messageId: String): Unit = {
+    Future {
+      converterConfig.dispatchResult(gln, edifactType, writable, messageId)
+      System.out.println("Dispatched result")
+    }(blockingEc).onComplete {
+      case Success(_) => ()
+      case Failure(e) => logger.error("Dispatching " + edifactType + " result failed", e)
+    }(blockingEc)
   }
 
   def makeReceivedContentMIC(request: Request[AnyContent]): String = {
@@ -278,7 +315,9 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
     null
   }
 
-  def as2() = Action(as2Fn(_))
+  def as2() = Action.async { request: Request[AnyContent] =>
+    Future { as2Fn(request) }(blockingEc)
+  }
 
   def canSign(): Boolean = {
     try {
@@ -454,7 +493,9 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
     )
     return Ok(Json.toJson(obj))
   }
-  def janico() = Action(janicoFn(_))
+  def janico() = Action.async { request: Request[AnyContent] =>
+    Future { janicoFn(request) }(blockingEc)
+  }
 
   // Sometimes Play fails to parse request, e.g. it doesn't understand
   // the request when multipart boundary has "="

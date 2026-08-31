@@ -165,10 +165,15 @@ public class ResultDispatch {
 
     void sendHTTPPost(Writable writable, String messageId) {
         System.out.println("Uploading file to " + this.httpPost.url);
+        HttpURLConnection http = null;
         try {
             URL url = new URL(this.httpPost.url);
             URLConnection con = url.openConnection();
-            HttpURLConnection http = (HttpURLConnection)con;
+            http = (HttpURLConnection)con;
+            // Both default to 0 == wait forever. A partner that accepts the TCP
+            // connection but never answers would otherwise block this thread for good.
+            http.setConnectTimeout(Timeouts.millis(Timeouts.HTTP_CONNECT));
+            http.setReadTimeout(Timeouts.millis(Timeouts.HTTP_READ));
             http.setRequestMethod("POST");
             http.setRequestProperty("Content-Type", "text/xml; charset=UTF-8");
             for (String key : this.httpPost.headers.keySet()) {
@@ -181,7 +186,12 @@ public class ResultDispatch {
             String res = IOUtils.toString(con.getInputStream(), Charset.defaultCharset());
             System.out.println("Response: " + res);
         } catch (Exception e) {
+            System.out.println("Failed to upload file to " + this.httpPost.url + ": " + e);
             e.printStackTrace();
+        } finally {
+            if (http != null) {
+                http.disconnect();
+            }
         }
     }
 
@@ -192,6 +202,10 @@ public class ResultDispatch {
         prop.put("mail.smtp.port", emailCreds.smtpPort);
         prop.put("mail.smtp.auth", "true");
         prop.put("mail.smtp.protocols", "TLSv1.2 TLSv1.3");
+        // JavaMail waits forever by default; Transport.send() below is a blocking call.
+        prop.put("mail.smtp.connectiontimeout", String.valueOf(Timeouts.millis(Timeouts.CONNECT)));
+        prop.put("mail.smtp.timeout", String.valueOf(Timeouts.millis(Timeouts.READ)));
+        prop.put("mail.smtp.writetimeout", String.valueOf(Timeouts.millis(Timeouts.WRITE)));
         if (emailCreds.secure) {
             prop.put("mail.smtp.starttls.enable", "true"); //TLS
         }
@@ -239,10 +253,13 @@ public class ResultDispatch {
     }
 
     void sendSFPTX400(Writable writable, String messageId) {
+        com.jcraft.jsch.Session session = null;
+        ChannelSftp sftp = null;
         try {
             com.ywesee.java.yopenedi.common.SFTPX400 sftpConfig = this.config.getSFTPX400Credential();
             if (sftpConfig == null) {
                 System.out.println("Credential for SFTP X.400 not found, skipping");
+                return;
             }
             JSch jsch = new JSch();
             String privateKeyPath = new File(sftpConfig.privateKeyPath).getAbsolutePath();
@@ -250,10 +267,11 @@ public class ResultDispatch {
             jsch.addIdentity(privateKeyPath);
             jsch.setKnownHosts(IOUtils.toInputStream(sftpConfig.knownHosts, StandardCharsets.UTF_8));
 
-            com.jcraft.jsch.Session session = jsch.getSession(sftpConfig.username, sftpConfig.host);
-            session.connect();
-            ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
-            sftp.connect();
+            session = jsch.getSession(sftpConfig.username, sftpConfig.host);
+            SSH.applyTimeouts(session);
+            session.connect(Timeouts.millis(Timeouts.CONNECT));
+            sftp = (ChannelSftp) session.openChannel("sftp");
+            sftp.connect(Timeouts.millis(Timeouts.CONNECT));
 
             String randomMessageFilename = RandomStringUtils.randomNumeric(9);
             String pwd = sftp.pwd();
@@ -263,10 +281,10 @@ public class ResultDispatch {
 
             sftp.rename(pwd + "/M_" + randomMessageFilename + ".TMP", pwd + "/M_" + randomMessageFilename + ".IN");
             System.out.println("Renamed to: " + pwd + "/M_" + randomMessageFilename + ".IN");
-            sftp.exit();
-            session.disconnect();
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Failed to send over SFTP X.400: " + e);
+        } finally {
+            SSH.disconnect(sftp, session);
         }
     }
 

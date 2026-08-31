@@ -38,6 +38,39 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
 * Input files: `yopenedi/edifact_orders`
 * Output files: `yopenedi/opentrans_orders`
 
+### Keeping the server from hanging
+The Play server is supervised by runit (`/etc/service/prod.yopenedi.ch/run`), which
+restarts a service that *exits* but never one that is merely wedged. Three things
+guard against a stuck partner taking the server down:
+
+* **Every outbound call is bounded.** HTTP, SMTP, IMAP and SFTP all have connect and
+  read timeouts (`com.ywesee.java.yopenedi.common.Timeouts`). Override any of them
+  per-process without a rebuild:
+  ```
+  -Dyopenedi.connectTimeout=30   -Dyopenedi.readTimeout=120
+  -Dyopenedi.writeTimeout=120    -Dyopenedi.http.readTimeout=120
+  -Dyopenedi.maxRuntime=1800     # email-fetcher run limit, 0 disables
+  ```
+* **The AS2 MDN is returned before the order is forwarded downstream.** Conversion and
+  result dispatch run on a dedicated pool (`contexts.blocking-io-dispatcher`) so they
+  cannot starve the threads that answer requests. Holding the MDN behind the downstream
+  forward is what made senders report `SocketTimeoutException: Read timed out`.
+* **A health check covers the supervisor gap.** Add `java/scripts/yopenedi-healthcheck.sh`
+  to cron; after three consecutive non-responses it takes a thread dump and restarts
+  the service:
+  ```
+  */2 * * * * /home/zdavatz/software/yopenedi/java/scripts/yopenedi-healthcheck.sh
+  ```
+
+Recommended additions to `JAVA_OPTS` in the runit `run` script, so an out-of-memory
+stall also turns into a restart instead of a wedge:
+```sh
+export JAVA_OPTS="$JAVA_OPTS -XX:+ExitOnOutOfMemoryError -XX:+HeapDumpOnOutOfMemoryError"
+```
+
+The email-fetcher has a watchdog of its own: if a run exceeds `maxRuntime` it dumps all
+thread stacks and exits with code 3, so a hang leaves an explanation in the log.
+
 ### Apache setup
 ```
 <VirtualHost *:80>

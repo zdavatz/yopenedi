@@ -8,6 +8,9 @@ import com.jcraft.jsch.JSch;
 import com.ywesee.java.yopenedi.common.Config;
 import com.ywesee.java.yopenedi.common.EmailCredential;
 import com.ywesee.java.yopenedi.common.SFTPX400;
+import com.ywesee.java.yopenedi.common.SSH;
+import com.ywesee.java.yopenedi.common.Timeouts;
+import com.ywesee.java.yopenedi.common.Watchdog;
 import com.ywesee.java.yopenedi.converter.Converter;
 
 import com.sun.mail.imap.IMAPFolder;
@@ -123,6 +126,7 @@ public class App {
         if (!setupCliFromArgs(args)) {
             return;
         }
+        Watchdog.start("email-fetcher", Timeouts.MAX_RUNTIME);
         if (!edifactFolder.exists()) {
             edifactFolder.mkdirs();
         }
@@ -216,8 +220,10 @@ public class App {
         }
         properties.setProperty("mail.imap.host", emailCreds.imapHost);
         properties.setProperty("mail.imap.port", emailCreds.imapPort);
-        properties.setProperty("mail.imap.connectiontimeout", "5000");
-        properties.setProperty("mail.imap.timeout", "5000");
+        properties.setProperty("mail.imap.connectiontimeout", String.valueOf(Timeouts.millis(Timeouts.CONNECT)));
+        properties.setProperty("mail.imap.timeout", String.valueOf(Timeouts.millis(Timeouts.READ)));
+        // Without this a blocked write (peer stops reading) hangs the fetch forever.
+        properties.setProperty("mail.imap.writetimeout", String.valueOf(Timeouts.millis(Timeouts.WRITE)));
         properties.setProperty("mail.imap.ssl.protocols", "TLSv1.2 TLSv1.3");
 
         Session imapSession = Session.getInstance(properties, null);
@@ -228,57 +234,65 @@ public class App {
 
         imapStore.connect(emailCreds.imapHost, emailCreds.user, emailCreds.password);
 
-        Folder defaultFolder = imapStore.getDefaultFolder();
-        Folder[] folders = defaultFolder.list();
+        try {
+            Folder defaultFolder = imapStore.getDefaultFolder();
+            Folder[] folders = defaultFolder.list();
 
-        IMAPFolder inbox = null;
-        for (Folder f : folders) {
-            if (f.getFullName().equalsIgnoreCase(mailboxName)) {
-                inbox = (IMAPFolder) f;
-                break;
-            }
-        }
-        if (inbox == null) {
-            System.err.println("Cannot find mailbox named " + mailboxName + ". Available folders are:");
+            IMAPFolder inbox = null;
             for (Folder f : folders) {
-                System.err.println(f.getFullName());
+                if (f.getFullName().equalsIgnoreCase(mailboxName)) {
+                    inbox = (IMAPFolder) f;
+                    break;
+                }
             }
-            throw new Exception("Cannot find mailbox.");
+            if (inbox == null) {
+                System.err.println("Cannot find mailbox named " + mailboxName + ". Available folders are:");
+                for (Folder f : folders) {
+                    System.err.println(f.getFullName());
+                }
+                throw new Exception("Cannot find mailbox.");
+            }
+
+            inbox.open(Folder.READ_WRITE);
+
+            Message[] ms = skipSeenMessage
+                    ? inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))
+                    : inbox.getMessages();
+            System.out.println("Found " + ms.length + " messages");
+
+            ArrayList<File> files = new ArrayList<>();
+
+            for (Message message : ms) {
+                long uid = inbox.getUID(message);
+                System.out.println("Found message. UID=" + uid);
+                System.out.println("Subject: " + message.getSubject());
+
+                System.out.println("Getting attachment");
+                Object content = message.getContent();
+                BASE64DecoderStream stream = null;
+                if (content instanceof BASE64DecoderStream) {
+                    stream = (BASE64DecoderStream) content;
+                } else {
+                    System.err.println("Attachment is not base64: " + content.toString());
+                    System.err.println("Skipping");
+                    continue;
+                }
+                files.add(saveStream(stream, "" + uid));
+
+                if (markMessageAsSeen) {
+                    System.out.println("Marking message as seen.");
+                    message.setFlag(Flags.Flag.SEEN, true);
+                }
+            }
+            inbox.close(false);
+            return files;
+        } finally {
+            try {
+                imapStore.close();
+            } catch (Exception e) {
+                System.out.println("Error while closing IMAP store: " + e);
+            }
         }
-
-        inbox.open(Folder.READ_WRITE);
-
-        Message[] ms = skipSeenMessage
-                ? inbox.search(new FlagTerm(new Flags(Flags.Flag.SEEN), false))
-                : inbox.getMessages();
-        System.out.println("Found " + ms.length + " messages");
-
-        ArrayList<File> files = new ArrayList<>();
-
-        for (Message message : ms) {
-            long uid = inbox.getUID(message);
-            System.out.println("Found message. UID=" + uid);
-            System.out.println("Subject: " + message.getSubject());
-
-            System.out.println("Getting attachment");
-            Object content = message.getContent();
-            BASE64DecoderStream stream = null;
-            if (content instanceof BASE64DecoderStream) {
-                stream = (BASE64DecoderStream) content;
-            } else {
-                System.err.println("Attachment is not base64: " + content.toString());
-                System.err.println("Skipping");
-                continue;
-            }
-            files.add(saveStream(stream, "" + uid));
-
-            if (markMessageAsSeen) {
-                System.out.println("Marking message as seen.");
-                message.setFlag(Flags.Flag.SEEN, true);
-            }
-        }
-        inbox.close(false);
-        return files;
     }
 
     static File saveStream(InputStream stream, String filename) throws Exception {
@@ -305,6 +319,8 @@ public class App {
     }
 
     static ArrayList<File> fetchSTPX400(Config config) throws Exception {
+        com.jcraft.jsch.Session session = null;
+        ChannelSftp sftp = null;
         try {
             JSch jsch = new JSch();
             SFTPX400 sftpConfig = config.getSFTPX400Credential();
@@ -314,10 +330,11 @@ public class App {
 
             jsch.setKnownHosts(IOUtils.toInputStream(sftpConfig.knownHosts, StandardCharsets.UTF_8));
 
-            com.jcraft.jsch.Session session = jsch.getSession(sftpConfig.username, sftpConfig.host);
-            session.connect();
-            ChannelSftp sftp = (ChannelSftp) session.openChannel("sftp");
-            sftp.connect();
+            session = jsch.getSession(sftpConfig.username, sftpConfig.host);
+            SSH.applyTimeouts(session);
+            session.connect(Timeouts.millis(Timeouts.CONNECT));
+            sftp = (ChannelSftp) session.openChannel("sftp");
+            sftp.connect(Timeouts.millis(Timeouts.CONNECT));
 
             String pwd = sftp.pwd();
             Vector<ChannelSftp.LsEntry> remoteFiles = sftp.ls(pwd);
@@ -364,11 +381,11 @@ public class App {
             if (foundCount == 0) {
                 System.out.println("No message found in SFTP X.400 mailbox");
             }
-            sftp.exit();
-            session.disconnect();
             return outFiles;
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("Failed to fetch from SFTP X.400: " + e);
+        } finally {
+            SSH.disconnect(sftp, session);
         }
         return new ArrayList<>();
     }

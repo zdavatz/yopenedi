@@ -65,6 +65,36 @@ Domain models exist for: `Order`, `Invoice`, `OrderResponse`, `DespatchAdvice` �
 - `gln-override.json` — GLN (Global Location Number) overrides
 - `server/conf/application.conf` — Play server config (file paths, host filtering)
 
+### Timeouts and hang protection
+
+Added in v1.1.16 after the production server was found wedging itself: senders
+reported `SocketTimeoutException: Read timed out` waiting for their AS2 MDN.
+
+Every outbound network call (HTTP POST, SMTP, IMAP, SFTP) is bounded by
+`common.Timeouts`. Defaults are in seconds and can be overridden per-process with
+system properties, no rebuild needed:
+
+```bash
+-Dyopenedi.connectTimeout=30    -Dyopenedi.readTimeout=120
+-Dyopenedi.writeTimeout=120     -Dyopenedi.http.readTimeout=120
+-Dyopenedi.maxRuntime=1800      # email-fetcher watchdog, 0 disables
+```
+
+Three layers keep a stuck partner from taking the process down:
+
+1. **Per-call timeouts** — nothing waits forever. Previously all of these defaulted
+   to "wait indefinitely".
+2. **`contexts.blocking-io-dispatcher`** (server) — conversion and result dispatch
+   run there, never on Play's default dispatcher, so a slow partner cannot starve
+   the threads that answer requests. The AS2 MDN is returned *before* the result is
+   forwarded downstream; holding the MDN behind that forward is what caused senders
+   to report `SocketTimeoutException: Read timed out`.
+3. **`common.Watchdog`** (email-fetcher) — dumps all thread stacks and halts with
+   exit code 3 if a run exceeds `maxRuntime`, so a hang self-documents in the log.
+
+`scripts/yopenedi-healthcheck.sh` covers the supervisor gap: runit restarts a
+service that exits, but never one that is merely wedged. Run it from cron.
+
 ### Encoding
 
 EDIFACT files over SFTP use ISO-8859-1 encoding. This was a recent fix area (v1.1.12–1.1.13).
