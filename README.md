@@ -39,8 +39,9 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
 * Output files: `yopenedi/opentrans_orders`
 
 ### Keeping the server from hanging
-The Play server is supervised by runit (`/etc/service/prod.yopenedi.ch/run`), which
-restarts a service that *exits* but never one that is merely wedged. Three things
+The Play server is supervised by daemontools (`/etc/service/prod.yopenedi.ch/run`,
+controlled with `svc -d` / `svc -u`), which restarts a service that *exits* but never
+one that is merely wedged. Three things
 guard against a stuck partner taking the server down:
 
 * **Every outbound call is bounded.** HTTP, SMTP, IMAP and SFTP all have connect and
@@ -56,13 +57,14 @@ guard against a stuck partner taking the server down:
   cannot starve the threads that answer requests. Holding the MDN behind the downstream
   forward is what made senders report `SocketTimeoutException: Read timed out`.
 * **A health check covers the supervisor gap.** Add `java/scripts/yopenedi-healthcheck.sh`
-  to cron; after three consecutive non-responses it takes a thread dump and restarts
-  the service:
+  to `/etc/crontab`; after three consecutive non-responses it takes a thread dump and
+  restarts the service. Note the user column -- `/etc/crontab` requires it and user
+  crontabs do not, and the job needs root to control the service:
   ```
-  */2 * * * * /home/zdavatz/software/yopenedi/java/scripts/yopenedi-healthcheck.sh
+  */2 * * * * root /home/zdavatz/software/yopenedi/java/scripts/yopenedi-healthcheck.sh
   ```
 
-Recommended additions to `JAVA_OPTS` in the runit `run` script, so an out-of-memory
+Recommended additions to `JAVA_OPTS` in the `run` script, so an out-of-memory
 stall also turns into a restart instead of a wedge:
 ```sh
 export JAVA_OPTS="$JAVA_OPTS -XX:+ExitOnOutOfMemoryError -XX:+HeapDumpOnOutOfMemoryError"

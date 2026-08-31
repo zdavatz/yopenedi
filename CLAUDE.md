@@ -92,8 +92,12 @@ Three layers keep a stuck partner from taking the process down:
 3. **`common.Watchdog`** (email-fetcher) — dumps all thread stacks and halts with
    exit code 3 if a run exceeds `maxRuntime`, so a hang self-documents in the log.
 
-`scripts/yopenedi-healthcheck.sh` covers the supervisor gap: runit restarts a
-service that exits, but never one that is merely wedged. Run it from cron.
+`scripts/yopenedi-healthcheck.sh` covers the supervisor gap: daemontools restarts a
+service that exits, but never one that is merely wedged. Run it from `/etc/crontab`
+as root (that file needs a user column; user crontabs do not).
+
+Production is deployed with `/usr/local/bin/update_yopenedi` on the server, which
+pulls the release artifacts -- its version number must be bumped for each release.
 
 ### Encoding
 
