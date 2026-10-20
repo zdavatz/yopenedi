@@ -48,6 +48,7 @@ public class InvoiceItem {
     public String deliveryOrderItemId; // Like line number, e.g. 1
 
     public String taxType;
+    public String taxCategory; // e.g. "standard_rate", "exemption"
     public Float taxRate; // e.g. 0.19 means 19%
     public Float taxAmount;
 
@@ -121,6 +122,8 @@ public class InvoiceItem {
                     processDeliveryReference(er, se);
                 } else if (name.equals("TAX_TYPE")) {
                     this.taxType = nextStringOrNull(er);
+                } else if (name.equals("TAX_CATEGORY")) {
+                    this.taxCategory = nextStringOrNull(er);
                 } else if (name.equals("TAX")) {
                     try {
                         this.taxRate = Float.parseFloat(nextStringOrNull(er));

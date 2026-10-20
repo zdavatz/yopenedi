@@ -23,6 +23,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import static com.ywesee.java.yopenedi.converter.Utility.*;
 
@@ -39,11 +41,18 @@ public class Invoice implements Writable, MessageExchange<Party> {
 
     public String taxType; // e.g. "VAT"
     public String taxRate; // "19" means 19%;
+    public String taxCategory; // UN/ECE 5305, e.g. "S" = standard rate
     public String currencyCode;
 
     public Date dateWithDiscount;
     public Date dateWithoutDiscount;
     public BigDecimal discountPercentage; // "3" means 3%
+
+    // Supplier's bank account, for PAI / FII in SG8
+    public String accountHolder;
+    public String iban;
+    public String bic;
+    public String bankCountry;
 
     public ArrayList<Party> parties = new ArrayList<>();
     public ArrayList<InvoiceItem> invoiceItems = new ArrayList<>();
@@ -203,6 +212,14 @@ public class Invoice implements Writable, MessageExchange<Party> {
         }
 
 //        invoic.setFTXFreeText() // TODO: what to put in free text?
+        // EN 16931 (FEGIME, 1.6): an order reference goes on the header when it is valid for
+        // the whole invoice, otherwise on the items, but never on both.
+        boolean orderReferenceOnItems = this.invoiceItems.stream()
+                .map(ii -> ii.buyerOrderId)
+                .filter(id -> notNullOrEmpty(id))
+                .distinct()
+                .count() > 1;
+
         ArrayList<SegmentGroup1> sg1s = new ArrayList<>();
 
         if (notNullOrEmpty(this.deliveryNoteNumber)) {
@@ -234,7 +251,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
             sg1s.add(sg1);
         }
 
-        if (notNullOrEmpty(this.orderNumberForCustomer)) {
+        if (notNullOrEmpty(this.orderNumberForCustomer) && !orderReferenceOnItems) {
             SegmentGroup1 sg1 = new SegmentGroup1();
             RFFReference r = new RFFReference();
             segmentCount++;
@@ -354,6 +371,9 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 SegmentGroup5 sg5 = new SegmentGroup5();
                 CTAContactInformation contactInfo = new CTAContactInformation();
                 segmentCount++;
+                if (p.role == Party.Role.Supplier) {
+                    contactInfo.setE3139ContactFunctionCoded("AP");
+                }
                 C056DepartmentOrEmployeeDetails c056 = new C056DepartmentOrEmployeeDetails();
                 c056.setE3412DepartmentOrEmployee(leftWithUmlautAsDouble(cd.name, 35));
                 contactInfo.setC056DepartmentOrEmployeeDetails(c056);
@@ -409,6 +429,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
             C243DutyTaxFeeDetail c243 = new C243DutyTaxFeeDetail();
             c243.setE5278DutyTaxFeeRate(leftWithUmlautAsDouble(this.taxRate, 17));
             taxDetails.setC243DutyTaxFeeDetail(c243);
+            taxDetails.setE5305DutyTaxFeeCategoryCoded(this.taxCategory);
             sg6.setTAXDutyTaxFeeDetails(taxDetails);
             sg6s.add(sg6);
             invoic.setSegmentGroup6(sg6s);
@@ -434,22 +455,12 @@ public class Invoice implements Writable, MessageExchange<Party> {
 
         // 1 = Basic, Payment conditions normally applied.
         // 3 = Fixed date
-        patPaymentTermsBasis.setE4279PaymentTermsTypeQualifier("1");
+        patPaymentTermsBasis.setE4279PaymentTermsTypeQualifier(this.dateWithoutDiscount != null ? "3" : "1");
         sg8.setPATPaymentTermsBasis(patPaymentTermsBasis);
 
         {
             DateFormat df = new SimpleDateFormat("yyyyMMdd");
             ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
-            if (this.dateWithDiscount != null) {
-                DTMDateTimePeriod dtm = new DTMDateTimePeriod();
-                segmentCount++;
-                C507DateTimePeriod c507 = new C507DateTimePeriod();
-                c507.setE2005DateTimePeriodQualifier("12"); // With discount
-                c507.setE2379DateTimePeriodFormatQualifier("102");
-                c507.setE2380DateTimePeriod(df.format(this.dateWithDiscount));
-                dtm.setC507DateTimePeriod(c507);
-                dtms.add(dtm);
-            }
             if (this.dateWithoutDiscount != null) {
                 DTMDateTimePeriod dtm = new DTMDateTimePeriod();
                 segmentCount++;
@@ -457,6 +468,16 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 c507.setE2005DateTimePeriodQualifier("13"); // Without discount
                 c507.setE2379DateTimePeriodFormatQualifier("102");
                 c507.setE2380DateTimePeriod(df.format(this.dateWithoutDiscount));
+                dtm.setC507DateTimePeriod(c507);
+                dtms.add(dtm);
+            }
+            if (this.dateWithDiscount != null) {
+                DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                segmentCount++;
+                C507DateTimePeriod c507 = new C507DateTimePeriod();
+                c507.setE2005DateTimePeriodQualifier("12"); // With discount
+                c507.setE2379DateTimePeriodFormatQualifier("102");
+                c507.setE2380DateTimePeriod(df.format(this.dateWithDiscount));
                 dtm.setC507DateTimePeriod(c507);
                 dtms.add(dtm);
             }
@@ -471,6 +492,32 @@ public class Invoice implements Writable, MessageExchange<Party> {
             c501.setE5482Percentage(this.discountPercentage);
             pcdPercentageDetails.setC501PercentageDetails(c501);
             sg8.setPCDPercentageDetails(pcdPercentageDetails);
+        }
+
+        if (notNullOrEmpty(this.iban)) {
+            PAIPaymentInstructions pai = new PAIPaymentInstructions();
+            segmentCount++;
+            C534PaymentInstructionDetails c534 = new C534PaymentInstructionDetails();
+            c534.setE4461PaymentMeansCoded("42"); // Payment to bank account
+            pai.setC534PaymentInstructionDetails(c534);
+            sg8.setPAIPaymentInstructions(pai);
+
+            FIIFinancialInstitutionInformation fii = new FIIFinancialInstitutionInformation();
+            segmentCount++;
+            fii.setE3035PartyQualifier("RB"); // Receiving financial institution
+            C078AccountIdentification c078 = new C078AccountIdentification();
+            c078.setE3194AccountHolderNumber(leftWithUmlautAsDouble(this.iban, 35));
+            c078.setE31921AccountHolderName(leftWithUmlautAsDouble(this.accountHolder, 35));
+            fii.setC078AccountIdentification(c078);
+            if (notNullOrEmpty(this.bic)) {
+                C088InstitutionIdentification c088 = new C088InstitutionIdentification();
+                c088.setE3433InstitutionNameIdentification(leftWithUmlautAsDouble(this.bic, 11));
+                c088.setE11311CodeListQualifier("25"); // Bank identification
+                c088.setE30551CodeListResponsibleAgencyCoded("5"); // ISO
+                fii.setC088InstitutionIdentification(c088);
+            }
+            fii.setE3207CountryCoded(leftWithUmlautAsDouble(this.bankCountry, 3));
+            sg8.setFIIFinancialInstitutionInformation(fii);
         }
 
         sg8s.add(sg8);
@@ -693,6 +740,16 @@ public class Invoice implements Writable, MessageExchange<Party> {
             if (ii.deliveryDate != null) {
                 DateFormat df = new SimpleDateFormat("yyyyMMdd");
                 ArrayList<DTMDateTimePeriod> dtms = new ArrayList<>();
+                {
+                    DTMDateTimePeriod dtm = new DTMDateTimePeriod();
+                    segmentCount++;
+                    C507DateTimePeriod c507 = new C507DateTimePeriod();
+                    c507.setE2005DateTimePeriodQualifier("35"); // delivery date, EN 16931
+                    c507.setE2379DateTimePeriodFormatQualifier("102");
+                    c507.setE2380DateTimePeriod(df.format(ii.deliveryDate));
+                    dtm.setC507DateTimePeriod(c507);
+                    dtms.add(dtm);
+                }
                 DTMDateTimePeriod dtm = new DTMDateTimePeriod();
                 segmentCount++;
                 C507DateTimePeriod c507 = new C507DateTimePeriod();
@@ -751,7 +808,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                     sg29.setRFFReference(rff);
                     sg29s.add(sg29);
                 }
-                if (notNullOrEmpty(ii.buyerOrderId)) {
+                if (notNullOrEmpty(ii.buyerOrderId) && orderReferenceOnItems) {
                     SegmentGroup29 sg29 = new SegmentGroup29();
                     RFFReference rff = new RFFReference();
                     segmentCount++;
@@ -809,6 +866,7 @@ public class Invoice implements Writable, MessageExchange<Party> {
                 C243DutyTaxFeeDetail c243 = new C243DutyTaxFeeDetail();
                 c243.setE5278DutyTaxFeeRate(leftWithUmlautAsDouble(ii.taxRate, 17));
                 tax.setC243DutyTaxFeeDetail(c243);
+                tax.setE5305DutyTaxFeeCategoryCoded(ii.taxCategory);
                 sg33.setTAXDutyTaxFeeDetails(tax);
                 MOAMonetaryAmount moa = new MOAMonetaryAmount();
                 segmentCount++;
@@ -950,6 +1008,58 @@ public class Invoice implements Writable, MessageExchange<Party> {
         }
         invoic.setSegmentGroup48(sg48s);
 
+        {
+            // EN 16931 (FEGIME, 1.11): tax amount and taxable amount per tax rate
+            LinkedHashMap<String, BigDecimal[]> byRate = new LinkedHashMap<>();
+            for (InvoiceItem ii : this.invoiceItems) {
+                String key = ii.taxType + "|" + ii.taxRate + "|" + ii.taxCategory;
+                BigDecimal[] sums = byRate.computeIfAbsent(key, k -> new BigDecimal[]{BigDecimal.ZERO, BigDecimal.ZERO});
+                if (ii.taxAmount != null) sums[0] = sums[0].add(ii.taxAmount);
+                if (ii.priceLineAmount != null) sums[1] = sums[1].add(ii.priceLineAmount);
+            }
+            if (byRate.size() == 1) {
+                // A single rate takes the amounts of the summary, they are what the totals show.
+                BigDecimal[] sums = byRate.values().iterator().next();
+                if (this.taxAmount != null) sums[0] = this.taxAmount;
+                if (this.netAmountOfItems != null) sums[1] = this.netAmountOfItems;
+            }
+            ArrayList<SegmentGroup50> sg50s = new ArrayList<>();
+            for (Map.Entry<String, BigDecimal[]> e : byRate.entrySet()) {
+                String[] k = e.getKey().split("\\|", -1);
+                SegmentGroup50 sg50 = new SegmentGroup50();
+                TAXDutyTaxFeeDetails tax = new TAXDutyTaxFeeDetails();
+                segmentCount++;
+                tax.setE5283DutyTaxFeeFunctionQualifier("7");
+                C241DutyTaxFeeType c241 = new C241DutyTaxFeeType();
+                c241.setE5153DutyTaxFeeTypeCoded(leftWithUmlautAsDouble(nullIfString(k[0]), 3));
+                tax.setC241DutyTaxFeeType(c241);
+                C243DutyTaxFeeDetail c243 = new C243DutyTaxFeeDetail();
+                c243.setE5278DutyTaxFeeRate(leftWithUmlautAsDouble(nullIfString(k[1]), 17));
+                tax.setC243DutyTaxFeeDetail(c243);
+                tax.setE5305DutyTaxFeeCategoryCoded(nullIfString(k[2]));
+                sg50.setTAXDutyTaxFeeDetails(tax);
+
+                ArrayList<MOAMonetaryAmount> moas = new ArrayList<>();
+                MOAMonetaryAmount taxMoa = new MOAMonetaryAmount();
+                segmentCount++;
+                C516MonetaryAmount taxC516 = new C516MonetaryAmount();
+                taxC516.setE5025MonetaryAmountTypeQualifier("124"); // Tax amount
+                taxC516.setE5004MonetaryAmount(e.getValue()[0]);
+                taxMoa.setC516MonetaryAmount(taxC516);
+                moas.add(taxMoa);
+                MOAMonetaryAmount baseMoa = new MOAMonetaryAmount();
+                segmentCount++;
+                C516MonetaryAmount baseC516 = new C516MonetaryAmount();
+                baseC516.setE5025MonetaryAmountTypeQualifier("125"); // Taxable amount
+                baseC516.setE5004MonetaryAmount(e.getValue()[1]);
+                baseMoa.setC516MonetaryAmount(baseC516);
+                moas.add(baseMoa);
+                sg50.setMOAMonetaryAmount(moas);
+                sg50s.add(sg50);
+            }
+            invoic.setSegmentGroup50(sg50s);
+        }
+
         UNT41 unt41 = new UNT41();
         segmentCount++;
         unt41.setMessageRefNum("1");
@@ -958,6 +1068,11 @@ public class Invoice implements Writable, MessageExchange<Party> {
         interchange.setMessages(Arrays.asList(message41));
 
         factory.toUNEdifact(interchange, new OutputStreamWriter(outputStream, encoding));
+    }
+
+    // The keys of the tax rate groups turn null into "null"
+    static String nullIfString(String s) {
+        return "null".equals(s) ? null : s;
     }
 
     public void write(OutputStream s, Config _config, Charset encoding) throws Exception {

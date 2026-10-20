@@ -39,6 +39,7 @@ public class InvoiceItem {
 
     public String taxType;
     public String taxRate; // e.g. "19"
+    public String taxCategory; // UN/ECE 5305, e.g. "S" = standard rate
     public BigDecimal taxAmount;
 
     public ArrayList<AllowanceOrCharge> allowanceOrCharges = new ArrayList<>();

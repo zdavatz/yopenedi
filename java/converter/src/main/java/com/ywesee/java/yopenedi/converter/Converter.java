@@ -14,7 +14,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
+
+import static com.ywesee.java.yopenedi.converter.Utility.concatStrings;
+import static com.ywesee.java.yopenedi.converter.Utility.notNullOrEmpty;
 
 public class Converter {
     public boolean shouldMergeContactDetails;
@@ -185,20 +190,43 @@ public class Converter {
         i.orderNumberForSupplier = invoice.getSupplierOrderId();
         i.orderDate = invoice.getOrderDate();
         i.taxType = invoice.taxType;
-        i.taxRate = String.valueOf(Float.parseFloat(invoice.taxRate) * 100);
+        i.taxRate = taxRateToPercent(invoice.taxRate);
+        i.taxCategory = taxCategoryToEdifact(invoice.taxCategory, i.taxRate);
         i.currencyCode = invoice.currencyCode;
 
+        // EN 16931: due date (net) and the cash discount term.
+        // Senders pad the list with empty terms (0 days, factor 0), skip those.
+        Integer netDays = null;
         for (PaymentTerm pt : invoice.paymentTerms) {
-            if (pt.discountFactor == null || pt.discountFactor == 0.0f) {
-                i.dateWithoutDiscount = invoice.dateForPaymentTerm(pt);
-            } else if (i.dateWithDiscount == null) {
-                if (pt.discountFactor != 0.0f) {
+            boolean hasDiscount = pt.discountFactor != null && pt.discountFactor > 0.0f;
+            if (!hasDiscount) {
+                if (pt.date == null && (pt.days == null || pt.days <= 0)) continue;
+                int days = pt.days == null ? Integer.MAX_VALUE : pt.days;
+                if (netDays == null || days > netDays) {
+                    netDays = days;
                     i.dateWithoutDiscount = invoice.dateForPaymentTerm(pt);
-                    if (pt.discountFactor != null) {
-                        i.discountPercentage = BigDecimal.valueOf(pt.discountFactor * 10.0f);
-                    }
                 }
+            } else if (i.dateWithDiscount == null) {
+                i.dateWithDiscount = invoice.dateForPaymentTerm(pt);
+                // "3" means 3%; the openTrans spec reads "0.3" as 3%, keep accepting that.
+                float factor = pt.discountFactor < 1.0f ? pt.discountFactor * 10.0f : pt.discountFactor;
+                i.discountPercentage = new BigDecimal(Float.toString(factor)).stripTrailingZeros();
             }
+        }
+
+        i.accountHolder = invoice.accountHolder;
+        if (notNullOrEmpty(invoice.iban)) {
+            i.iban = invoice.iban.replaceAll("\\s", "").toUpperCase();
+        }
+        if (notNullOrEmpty(invoice.bic)) {
+            // Seen in production: "BIC-Code: SMHBDEFFXXX"
+            Matcher m = Pattern.compile("\\b[A-Z]{6}[A-Z0-9]{2}([A-Z0-9]{3})?\\b").matcher(invoice.bic);
+            i.bic = m.find() ? m.group() : invoice.bic.trim();
+        }
+        if (notNullOrEmpty(invoice.bankCountry)) {
+            i.bankCountry = invoice.bankCountry;
+        } else if (i.iban != null && i.iban.length() >= 2) {
+            i.bankCountry = i.iban.substring(0, 2);
         }
 
         if (invoice.totalAmount != null) {
@@ -214,13 +242,71 @@ public class Converter {
                 .map(this::allowanceOrChargesToEdifact)
                 .collect(Collectors.toCollection(ArrayList::new));
 
-        i.parties = invoice.parties.stream()
-                .map(this::partyToEdifact)
-                .collect(Collectors.toCollection(ArrayList::new));
+        i.parties = new ArrayList<>();
+        for (Party party : invoice.parties) {
+            com.ywesee.java.yopenedi.Edifact.Party p = this.partyToEdifact(party);
+            p.contactDetails = invoiceContactDetails(party);
+            i.parties.add(p);
+        }
         i.invoiceItems = invoice.invoiceItems.stream()
                 .map(this::invoiceItemToEdifact)
                 .collect(Collectors.toCollection(ArrayList::new));
         return i;
+    }
+
+    // "0.19" -> "19"
+    static String taxRateToPercent(String rate) {
+        if (!notNullOrEmpty(rate)) return null;
+        return new BigDecimal(rate.trim()).multiply(BigDecimal.valueOf(100)).stripTrailingZeros().toPlainString();
+    }
+
+    // openTrans TAX_CATEGORY -> UN/ECE 5305 duty/tax/fee category, as required by EN 16931.
+    // A positive rate is always "S": in production the sender marks 19% VAT as "exemption".
+    static String taxCategoryToEdifact(String category, String percent) {
+        if (percent != null && new BigDecimal(percent).signum() > 0) return "S";
+        if (category == null) return "Z";
+        switch (category) {
+            case "exemption":
+                return "E";
+            case "reverse_charge":
+                return "AE";
+            case "outside_scope":
+                return "O";
+            default:
+                return "Z";
+        }
+    }
+
+    // EN 16931 wants name, phone and email of the supplier's contact in one CTA,
+    // so contacts take the party's phone / email / fax where they have none of their own.
+    ArrayList<com.ywesee.java.yopenedi.Edifact.ContactDetail> invoiceContactDetails(Party party) {
+        ArrayList<com.ywesee.java.yopenedi.Edifact.ContactDetail> result = new ArrayList<>();
+        for (ContactDetail contactDetail : party.contactDetails) {
+            com.ywesee.java.yopenedi.Edifact.ContactDetail cd = new com.ywesee.java.yopenedi.Edifact.ContactDetail();
+            cd.name = concatStrings(" ", nullIfEmpty(contactDetail.firstName), nullIfEmpty(contactDetail.name));
+            cd.phone = notNullOrEmpty(contactDetail.phone) ? contactDetail.phone : party.phone;
+            cd.email = notNullOrEmpty(contactDetail.email) ? contactDetail.email : party.email;
+            cd.fax = notNullOrEmpty(contactDetail.fax) ? contactDetail.fax : party.fax;
+            result.add(cd);
+        }
+        // As before, the party's own phone / email / fax go into a contact of their own
+        // unless a contact already carries them.
+        boolean needToAddPhone = notNullOrEmpty(party.phone) && result.stream().noneMatch(cd -> party.phone.equals(cd.phone));
+        boolean needToAddEmail = notNullOrEmpty(party.email) && result.stream().noneMatch(cd -> party.email.equals(cd.email));
+        boolean needToAddFax = notNullOrEmpty(party.fax) && result.stream().noneMatch(cd -> party.fax.equals(cd.fax));
+        if (needToAddPhone || needToAddEmail || needToAddFax) {
+            com.ywesee.java.yopenedi.Edifact.ContactDetail cd = new com.ywesee.java.yopenedi.Edifact.ContactDetail();
+            cd.name = party.name;
+            if (needToAddPhone) cd.phone = party.phone;
+            if (needToAddEmail) cd.email = party.email;
+            if (needToAddFax) cd.fax = party.fax;
+            result.add(cd);
+        }
+        return result;
+    }
+
+    static String nullIfEmpty(String s) {
+        return notNullOrEmpty(s) ? s : null;
     }
 
     public com.ywesee.java.yopenedi.Edifact.InvoiceItem invoiceItemToEdifact(InvoiceItem invoiceItem) {
@@ -275,7 +361,10 @@ public class Converter {
         ii.deliveryOrderItemId = invoiceItem.deliveryOrderItemId;
 
         ii.taxType = invoiceItem.taxType;
-        ii.taxRate = Float.toString(invoiceItem.taxRate * 100);
+        if (invoiceItem.taxRate != null) {
+            ii.taxRate = taxRateToPercent(Float.toString(invoiceItem.taxRate));
+        }
+        ii.taxCategory = taxCategoryToEdifact(invoiceItem.taxCategory, ii.taxRate);
         if (invoiceItem.taxAmount != null) {
             ii.taxAmount = BigDecimal.valueOf(invoiceItem.taxAmount);
         }

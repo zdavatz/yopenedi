@@ -35,11 +35,19 @@ public class Invoice {
     public String remitteeIdRef;
 
     public String taxType; // e.g. "VAT"
+    public String taxCategory; // e.g. "standard_rate", "exemption"
     public String taxRate; // "0.19" means 19%
     public String currencyCode;
 
     public ArrayList<Party> parties = new ArrayList<>();
     public ArrayList<InvoiceItem> invoiceItems = new ArrayList<>();
+
+    // PAYMENT/ACCOUNT, the supplier's bank account
+    public String accountHolder;
+    public String iban;
+    public String bic;
+    public String bankName;
+    public String bankCountry;
 
     public Date paymentValueDate;
     public ArrayList<PaymentTerm> paymentTerms = new ArrayList<>();
@@ -196,12 +204,42 @@ public class Invoice {
                     this.remitteeIdRef = nextStringOrNull(er);
                 } else if (name.equals("CURRENCY")) {
                     this.currencyCode = nextStringOrNull(er);
+                } else if (name.equals("ACCOUNT") && this.iban == null) {
+                    processAccount(er, se);
                 }
             }
             if (event.isEndElement()) {
                 EndElement ee = event.asEndElement();
                 String name = ee.getName().getLocalPart();
                 if (name.equals("INVOICE_HEADER")) {
+                    break;
+                }
+            }
+        }
+    }
+
+    void processAccount(XMLEventReader er, StartElement _se) throws XMLStreamException {
+        while (er.hasNext()) {
+            XMLEvent event = er.nextEvent();
+            if (event.isStartElement()) {
+                StartElement se = event.asStartElement();
+                String name = se.getName().getLocalPart();
+                if (name.equals("HOLDER")) {
+                    this.accountHolder = nextStringOrNull(er);
+                } else if (name.equals("BANK_ACCOUNT")) {
+                    this.iban = nextStringOrNull(er);
+                } else if (name.equals("BANK_CODE")) {
+                    this.bic = nextStringOrNull(er);
+                } else if (name.equals("BANK_NAME")) {
+                    this.bankName = nextStringOrNull(er);
+                } else if (name.equals("BANK_COUNTRY")) {
+                    this.bankCountry = nextStringOrNull(er);
+                }
+            }
+            if (event.isEndElement()) {
+                EndElement ee = event.asEndElement();
+                String name = ee.getName().getLocalPart();
+                if (name.equals("ACCOUNT")) {
                     break;
                 }
             }
@@ -302,6 +340,8 @@ public class Invoice {
                 String prefix = se.getName().getPrefix();
                 if (name.equals("ALLOW_OR_CHARGE")) {
                     this.allowanceOrCharges.add(new AllowanceOrCharge(er, se));
+                } else if (prefix.equals("bmecat") && name.equals("TAX_CATEGORY")) {
+                    this.taxCategory = nextStringOrNull(er);
                 } else if (prefix.equals("bmecat") && name.equals("TAX_TYPE")) {
                     this.taxType = nextStringOrNull(er);
                 } else if (prefix.equals("bmecat") && name.equals("TAX")) {
