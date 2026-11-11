@@ -86,9 +86,12 @@ Three layers keep a stuck partner from taking the process down:
    to "wait indefinitely".
 2. **`contexts.blocking-io-dispatcher`** (server) — conversion and result dispatch
    run there, never on Play's default dispatcher, so a slow partner cannot starve
-   the threads that answer requests. The AS2 MDN is returned *before* the result is
-   forwarded downstream; holding the MDN behind that forward is what caused senders
-   to report `SocketTimeoutException: Read timed out`.
+   the threads that answer requests. Since v1.1.18 the AS2 MDN is returned as soon
+   as the order is stored, *before* it is even parsed: Smooks takes 12-14s on a
+   large order, and senders (compacer) hit `Read timed out` and resent. A
+   byte-identical copy of an order received in the last 7 days is stored but not
+   forwarded again. Conversion errors therefore no longer reach the sender as a
+   400; they are only in the log.
 3. **`common.Watchdog`** (email-fetcher) — dumps all thread stacks and halts with
    exit code 3 if a run exceeds `maxRuntime`, so a hang self-documents in the log.
 

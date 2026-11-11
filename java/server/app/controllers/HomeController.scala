@@ -102,56 +102,23 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
       }
     }
 
-    var recipientGLN : String = null
-    val result = retryWithEdifactExtracted(makeStream, (s: InputStream, isRetry) => {
-      // We have to save the file first, and then read from the file, instead of making a new stream from request
-      // otherwise it hits this bug:
-      // http://milyn.996300.n3.nabble.com/Character-Encoding-problem-td1055.html
-      val ediFile = new File(ediOrdersFolder, filename)
+    // Only store the file here and owe the sender nothing but the MDN. Parsing a
+    // large order with Smooks takes 12-14s (49 lines, 11.11.2026); holding the MDN
+    // behind that made compacer hit their read timeout and resend the same order
+    // four times, and every copy was forwarded to the ERP. Conversion and dispatch
+    // now run after the MDN, see processOrderInBackground.
+    val ediFile = new File(ediOrdersFolder, filename)
+    val result: Either[Result, Unit] = makeStream().map { s =>
       val ediOutStream = new FileOutputStream(ediFile)
-      IOUtils.copy(s, ediOutStream)
+      try {
+        IOUtils.copy(s, ediOutStream)
+      } finally {
+        ediOutStream.close()
+        s.close()
+      }
       System.out.println("Received Edifact File path: " + ediFile.getAbsolutePath())
       System.out.println("Edifact File size: " + ediFile.length())
-
-      val outFile = new File(otOrdersFolder, filename)
-      if (outFile.exists() && !outFile.canWrite()) {
-        throw new Exception("Cannot write file to: " + outFile.getAbsolutePath())
-      }
-
-      val er = new EdifactReader()
-      val ediInStream = new FileInputStream(ediFile)
-      val ediOrders = er.run(ediInStream)
-      System.out.println("EDIFACT orders count: " + ediOrders.size())
-      val converter = new Converter(converterConfig)
-      if (ediOrders.size() == 0) {
-        Left(BadRequest("No order found in EDIFACT file."))
-      } else if (ediOrders.size() > 1) {
-        Left(BadRequest("More than 1 order in EDIFACT file."))
-      } else {
-        val otOrder = converter.orderToOpenTrans(ediOrders.get(0))
-        otOrder.isTestEnvironment = isTestEnvironment
-        System.out.println("Opentrans order: " + otOrder.toString())
-
-        val recipient = otOrder.getRecipient()
-        if (recipient != null) {
-          recipientGLN = recipient.id
-        }
-
-        System.out.println("Writing to file: " + outFile.getAbsolutePath())
-        val outStream = new FileOutputStream(outFile)
-        otOrder.write(outStream, converterConfig, StandardCharsets.UTF_8)
-        outStream.flush()
-        outStream.getFD().sync()
-        outStream.close()
-        System.out.println("File written, File size: " + outFile.length())
-        // Deliberately not awaited. Forwarding the order to the downstream partner
-        // must not delay the MDN we owe the sender, or they hit a read timeout
-        // waiting for it. Dispatch failures were already swallowed and never
-        // affected the MDN, so nothing the caller sees changes here.
-        dispatchInBackground(converterConfig, recipientGLN, "ORDERS", otOrder, messageId.getOrElse(""))
-        Right(())
-      }
-    })
+    }
 
     val mic = makeReceivedContentMIC(request)
 
@@ -180,6 +147,7 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
     result match {
       case Left(e) => return e
       case Right(_) =>
+        processOrderInBackground(ediFile, new File(otOrdersFolder, filename), converterConfig, isTestEnvironment, messageId.getOrElse(""))
         val message = new models.Message(
           messageId.getOrElse("MISSING MESSAGE ID"),
           as2From.getOrElse("MISSING as2From"),
@@ -281,14 +249,80 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
       logger.error("Async MDN to " + url + " failed", e)
   }
 
-  private def dispatchInBackground(converterConfig: Config, gln: String, edifactType: String, writable: Writable, messageId: String): Unit = {
+  // A sender that misses our MDN sends the very same interchange again, byte for
+  // byte. Such a copy is stored but not forwarded a second time.
+  private val duplicateWindowMillis = 7L * 24 * 3600 * 1000
+
+  private[controllers] def findEarlierCopy(file: File): Option[File] = {
+    val folder = file.getParentFile()
+    val since = System.currentTimeMillis() - duplicateWindowMillis
+    lazy val content = Files.readAllBytes(file.toPath())
+    Option(folder.listFiles()).getOrElse(Array.empty[File])
+      // Only files received before this one, named yyyy-MM-dd_HHmmss: of two copies
+      // arriving together the first must still go through.
+      .filter(f => f.isFile() && f.getName() < file.getName() && f.length() == file.length() && f.lastModified() >= since)
+      .sortBy(_.lastModified())
+      .find(f => java.util.Arrays.equals(Files.readAllBytes(f.toPath()), content))
+  }
+
+  private def processOrderInBackground(ediFile: File, outFile: File, converterConfig: Config, isTestEnvironment: Boolean, messageId: String): Unit = {
     Future {
-      converterConfig.dispatchResult(gln, edifactType, writable, messageId)
-      System.out.println("Dispatched result")
+      findEarlierCopy(ediFile) match {
+        case Some(earlier) =>
+          System.out.println("Duplicate of " + earlier.getAbsolutePath() + ", not forwarded again: " + ediFile.getAbsolutePath())
+        case None =>
+          convertAndDispatchOrder(ediFile, outFile, converterConfig, isTestEnvironment, messageId)
+      }
     }(blockingEc).onComplete {
       case Success(_) => ()
-      case Failure(e) => logger.error("Dispatching " + edifactType + " result failed", e)
+      case Failure(e) => logger.error("Processing order " + ediFile.getAbsolutePath() + " failed", e)
     }(blockingEc)
+  }
+
+  private def convertAndDispatchOrder(ediFile: File, outFile: File, converterConfig: Config, isTestEnvironment: Boolean, messageId: String): Unit = {
+    def readOrders(): java.util.List[com.ywesee.java.yopenedi.Edifact.Order] = {
+      val in = new FileInputStream(ediFile)
+      try new EdifactReader().run(in) finally in.close()
+    }
+    var ediOrders = readOrders()
+    if (ediOrders.size() == 0) {
+      // Some senders wrap the interchange in other content
+      logger.info("Retrying by extracting EDIFACT from " + ediFile.getAbsolutePath())
+      val in = new FileInputStream(ediFile)
+      val extracted = try extractedEdifact(in) finally in.close()
+      extracted.foreach { line =>
+        FileUtils.writeStringToFile(ediFile, line, StandardCharsets.UTF_8)
+        ediOrders = readOrders()
+      }
+    }
+    System.out.println("EDIFACT orders count: " + ediOrders.size())
+    if (ediOrders.size() != 1) {
+      logger.error("Expected 1 order in EDIFACT file, found " + ediOrders.size() + ": " + ediFile.getAbsolutePath())
+      return
+    }
+    if (outFile.exists() && !outFile.canWrite()) {
+      throw new Exception("Cannot write file to: " + outFile.getAbsolutePath())
+    }
+    val converter = new Converter(converterConfig)
+    val otOrder = converter.orderToOpenTrans(ediOrders.get(0))
+    otOrder.isTestEnvironment = isTestEnvironment
+    System.out.println("Opentrans order: " + otOrder.toString())
+
+    val recipient = otOrder.getRecipient()
+    val recipientGLN = if (recipient != null) recipient.id else null
+
+    System.out.println("Writing to file: " + outFile.getAbsolutePath())
+    val outStream = new FileOutputStream(outFile)
+    try {
+      otOrder.write(outStream, converterConfig, StandardCharsets.UTF_8)
+      outStream.flush()
+      outStream.getFD().sync()
+    } finally {
+      outStream.close()
+    }
+    System.out.println("File written, File size: " + outFile.length())
+    converterConfig.dispatchResult(recipientGLN, "ORDERS", otOrder, messageId)
+    System.out.println("Dispatched result")
   }
 
   def makeReceivedContentMIC(request: Request[AnyContent]): String = {
@@ -500,26 +534,6 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
   // Sometimes Play fails to parse request, e.g. it doesn't understand
   // the request when multipart boundary has "="
   // We retry when the stream fails, by manually extracting the EDIFACT out of the request body
-  private def retryWithEdifactExtracted[A, B](mkStream: () => Either[A, InputStream], op: (InputStream, Boolean) => Either[A, B]): Either[A, B] = {
-    mkStream().flatMap { s =>
-      val result = op(s, false)
-      result match {
-        case Right(a) => Right(a)
-        case Left(_) =>
-          logger.info("Retrying by extracting EDIFACT from request body")
-          mkStream().flatMap { s =>
-            var ediLine: Option[String] = extractedEdifact(s)
-            ediLine match {
-              case Some(l) => op(IOUtils.toInputStream(l, "UTF-8"), true)
-              case None =>
-                logger.error("Cannot find EDIFACT from request body")
-                op(IOUtils.toInputStream("", "UTF-8"), true)
-            }
-          }
-      }
-    }
-  }
-
   private def extractedEdifact(s: InputStream): Option[String] = {
     val it = IOUtils.lineIterator(s, "UTF-8")
     while (it.hasNext()) {

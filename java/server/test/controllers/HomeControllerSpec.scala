@@ -31,7 +31,7 @@ class HomeControllerSpec extends PlaySpec with GuiceOneAppPerTest with Injecting
     }
 
     "render the index page from the router" in {
-      val request = FakeRequest(GET, "/")
+      val request = FakeRequest(GET, "/").withHeaders(HOST -> "localhost:9000")
       val home = route(app, request).get
 
       status(home) mustBe OK
