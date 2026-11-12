@@ -254,15 +254,30 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
   private val duplicateWindowMillis = 7L * 24 * 3600 * 1000
 
   private[controllers] def findEarlierCopy(file: File): Option[File] = {
-    val folder = file.getParentFile()
-    val since = System.currentTimeMillis() - duplicateWindowMillis
-    lazy val content = Files.readAllBytes(file.toPath())
-    Option(folder.listFiles()).getOrElse(Array.empty[File])
-      // Only files received before this one, named yyyy-MM-dd_HHmmss: of two copies
-      // arriving together the first must still go through.
-      .filter(f => f.isFile() && f.getName() < file.getName() && f.length() == file.length() && f.lastModified() >= since)
-      .sortBy(_.lastModified())
-      .find(f => java.util.Arrays.equals(Files.readAllBytes(f.toPath()), content))
+    // Read through java.io like the rest of this controller. In production the
+    // process runs in /var/www/yopenedi.ch while user.dir points into the dist
+    // folder; java.nio resolves the relative "./edifact_orders" against user.dir and
+    // found nothing (NoSuchFileException, 12.11.2026).
+    def readBytes(f: File): Array[Byte] = {
+      val in = new FileInputStream(f)
+      try IOUtils.toByteArray(in) finally in.close()
+    }
+    try {
+      val folder = file.getParentFile()
+      val since = System.currentTimeMillis() - duplicateWindowMillis
+      lazy val content = readBytes(file)
+      Option(folder.listFiles()).getOrElse(Array.empty[File])
+        // Only files received before this one, named yyyy-MM-dd_HHmmss: of two copies
+        // arriving together the first must still go through.
+        .filter(f => f.isFile() && f.getName() < file.getName() && f.length() == file.length() && f.lastModified() >= since)
+        .sortBy(_.lastModified())
+        .find(f => java.util.Arrays.equals(readBytes(f), content))
+    } catch {
+      // The check must never cost an order: when in doubt, forward it.
+      case e: Exception =>
+        logger.error("Duplicate check failed for " + file.getAbsolutePath() + ", processing it anyway", e)
+        None
+    }
   }
 
   private def processOrderInBackground(ediFile: File, outFile: File, converterConfig: Config, isTestEnvironment: Boolean, messageId: String): Unit = {
@@ -291,7 +306,8 @@ class HomeController @Inject()(cc: ControllerComponents, config: Configuration, 
       val in = new FileInputStream(ediFile)
       val extracted = try extractedEdifact(in) finally in.close()
       extracted.foreach { line =>
-        FileUtils.writeStringToFile(ediFile, line, StandardCharsets.UTF_8)
+        val out = new FileOutputStream(ediFile)
+        try out.write(line.getBytes(StandardCharsets.UTF_8)) finally out.close()
         ediOrders = readOrders()
       }
     }

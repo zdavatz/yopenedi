@@ -66,5 +66,18 @@ class AS2Spec extends PlaySpec with GuiceOneAppPerTest with Injecting {
 
       controller.findEarlierCopy(other) mustBe None
     }
+
+    // 12.11.2026: an unreadable earlier file threw, and the order was not processed at all
+    "process the order when an earlier file cannot be read" in {
+      val controller = inject[HomeController]
+      val earlier = write("2026-11-14_080000", "UNA:+.? 'UNB+lost'")
+      val order = write("2026-11-14_090000", "UNA:+.? 'UNB+lost'")
+      earlier.setReadable(false)
+      try {
+        controller.findEarlierCopy(order) mustBe None
+      } finally {
+        earlier.setReadable(true)
+      }
+    }
   }
 }
