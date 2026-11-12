@@ -101,6 +101,32 @@ as root (that file needs a user column; user crontabs do not).
 
 Production is deployed with `/usr/local/bin/update_yopenedi` on the server, which
 pulls the release artifacts -- its version number must be bumped for each release.
+Never build on the server: pushing a tag makes `.github/workflows/release.yml` build
+and attach the three artifacts. Build and test locally first.
+
+### Production server pitfalls
+
+- The Play server runs in `/var/www/yopenedi.ch`, but its start script sets
+  `user.dir` to the dist folder. `java.io.File` resolves the relative
+  `./edifact_orders` against the process cwd (where the files are), `java.nio`
+  (`Files.*`, `File.toPath()`) against `user.dir` (where they are not), and
+  `getAbsolutePath()` in the log shows the wrong folder. Use `java.io` streams in the
+  server; 1.1.18 used `Files.readAllBytes` and dropped an order with
+  `NoSuchFileException` (fixed in 1.1.19).
+- Logs are in `/etc/service/prod.yopenedi.ch/log/main/current` (pipe through
+  `tai64nlocal`), not `logs/application.log`, which stays empty.
+- `AllowedHostsFilter` only accepts `localhost:9000`, `.yopenedi.ch` and the IP:
+  server tests need `HOST -> "localhost:9000"`.
+- Smooks 1.7.1 cannot *read* EDIFACT on JDK 21 (`java.lang.Compiler` is gone); run
+  tests with JDK 17, like CI and production.
+
+### Invoices: EN 16931
+
+FEGIME requires EN 16931 data in EDI-INVOIC from November 2026 (rejects from January
+2027); see the table in README.md. Added in 1.1.17 in `Edifact.Invoice` and
+`converter.Converter.invoiceToEdifact`, covered by `InvoiceEN16931Test` with a
+synthetic invoice (never commit partner data as fixtures). The payment term mapping
+used to write the invoice date as due date and 3% discount as `PCD+12:30`.
 
 ### Encoding
 

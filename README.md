@@ -29,6 +29,37 @@ Focus on the opening [UNH/UNT](https://user-images.githubusercontent.com/4953/82
 * https://stackoverflow.com/questions/42390232/edi-as2-http-trace
 * https://docs.axway.com/bundle/B2Bi_230_AdministratorsGuide_allOS_en_HTML5/page/Content/Transports/Secure_file/curl_tool.htm
 
+## Invoices: EN 16931 (FEGIME)
+FEGIME checks incoming EDI-INVOIC against EN 16931 from November 2026 and rejects
+incomplete invoices from January 2027 (technical appendix "EDILEKTRO-INVOIC / EN 16931",
+October 2026). Since 1.1.17 the OpenTrans -> EDIFACT INVOIC conversion writes:
+
+| Appendix | Segment | Content |
+|---|---|---|
+| 1.3 | `CTA+AP` / `COM` | supplier contact with phone and email |
+| 1.4 | `PAT+3`, `DTM+13`, `DTM+12`, `PCD+12` | net due date, discount date and percentage |
+| 1.5 | `PAI+::42`, `FII+RB` | IBAN, account holder, BIC from `PAYMENT/ACCOUNT` |
+| 1.6 | `RFF+ON` | order reference on the header *or* the items, never both |
+| 1.8 | `DTM+35` per item | delivery date |
+| 1.9 | `TAX+7+VAT+++:::19+S` | tax category; `S` for any positive rate |
+| 1.11 | SG50 `TAX` + `MOA+124/125` | tax and taxable amount per rate |
+
+Janico's ERP marks 19% VAT as `TAX_CATEGORY=exemption`; the converter writes `S` for
+any positive rate regardless. `java/converter/src/test/.../InvoiceEN16931Test.java`
+covers every row of the table.
+
+## Releases
+Pushing a tag (`git tag 1.1.19 && git push origin 1.1.19`) makes the GitHub Action build
+`yopenedi-1.0-SNAPSHOT.zip`, `email-fetcher-1.0-all.jar` and `cli-1.0-all.jar` and attach
+them to the release. Nothing is built on the server: bump the version in
+`/usr/local/bin/update_yopenedi` there and run it, it downloads the release and restarts
+the service.
+
+## Certificates
+The server only uses the Let's Encrypt TLS certificate of prod.yopenedi.ch. There is no
+separate AS2 certificate: `cert` / `private-key` are commented out in
+`server/conf/application.conf`, so MDNs go out unsigned.
+
 ## Certbot for Ubuntu 20.04
 * https://certbot.eff.org/lets-encrypt/ubuntufocal-other
 * `certbot certonly --server https://acme-v02.api.letsencrypt.org/directory --manual --preferred-challenges dns -d 'test.yopenedi.ch'`
@@ -52,10 +83,15 @@ guard against a stuck partner taking the server down:
   -Dyopenedi.writeTimeout=120    -Dyopenedi.http.readTimeout=120
   -Dyopenedi.maxRuntime=1800     # email-fetcher run limit, 0 disables
   ```
-* **The AS2 MDN is returned before the order is forwarded downstream.** Conversion and
-  result dispatch run on a dedicated pool (`contexts.blocking-io-dispatcher`) so they
-  cannot starve the threads that answer requests. Holding the MDN behind the downstream
-  forward is what made senders report `SocketTimeoutException: Read timed out`.
+* **The AS2 MDN is returned as soon as the order is stored** (since 1.1.18), before it
+  is parsed. Smooks needs 12-14s for a large order; senders with a 10s read timeout
+  (compacer) gave up and resent, and every copy reached the ERP. Conversion and result
+  dispatch run afterwards on a dedicated pool (`contexts.blocking-io-dispatcher`) so
+  they cannot starve the threads that answer requests. A file without exactly one order
+  is therefore only logged, the sender no longer gets a 400.
+* **Resent orders are forwarded once.** A byte-identical copy of an order received in
+  the last 7 days is stored in `edifact_orders` but not converted or forwarded again
+  (log line `Duplicate of ...`). If the check itself fails, the order is processed.
 * **A health check covers the supervisor gap.** Add `java/scripts/yopenedi-healthcheck.sh`
   to `/etc/crontab`; after three consecutive non-responses it takes a thread dump and
   restarts the service. Note the user column -- `/etc/crontab` requires it and user
